@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 만능 인코더 & 디코더 (이미지/텍스트 변환)</title>
+    <meta name="description"
+        content="이미지를 Base64 코드로 변환하거나 텍스트를 Base64로 인코딩/디코딩하세요. UTF-8 한글 지원, HTML/CSS 코드 자동 생성. 서버 전송 없는 안전한 무료 툴.">
+    <meta name="keywords"
+        content="Base64변환, 이미지Base64, Base64인코딩, Base64디코딩, DataURI생성, Base64Encoder, Base64Decoder, 개발자도구, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Base64 All-in-One Converter ⚡">
+    <meta property="og:description" content="텍스트, 이미지 무엇이든 Base64로 즉시 변환! 100% 브라우저 처리로 안전합니다.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_base64.png">
+
+    <style>
+        /* Theme: Cyberpunk Dark (Dark Grey + Neon Mint) */
+        :root {
+            --bg: #121212;
+            --card-bg: #1E1E1E;
+            --primary: #00E676;
+            /* Neon Mint */
+            --primary-hover: #00C853;
+            --secondary: #292929;
+            --text-main: #E0E0E0;
+            --text-muted: #9E9E9E;
+            --border: #333333;
+            --error: #FF5252;
+            --success: #00E676;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-home {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .nav-home:hover {
+            color: var(--primary);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0;
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: rgba(0, 230, 118, 0.05);
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.1) inset;
+        }
+
+        /* CONTENT AREA */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background-color: #000;
+            color: var(--primary);
+            border: 1px solid var(--border);
+            padding: 15px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+        }
+
+        textarea::placeholder {
+            color: #555;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background-color: var(--secondary);
+            color: white;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background-color: #424242;
+            border-color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #000;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+        }
+
+        /* Image Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            padding: 40px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.02);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background-color: rgba(0, 230, 118, 0.05);
+        }
+
+        .drop-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .drop-text {
+            color: var(--text-main);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .security-badge {
+            display: inline-block;
+            background: #263238;
+            color: #80CBC4;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        /* Image Result */
+        .img-preview-box {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .img-preview-box img {
+            max-width: 100%;
+            max-height: 300px;
+        }
+
+        .code-options {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .code-opt-btn {
+            padding: 8px 12px;
+            background: #000;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .code-opt-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .result-box {
+            position: relative;
+        }
+
+        .copy-overlay-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 230, 118, 0.9);
+            color: black;
+            border: none;
+            padding: 5px 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* Ad & Footer */
+        .ad-banner {
+            background-color: #000;
+            border: 1px solid #333;
+            color: #444;
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.8rem;
+        }
+
+        .seo-section {
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <a href="index.html" class="nav-home">← DEV_TOOLS</a>
+            </div>
+            <h1>Base64 Converter</h1>
+            <div class="subtitle">Secure, Client-side Encoding & Decoding</div>
+        </header>
+
+        <!-- Ad: Top -->
+
+
+        <div class="tabs">
+            <div class="tab-btn active" onclick="switchTab('text')">TXT ↔ Base64</div>
+            <div class="tab-btn" onclick="switchTab('image')">IMG → Base64</div>
+        </div>
+
+        <!-- TAB 1: TEXT -->
+        <div id="tab-text" class="content-section active">
+            <div class="card">
+                <textarea id="txt-input" placeholder="Type text here... (UTF-8 Supported)"></textarea>
+
+                <div class="action-row">
+                    <button class="btn btn-primary" onclick="txtEncode()">ENCODE (▼)</button>
+                    <button class="btn" onclick="txtDecode()">DECODE (▲)</button>
+                    <button class="btn" onclick="document.getElementById('txt-input').value=''">CLEAR</button>
+                </div>
+
+                <textarea id="txt-output" readonly placeholder="Result will appear here..."></textarea>
+                <button class="btn" style="width:100%; margin-top:10px;" onclick="copyResult('txt-output')">COPY
+                    RESULT</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: IMAGE -->
+        <div id="tab-image" class="content-section">
+            <div class="card">
+                <div class="drop-zone" id="drop-zone">
+                    <div class="drop-icon">📁</div>
+                    <div class="drop-text">Drag & Drop Image Here</div>
+                    <div style="font-size:0.85rem; color:#888;">or Click to Browse</div>
+                    <input type="file" id="file-input" accept="image/*" style="display:none;">
+
+                    <div class="security-badge">🔒 100% Client-side. No Server Upload.</div>
+                </div>
+            </div>
+
+            <div class="card" id="img-result-area" style="display:none;">
+                <div class="img-preview-box">
+                    <img id="img-preview" src="" alt="Preview">
+                </div>
+
+                <div class="code-options">
+                    <button class="code-opt-btn active" onclick="setImageMode('raw')">Raw String</button>
+                    <button class="code-opt-btn" onclick="setImageMode('html')">&lt;img&gt; Tag</button>
+                    <button class="code-opt-btn" onclick="setImageMode('css')">CSS Background</button>
+                </div>
+
+                <div class="result-box">
+                    <textarea id="img-output" readonly style="height:100px; color:#aaa;"></textarea>
+                    <button class="copy-overlay-btn" onclick="copyResult('img-output')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="seo-section">
+            <h3>Why use this tool?</h3>
+            <p>
+                This <strong>Base64 All-in-One Converter</strong> performs all encoding and decoding operations locally
+                in your browser.
+                Unlike server-based tools, your images never leave your device, ensuring maximum privacy and speed.
+                Perfect for developers needing `Data URI` generation for CSS or rapid prototyping.
+            </p>
+            <p>Supported features: <strong>UTF-8 Text Encoding</strong> (Korean/Emoji safe), <strong>Image directly to
+                    Base64</strong>, and one-click copying for HTML/CSS formats.</p>
+        </div>
+
+        <!-- Ad: Bottom -->
+
+    </div>
+
+    <script>
+        // --- TABS ---
+        function switchTab(mode) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(c => c.classList.remove('active'));
+
+            if (mode === 'text') {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+                document.getElementById('tab-text').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                document.getElementById('tab-image').classList.add('active');
+            }
+        }
+
+        // --- TEXT LOGIC ---
+        // UTF-8 Clean Handling
+        function utf8_to_b64(str) {
+            return window.btoa(unescape(encodeURIComponent(str)));
+        }
+
+        function b64_to_utf8(str) {
+            return decodeURIComponent(escape(window.atob(str)));
+        }
+
+        function txtEncode() {
+            const input = document.getElementById('txt-input').value;
+            if (!input) return;
+            try {
+                const res = utf8_to_b64(input);
+                document.getElementById('txt-output').value = res;
+            } catch (e) {
+                alert("Encoding Error: " + e.message);
+            }
+        }
+
+        function txtDecode() {
+            const input = document.getElementById('txt-input').value.trim();
+            if (!input) return;
+            try {
+                const res = b64_to_utf8(input);
+                document.getElementById('txt-output').value = res;
+            } catch (e) {
+                alert("Invalid Base64 String.\nMake sure you pasted the full code.");
+            }
+        }
+
+        // --- IMAGE LOGIC ---
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        let currentB64 = "";
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) processFile(files[0]);
+        });
+
+        function handleFileSelect(e) {
+            if (e.target.files.length) processFile(e.target.files[0]);
+        }
+
+        function processFile(file) {
+            if (!file.type.match('image.*')) {
+                alert("Please select an image file.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                currentB64 = e.target.result;
+                document.getElementById('img-preview').src = currentB64;
+                document.getElementById('img-result-area').style.display = 'block';
+
+                // Reset mode to raw
+                setImageMode('raw');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setImageMode(mode) {
+            // Update Buttons
+            document.querySelectorAll('.code-opt-btn').forEach(b => b.classList.remove('active'));
+            // Find button by text content or index logic (simple fix: usage order)
+            if (mode === 'raw') document.querySelectorAll('.code-opt-btn')[0].classList.add('active');
+            if (mode === 'html') document.querySelectorAll('.code-opt-btn')[1].classList.add('active');
+            if (mode === 'css') document.querySelectorAll('.code-opt-btn')[2].classList.add('active');
+
+            const out = document.getElementById('img-output');
+            if (mode === 'raw') out.value = currentB64;
+            else if (mode === 'html') out.value = `<img src="${currentB64}" alt="Base64 Image" />`;
+            else if (mode === 'css') out.value = `background-image: url('${currentB64}');`;
+        }
+
+        // --- COMMON ---
+        function copyResult(id) {
+            const el = document.getElementById(id);
+            if (!el.value) return;
+            el.select();
+            document.execCommand('copy');
+
+            // Visual feedback could be added here, but simplicity is key
+            alert("Copied to clipboard!");
+        }
+
+    </script>
+</body>
+
+</html>

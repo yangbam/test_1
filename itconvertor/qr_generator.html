@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator - 무료 QR코드 생성기 (URL, WiFi)</title>
+    <meta name="description"
+        content="URL 링크, 텍스트, 와이파이(WiFi) 접속용 QR코드를 무료로 생성하세요. 색상 커스텀 및 PNG 고화질 다운로드 제공. 매장 와이파이 비번 공유에 최적화.">
+    <meta name="keywords"
+        content="QR Code Generator, 무료 QR 생성기, WiFi QR Code, 와이파이 QR, 매장용 QR코드, QR Maker, QR코드 만들기, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="만능 QR코드 생성기 (URL/WiFi) 📱">
+    <meta property="og:description" content="카페/매장 와이파이, 비밀번호 입력 없이 QR 스캔 한 번으로 접속! 지금 바로 만들어보세요.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_qr.png">
+
+    <!-- Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338ca;
+            --bg: #F3F4F6;
+            --panel-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-sub: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-home {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            margin-top: 5px;
+            font-size: 0.95rem;
+        }
+
+        /* Main Card */
+        .card {
+            background: var(--panel-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-sub);
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            bottom: -2px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-main);
+            transition: 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Color Pickers */
+        .color-options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="color"] {
+            border: none;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+        }
+
+        /* Output Area */
+        .output-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border);
+            margin-top: 20px;
+        }
+
+        #qrcode {
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 20px;
+        }
+
+        #qrcode img {
+            display: block;
+        }
+
+        /* Fix layout */
+
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--bg);
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background-color: #ECFDF5;
+            color: #065F46;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .tip-box strong {
+            margin-right: 5px;
+        }
+
+        /* Ad Banner */
+        .ad-banner {
+            background-color: #E5E7EB;
+            color: #6B7280;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 0.85rem;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        @media (max-width: 600px) {
+            .tabs {
+                justify-content: space-between;
+            }
+
+            .tab-btn {
+                flex: 1;
+                padding: 10px 5px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="nav-home">← IT TOOLS</a>
+            <h1>QR Code Generator</h1>
+            <div class="subtitle">Create custom QR codes for Links & WiFi instantly.</div>
+        </header>
+
+        <div class="card">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="setMode('url')">URL / Text</button>
+                <button class="tab-btn" onclick="setMode('wifi')">WiFi Access</button>
+            </div>
+
+            <!-- WiFi Tip -->
+            <div id="wifi-tip" class="tip-box">
+                <strong>💡 Tip:</strong> 매장 카운터나 테이블에 붙여두세요! 손님들이 카메라만 켜면 비밀번호 입력 없이 바로 와이파이에 연결됩니다.
+            </div>
+
+            <!-- Input: URL -->
+            <div id="form-url">
+                <div class="form-group">
+                    <label>Content (URL or Text)</label>
+                    <input type="text" id="input-text" placeholder="https://example.com" value="https://Yangbam-lab.com"
+                        oninput="generateQR()">
+                </div>
+            </div>
+
+            <!-- Input: WiFi -->
+            <div id="form-wifi" style="display:none;">
+                <div class="form-group">
+                    <label>Network Name (SSID)</label>
+                    <input type="text" id="wifi-ssid" placeholder="MyWiFi_5G" oninput="generateQR()">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" id="wifi-pass" placeholder="Password1234" oninput="generateQR()">
+                </div>
+                <div class="form-group">
+                    <label>Security Type</label>
+                    <select id="wifi-type" onchange="generateQR()">
+                        <option value="WPA">WPA/WPA2 (Most Common)</option>
+                        <option value="WEP">WEP</option>
+                        <option value="nopass">No Encryption (Open)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="wifi-hidden" onchange="generateQR()"> Hidden Network (숨겨진 네트워크)
+                    </label>
+                </div>
+            </div>
+
+            <!-- Colors -->
+            <div class="color-options">
+                <div class="color-picker">
+                    <label style="margin:0;">QR Color</label>
+                    <input type="color" id="color-dark" value="#000000" onchange="generateQR()">
+                </div>
+                <div class="color-picker">
+                    <label style="margin:0;">Background</label>
+                    <input type="color" id="color-light" value="#ffffff" onchange="generateQR()">
+                </div>
+            </div>
+
+            <!-- Output -->
+            <div class="output-area">
+                <div id="qrcode"></div>
+
+                <!-- Ad Area inside output flow -->
+
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="downloadQR()">Download PNG 📥</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad: Bottom -->
+
+
+        <footer>
+            &copy; Yangbam Lab. Generated locally in your browser. No data sent to server.
+        </footer>
+    </div>
+
+    <script>
+        let currentMode = 'url';
+        let qrcodeObj = null;
+
+        // Init
+        window.onload = function () {
+            generateQR();
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+
+            // UI Toggle
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (mode === 'url') {
+                document.getElementById('form-url').style.display = 'block';
+                document.getElementById('form-wifi').style.display = 'none';
+                document.getElementById('wifi-tip').style.display = 'none';
+            } else {
+                document.getElementById('form-url').style.display = 'none';
+                document.getElementById('form-wifi').style.display = 'block';
+                document.getElementById('wifi-tip').style.display = 'block';
+            }
+
+            // Clean inputs for better UX? No, keep values.
+            generateQR();
+        }
+
+        function getWifiString() {
+            const ssid = document.getElementById('wifi-ssid').value;
+            const pass = document.getElementById('wifi-pass').value;
+            const type = document.getElementById('wifi-type').value;
+            const hidden = document.getElementById('wifi-hidden').checked;
+
+            if (!ssid) return '';
+
+            // Format: WIFI:S:MySSID;T:WPA;P:MyPass;H:false;;
+            // Order: T (Type), S (SSID), P (Password), H (Hidden)
+            let str = `WIFI:T:${type};S:${ssid};`;
+            if (type !== 'nopass') {
+                str += `P:${pass};`;
+            }
+            if (hidden) {
+                str += `H:true;`;
+            }
+            str += ';';
+            return str;
+        }
+
+        function generateQR() {
+            const container = document.getElementById('qrcode');
+            container.innerHTML = ''; // Clear prev
+
+            let text = '';
+            if (currentMode === 'url') {
+                text = document.getElementById('input-text').value;
+                if (!text) text = 'https://Yangbam-lab.com';
+            } else {
+                text = getWifiString();
+                if (!text) text = 'WIFI:S:Example;T:WPA;P:12345678;;'; // Sample for preview
+            }
+
+            const colorDark = document.getElementById('color-dark').value;
+            const colorLight = document.getElementById('color-light').value;
+
+            // Use library
+            qrcodeObj = new QRCode(container, {
+                text: text,
+                width: 200,
+                height: 200,
+                colorDark: colorDark,
+                colorLight: colorLight,
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function downloadQR() {
+            const img = document.querySelector('#qrcode img');
+            if (img && img.src) {
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = `qrcode_${currentMode}_${Date.now()}.png`;
+                link.click();
+            } else {
+                // Sometimes Canvas is rendered instead of IMG depending on browser support in lib
+                const canvas = document.querySelector('#qrcode canvas');
+                if (canvas) {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL("image/png");
+                    link.download = `qrcode_${currentMode}_${Date.now()}.png`;
+                    link.click();
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

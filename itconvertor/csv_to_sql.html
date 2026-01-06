@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to SQL Converter - 엑셀 데이터를 쿼리로 변환</title>
+    <meta name="description"
+        content="엑셀, CSV 데이터를 붙여넣기만 하면 Insert SQL 쿼리로 자동 변환해줍니다. 문자열/숫자 자동 감지, 테이블명 설정 가능. DBA와 개발자를 위한 필수 도구.">
+    <meta name="keywords"
+        content="CSVtoSQL, ExceltoSQL, 쿼리생성기, Insert문생성, 대량데이터변환, SQLGenerator, 개발자도구, 무료SQL변환, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="CSV to SQL Query Generator 💾">
+    <meta property="og:description" content="엑셀 데이터를 1초 만에 INSERT 쿼리로! 스마트 타입 감지 기능 탑재.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_sql.png">
+
+    <style>
+        /* Theme: Database Dark (Dark Grey + SQL Blue) */
+        :root {
+            --bg: #2B2D31;
+            --panel-bg: #1E1F22;
+            --input-bg: #111214;
+            --text-main: #D1D5DB;
+            --text-muted: #9CA3AF;
+            --accent: #3B82F6;
+            /* SQL Blue */
+            --accent-hover: #2563EB;
+            --border: #40444B;
+            --keyword: #C678DD;
+            /* Purple for SQL keywords */
+            --string: #98C379;
+            /* Green for strings */
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Consolas', 'Monaco', monospace;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-home {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .nav-home:hover {
+            color: var(--accent);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        /* Layout */
+        .workspace {
+            display: flex;
+            flex-grow: 1;
+            gap: 20px;
+            min-height: 0;
+            /* Important for scroll */
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--panel-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 10px 15px;
+            background-color: #232428;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        textarea {
+            flex-grow: 1;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: none;
+            padding: 15px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            white-space: pre;
+        }
+
+        textarea::placeholder {
+            color: #555;
+        }
+
+        /* Options Bar */
+        .options-bar {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 15px;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .opt-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        input[type="text"] {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-weight: bold;
+            width: 150px;
+        }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        /* Output Highlighting (Simple) */
+        #sql-output {
+            color: #abb2bf;
+        }
+
+        /* Ad Banner */
+        .ad-banner {
+            background-color: #111;
+            color: #444;
+            border: 1px solid #333;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        /* SEO Footer */
+        .seo-footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .workspace {
+                flex-direction: column;
+            }
+
+            .panel {
+                height: 400px;
+            }
+
+            .options-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <a href="index.html" class="nav-home">← DEV_TOOLS</a>
+                <h1>CSV to SQL Converter</h1>
+            </div>
+            <div>
+                <!-- Extra/Social links -->
+            </div>
+        </header>
+
+        <div class="options-bar">
+            <div class="opt-group">
+                <label>Table Name:</label>
+                <input type="text" id="table-name" value="my_table">
+            </div>
+
+            <div class="opt-group">
+                <input type="checkbox" id="has-header" checked>
+                <label for="has-header">First Row is Header (Column Names)</label>
+            </div>
+
+            <div style="flex-grow:1;"></div>
+
+            <button class="btn btn-outline" onclick="loadSample()">📄 Load Sample</button>
+            <button class="btn btn-outline" onclick="clearAll()">🗑 Clear</button>
+            <!-- <button class="btn btn-primary" onclick="convert()">▶ Generate SQL</button> -->
+        </div>
+
+        <!-- Ad: Middle -->
+
+
+        <div class="workspace">
+            <!-- INPUT -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span>INPUT (CSV / Excel Paste)</span>
+                    <span style="font-size:0.8rem; opacity:0.7;">Tab/Comma Detected</span>
+                </div>
+                <textarea id="csv-input" placeholder="Paste your Excel or CSV data here..."></textarea>
+            </div>
+
+            <!-- OUTPUT -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span>OUTPUT (SQL Query)</span>
+                    <button class="btn btn-primary" style="padding:4px 10px; font-size:0.8rem;"
+                        onclick="copyOutput()">📋 Copy SQL</button>
+                </div>
+                <textarea id="sql-output" readonly placeholder="INSERT INTO statements will appear here..."></textarea>
+            </div>
+        </div>
+
+        <div class="seo-footer">
+            <p>
+                <strong>Developer's Note:</strong> Simply paste your Excel data (Ctrl+V). This tool automatically
+                detects data types.
+                Strings are wrapped in quotes, numbers are not. Supports `Bulk Insert Generator`, `Excel to MySQL`, `CSV
+                to Oracle` conversions via standard SQL.
+            </p>
+        </div>
+
+        <!-- Ad: Bottom -->
+
+
+    </div>
+
+    <script>
+        const csvInput = document.getElementById('csv-input');
+        const sqlOutput = document.getElementById('sql-output');
+        const tableNameInput = document.getElementById('table-name');
+        const hasHeaderInput = document.getElementById('has-header');
+
+        // Event Listeners for Real-time
+        csvInput.addEventListener('input', convert);
+        tableNameInput.addEventListener('input', convert);
+        hasHeaderInput.addEventListener('change', convert);
+
+        function convert() {
+            const raw = csvInput.value.trim();
+            if (!raw) {
+                sqlOutput.value = '';
+                return;
+            }
+
+            const tableName = tableNameInput.value.trim() || 'my_table';
+            const hasHeader = hasHeaderInput.checked;
+
+            // 1. Split Lines
+            let lines = raw.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length === 0) return;
+
+            // 2. Detect Delimiter (Comma or Tab)
+            // Check first line
+            const firstLine = lines[0];
+            const commaCount = (firstLine.match(/,/g) || []).length;
+            const tabCount = (firstLine.match(/\t/g) || []).length;
+            const delimiter = tabCount >= commaCount ? '\t' : ',';
+
+            // 3. Parse Header
+            let columns = [];
+            let startRow = 0;
+
+            if (hasHeader) {
+                columns = lines[0].split(delimiter).map(c => cleanCell(c));
+                startRow = 1;
+            } else {
+                // Generate col1, col2, ...
+                const firstRowCols = lines[0].split(delimiter).length;
+                for (let i = 1; i <= firstRowCols; i++) columns.push(`col${i}`);
+            }
+
+            // Sanitize Column Names
+            columns = columns.map(c => `\`${c.replace(/[^a-zA-Z0-9_]/g, '_')}\``); // SQL safe backticks
+
+            // 4. Generate Inserts
+            let sql = '';
+
+            for (let i = startRow; i < lines.length; i++) {
+                let cells = lines[i].split(delimiter);
+
+                // Balance cells if row is short
+                while (cells.length < columns.length) cells.push('');
+                // If row is too long, slice
+                cells = cells.slice(0, columns.length);
+
+                const values = cells.map(cell => formatValue(cell));
+
+                sql += `INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${values.join(', ')});\n`;
+            }
+
+            sqlOutput.value = sql;
+        }
+
+        function cleanCell(txt) {
+            // Remove outer quotes if CSV
+            txt = txt.trim();
+            if (txt.startsWith('"') && txt.endsWith('"')) {
+                txt = txt.substring(1, txt.length - 1);
+                txt = txt.replace(/""/g, '"'); // Unescape double quotes
+            }
+            return txt;
+        }
+
+        function formatValue(val) {
+            val = cleanCell(val);
+
+            // Check if NULL
+            if (val.toLowerCase() === 'null') return 'NULL';
+            if (val === '') return "''"; // Empty string
+
+            // Check if Number (and not a phone number starting with 0, unless it's just 0)
+            // Regex for float/int
+            if (/^-?\d*(\.\d+)?$/.test(val)) {
+                // Special case: Leading zeros (e.g. 0101234) should be string 
+                // unless it is exactly "0" or "0.5" etc.
+                if (val.length > 1 && val.startsWith('0') && !val.includes('.')) {
+                    return `'${escapeString(val)}'`;
+                }
+                return val;
+            }
+
+            // Default: String
+            return `'${escapeString(val)}'`;
+        }
+
+        function escapeString(str) {
+            return str.replace(/'/g, "''"); // Escape single quote for SQL
+        }
+
+        function loadSample() {
+            csvInput.value = `id,name,role,salary,is_active\n1,Alice,Manager,75000,true\n2,Bob,"Developer, Senior",68000.50,true\n3,Charlie,Intern,0,false\n007,James Bond,Agent,999999,true`;
+            // Trigger checkbox to likely true
+            hasHeaderInput.checked = true;
+            tableNameInput.value = 'employees';
+            convert();
+        }
+
+        function clearAll() {
+            csvInput.value = '';
+            sqlOutput.value = '';
+            tableNameInput.value = 'my_table';
+        }
+
+        function copyOutput() {
+            if (!sqlOutput.value) return;
+            sqlOutput.select();
+            document.execCommand('copy');
+            alert("SQL Copied to Clipboard! Ready to paste into DB.");
+        }
+
+    </script>
+</body>
+
+</html>

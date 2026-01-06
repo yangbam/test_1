@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>만능 대소문자 변환기 (SNAKE, CAMEL, PASCAL, KEBAB)</title>
+    <meta name="description"
+        content="변수명 고민 끝! 텍스트 하나만 입력하면 CamelCase, Snake_Case, Kebab-Case 등 모든 프로그래밍 네이밍 규칙으로 자동 변환해드립니다.">
+    <meta name="keywords"
+        content="대소문자변환기, 카멜케이스변환, 스네이크케이스변환, 변수명생성기, 개발자네이밍툴, CaseConverter, PascalCase, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="All-in-One Case Converter 🔠">
+    <meta property="og:description" content="코딩할 때 변수명 바꾸기, 더 이상 직접 치지 마세요.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_case.png">
+
+    <style>
+        /* Theme: Deep Grey & Neon Blue/Green */
+        :root {
+            --bg: #1A1A1A;
+            --card-bg: #252525;
+            --input-bg: #333333;
+            --text-main: #ECECEC;
+            --text-sub: #AAAAAA;
+            --accent: #29B6F6;
+            /* Neon Blue */
+            --success: #66BB6A;
+            /* Neon Green */
+            --border: #444444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-home {
+            display: inline-block;
+            margin-bottom: 10px;
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .nav-home:hover {
+            color: var(--accent);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--accent);
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* Input Area */
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        #main-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            background-color: var(--input-bg);
+            border: 2px solid var(--border);
+            color: var(--text-main);
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        #main-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(41, 182, 246, 0.2);
+        }
+
+        /* Result Grid */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .result-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .result-card:hover {
+            transform: translateX(5px);
+            border-color: var(--text-sub);
+        }
+
+        .res-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            overflow: hidden;
+        }
+
+        .res-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .res-value {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 10px;
+            flex-shrink: 0;
+            transition: color 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: #fff;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        /* Ad Banner */
+        .ad-banner {
+            background-color: #000;
+            color: #444;
+            padding: 15px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            border: 1px solid #333;
+        }
+
+        /* SEO Footer */
+        .seo-footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            color: var(--text-sub);
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .tag {
+            color: var(--accent);
+            margin-right: 8px;
+            text-decoration: none;
+        }
+
+        @media (min-width: 600px) {
+            .result-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toast" id="toast">Copied!</div>
+
+    <div class="container">
+        <header>
+            <a href="index.html" class="nav-home">← DEV_TOOLS</a>
+            <h1>Case Converter</h1>
+            <div class="subtitle">camelCase, snake_case, CONSTANT... Real-time!</div>
+        </header>
+
+        <!-- Ad: Top -->
+
+
+        <div class="input-wrapper">
+            <input type="text" id="main-input" placeholder="Enter text (e.g. hello world, user_id)..." autofocus>
+        </div>
+
+        <div class="result-grid" id="result-grid">
+            <!-- Cards will be injected here -->
+        </div>
+
+        <div class="seo-footer">
+            <h3>Optimize Your Workflow</h3>
+            <p>
+                Switching naming conventions manually is tedious. Use this <strong>Universal Case Converter</strong> to
+                instantly transform `strings` into
+                programmatic identifiers. Supports smart tokenization for mixed inputs like `User-Id` or `first_name`.
+                Ideal for migrating DB columns to JSON keys or CSS classes.
+            </p>
+            <div style="margin-top:10px;">
+                <a href="#" class="tag">#VariableGenerator</a>
+                <a href="#" class="tag">#CamelCase</a>
+                <a href="#" class="tag">#SnakeCase</a>
+                <a href="#" class="tag">#KebabCase</a>
+            </div>
+        </div>
+
+        <!-- Ad: Bottom -->
+
+    </div>
+
+    <script>
+        const inputEl = document.getElementById('main-input');
+        const gridEl = document.getElementById('result-grid');
+        const toastEl = document.getElementById('toast');
+
+        // Case Definitions
+        const cases = [
+            { id: 'camel', label: 'camelCase', fn: toCamel },
+            { id: 'pascal', label: 'PascalCase', fn: toPascal },
+            { id: 'snake', label: 'snake_case', fn: toSnake },
+            { id: 'constant', label: 'CONSTANT_CASE', fn: toConstant },
+            { id: 'kebab', label: 'kebab-case', fn: toKebab },
+            { id: 'path', label: 'Path Case', fn: toPath },
+            { id: 'sentence', label: 'Sentence case', fn: toSentence },
+            { id: 'dot', label: 'dot.case', fn: toDot }
+        ];
+
+        // Init - Build Grid
+        cases.forEach(c => {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.innerHTML = `
+                <div class="res-info">
+                    <span class="res-label">${c.label}</span>
+                    <span class="res-value" id="val-${c.id}">...</span>
+                </div>
+                <button class="copy-btn" onclick="copyToClipboard('val-${c.id}')" title="Copy">📋</button>
+            `;
+            gridEl.appendChild(card);
+        });
+
+        // Event Listener
+        inputEl.addEventListener('input', updateAll);
+
+        // Core Logic
+        function parseWords(str) {
+            // Split by space, hyphens, underscores, or transitions from Lower to Upper
+            // "helloWorld" -> "hello", "World"
+            // "user_id" -> "user", "id"
+            if (!str) return [];
+
+            // Replace separators with spaces
+            let cleaner = str.replace(/([a-z])([A-Z])/g, '$1 $2'); // camel to space
+            cleaner = cleaner.replace(/[_\-\/\.]/g, ' '); // separators to space
+
+            // Split and filter empty
+            return cleaner.split(/\s+/).filter(w => w.length > 0);
+        }
+
+        function updateAll() {
+            const raw = inputEl.value;
+            const words = parseWords(raw);
+
+            cases.forEach(c => {
+                const el = document.getElementById(`val-${c.id}`);
+                if (words.length === 0) {
+                    el.innerText = '...';
+                } else {
+                    el.innerText = c.fn(words);
+                }
+            });
+        }
+
+        // --- CONVERTERS ---
+        function toCamel(words) {
+            return words.map((w, i) => {
+                if (i === 0) return w.toLowerCase();
+                return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            }).join('');
+        }
+
+        function toPascal(words) {
+            return words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+        }
+
+        function toSnake(words) {
+            return words.map(w => w.toLowerCase()).join('_');
+        }
+
+        function toConstant(words) {
+            return words.map(w => w.toUpperCase()).join('_');
+        }
+
+        function toKebab(words) {
+            return words.map(w => w.toLowerCase()).join('-');
+        }
+
+        function toPath(words) {
+            return words.map(w => w.toLowerCase()).join('/');
+        }
+
+        function toDot(words) {
+            return words.map(w => w.toLowerCase()).join('.');
+        }
+
+        function toSentence(words) {
+            const sentence = words.map(w => w.toLowerCase()).join(' ');
+            return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+        }
+
+        // --- UTILS ---
+        function copyToClipboard(id) {
+            const val = document.getElementById(id).innerText;
+            if (val === '...') return;
+
+            navigator.clipboard.writeText(val).then(() => {
+                showToast();
+            });
+        }
+
+        function showToast() {
+            toastEl.classList.add('show');
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 1500);
+        }
+
+    </script>
+</body>
+
+</html>

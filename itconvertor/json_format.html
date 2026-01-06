@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON 포맷터 & 변환기 (Validator / Minify / CSV)</title>
+    <meta name="description"
+        content="개발자를 위한 올인원 JSON 도구. JSON 유효성 검사, 예쁘게 정렬(Beautify), 압축(Minify), XML/CSV 변환까지. 데이터베이스 없이 브라우저에서 안전하게 처리하세요.">
+    <meta name="keywords" content="JSON포맷터, JSON검사기, JSON변환기, JSONtoCSV, JSONtoXML, JSONMinify, 개발자도구, 무료웹툴">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="JSON Formatter & Converter 🛠️">
+    <meta property="og:description" content="복잡한 JSON 데이터를 1초 만에 깔끔하게! XML, CSV 변환 기능 포함.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_json.png">
+
+    <!-- PapaParse CDN for CSV conversion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <style>
+        /* Theme: VS Code Dark */
+        :root {
+            --bg: #1e1e1e;
+            --sidebar: #252526;
+            --editor-bg: #1e1e1e;
+            --text-main: #d4d4d4;
+            --text-sub: #858585;
+            --accent: #007acc;
+            /* VS Blue */
+            --accent-hover: #0062a3;
+            --border: #3c3c3c;
+            --error: #f48771;
+            --string: #ce9178;
+            --number: #b5cea8;
+            --key: #9cdcfe;
+            --keyword: #569cd6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: #333333;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-home {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .app-title {
+            font-weight: bold;
+            color: var(--keyword);
+            font-size: 1.1rem;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: var(--sidebar);
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+
+        .btn {
+            background-color: #3c3c3c;
+            color: var(--text-main);
+            border: 1px solid transparent;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #4a4a4a;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Main Editor Area */
+        .editor-container {
+            flex-grow: 1;
+            display: flex;
+            height: calc(100vh - 120px);
+            /* Adjust based on header/toolbar */
+            overflow: hidden;
+        }
+
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            min-width: 0;
+            /* Fix flex layout issue */
+        }
+
+        .editor-pane:last-child {
+            border-right: none;
+        }
+
+        .pane-header {
+            background-color: #2d2d2d;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        textarea {
+            flex-grow: 1;
+            background-color: var(--editor-bg);
+            color: var(--text-main);
+            border: none;
+            resize: none;
+            padding: 15px;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            outline: none;
+        }
+
+        /* Message Area */
+        .status-bar {
+            background-color: var(--accent);
+            color: white;
+            padding: 5px 15px;
+            font-size: 0.85rem;
+        }
+
+        .status-error {
+            background-color: #c0392b;
+        }
+
+        /* AD Slots */
+        .ad-banner {
+            background-color: #252526;
+            color: #555;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* SEO Footer */
+        .seo-footer {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .tag-cloud {
+            margin-top: 10px;
+        }
+
+        .tag {
+            color: var(--keyword);
+            margin-right: 10px;
+            text-decoration: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .editor-pane {
+                height: 400px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            textarea {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ad: Top -->
+    <!-- <div class="ad-banner">AWS Free Tier 가입하기 (광고 Area)</div> -->
+
+    <header>
+        <div class="header-left">
+            <a href="index.html" class="nav-home">←</a>
+            <span class="app-title">JSON Formatter & Converter</span>
+        </div>
+        <div>
+            <!-- GitHub Icon or something could go here -->
+        </div>
+    </header>
+
+    <div class="toolbar">
+        <button class="btn btn-primary" onclick="processJSON('beautify')">✨ Beautify</button>
+        <button class="btn" onclick="processJSON('minify')">📦 Minify</button>
+        <div style="width: 1px; height: 20px; background: #555; margin: 0 5px;"></div>
+        <button class="btn" onclick="responseTo('xml')">To XML</button>
+        <button class="btn" onclick="responseTo('csv')">To CSV</button>
+        <div style="width: 1px; height: 20px; background: #555; margin: 0 5px;"></div>
+        <button class="btn" onclick="loadSample()">📄 Sample</button>
+        <button class="btn" onclick="clearAll()">🗑 Clear</button>
+    </div>
+
+    <div class="editor-container">
+        <!-- Input Pane -->
+        <div class="editor-pane">
+            <div class="pane-header">
+                <span>INPUT (JSON)</span>
+                <span id="input-size" style="font-size:0.75rem;">0 B</span>
+            </div>
+            <textarea id="json-input" placeholder="// Paste your JSON here..." spellcheck="false"></textarea>
+        </div>
+
+        <!-- Output Pane -->
+        <div class="editor-pane">
+            <div class="pane-header">
+                <span>OUTPUT</span>
+                <div>
+                    <button onclick="copyOutput()"
+                        style="background:none; border:none; color:#ccc; cursor:pointer; font-size:0.75rem;">📋
+                        Copy</button>
+                    <button onclick="downloadOutput()"
+                        style="background:none; border:none; color:#ccc; cursor:pointer; font-size:0.75rem; margin-left:10px;">💾
+                        Save</button>
+                </div>
+            </div>
+            <textarea id="json-output" readonly placeholder="// Result will appear here..."
+                spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <div id="status-bar" class="status-bar" style="display:none;">Ready</div>
+
+    <div class="seo-footer">
+        <strong>Developer's Note:</strong>
+        <p>This tool performs all conversions locally in your browser. No data is sent to any server.</p>
+        <div class="tag-cloud">
+            <a href="#" class="tag">#JSONFormatter</a>
+            <a href="#" class="tag">#JSONValidator</a>
+            <a href="#" class="tag">#XMLConverter</a>
+            <a href="#" class="tag">#CSVtoJSON</a>
+            <a href="#" class="tag">#AWSLambdaJSON</a>
+            <a href="#" class="tag">#RESTAPI</a>
+        </div>
+    </div>
+
+    <!-- Ad: Bottom -->
+    <!-- <div class="ad-banner">Google Cloud Platform $300 Credit (광고 Area)</div> -->
+
+    <script>
+        const inputEl = document.getElementById('json-input');
+        const outputEl = document.getElementById('json-output');
+        const statusEl = document.getElementById('status-bar');
+        const inputSizeEl = document.getElementById('input-size');
+
+        // Update Size Label
+        inputEl.addEventListener('input', () => {
+            const bytes = new Blob([inputEl.value]).size;
+            inputSizeEl.innerText = formatBytes(bytes);
+        });
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function showStatus(msg, isError = false) {
+            statusEl.innerText = msg;
+            statusEl.style.display = 'block';
+            statusEl.className = 'status-bar' + (isError ? ' status-error' : '');
+            setTimeout(() => { if (!isError) statusEl.style.display = 'none'; }, 3000);
+        }
+
+        function getJSON() {
+            const raw = inputEl.value.trim();
+            if (!raw) return null;
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                showStatus("Invalid JSON: " + e.message, true);
+                outputEl.value = e.message; // Show error in output too
+                return 'ERROR';
+            }
+        }
+
+        function processJSON(mode) {
+            const json = getJSON();
+            if (json === 'ERROR' || !json) return;
+
+            showStatus("Processing...", false);
+
+            if (mode === 'beautify') {
+                outputEl.value = JSON.stringify(json, null, 2);
+                showStatus("Beautified JSON (2 spaces)", false);
+            } else if (mode === 'minify') {
+                outputEl.value = JSON.stringify(json);
+                showStatus("Minified JSON", false);
+            }
+        }
+
+        function responseTo(format) {
+            const json = getJSON();
+            if (json === 'ERROR' || !json) return;
+
+            if (format === 'xml') {
+                // Simple JSON to XML
+                let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n' + jsonToXml(json) + '</root>';
+                outputEl.value = xml;
+                showStatus("Converted to XML", false);
+            } else if (format === 'csv') {
+                // Check if Array
+                let data = json;
+                if (!Array.isArray(json)) data = [json]; // Force array if convert single object
+
+                try {
+                    const csv = Papa.unparse(data);
+                    outputEl.value = csv;
+                    showStatus("Converted to CSV", false);
+                } catch (e) {
+                    showStatus("CSV Error: " + e.message, true);
+                }
+            }
+        }
+
+        // Recursive JSON to XML Helper
+        function jsonToXml(obj) {
+            let xml = '';
+            for (let prop in obj) {
+                xml += obj[prop] instanceof Array ? '' : "<" + prop + ">";
+                if (obj[prop] instanceof Array) {
+                    for (let array in obj[prop]) {
+                        xml += "<" + prop + ">";
+                        xml += jsonToXml(new Object(obj[prop][array]));
+                        xml += "</" + prop + ">";
+                    }
+                } else if (typeof obj[prop] == "object") {
+                    xml += jsonToXml(new Object(obj[prop]));
+                } else {
+                    xml += obj[prop];
+                }
+                xml += obj[prop] instanceof Array ? '' : "</" + prop + ">\n";
+            }
+            let xmlStart = xml.replace(/<\/?[0-9]{1,}>/g, '');
+            return xmlStart;
+        }
+
+        function loadSample() {
+            const sample = {
+                "project": "Yangbam Lab",
+                "tools": ["Calculator", "Test", "Converter"],
+                "active": true,
+                "meta": {
+                    "founded": 2026,
+                    "location": "Seoul"
+                },
+                "data": [
+                    { "id": 1, "value": "A" },
+                    { "id": 2, "value": "B" }
+                ]
+            };
+            inputEl.value = JSON.stringify(sample, null, 2);
+            inputEl.dispatchEvent(new Event('input')); // Trigger size update
+            showStatus("Sample Loaded", false);
+        }
+
+        function clearAll() {
+            inputEl.value = '';
+            outputEl.value = '';
+            inputSizeEl.innerText = '0 B';
+            statusEl.style.display = 'none';
+        }
+
+        function copyOutput() {
+            if (!outputEl.value) return;
+            outputEl.select();
+            document.execCommand('copy');
+            showStatus("Copied to Clipboard!", false);
+        }
+
+        function downloadOutput() {
+            if (!outputEl.value) return;
+            const text = outputEl.value;
+            // Determine ext
+            let ext = 'txt';
+            if (text.trim().startsWith('{') || text.trim().startsWith('[')) ext = 'json';
+            if (text.trim().startsWith('<')) ext = 'xml';
+            if (text.indexOf(',') > -1 && !text.trim().startsWith('{')) ext = 'csv';
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = `convert_result.${ext}`;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.click();
+        }
+    </script>
+</body>
+
+</html>

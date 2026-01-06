@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG/PNG to WebP 변환기 - 이미지 용량 줄이기</title>
+    <meta name="description"
+        content="설치 없이 브라우저에서 바로 사용 가능한 무료 WebP 변환기. JPG, PNG 이미지를 고화질 WebP로 변환하여 파일 용량을 획기적으로 줄이세요. SEO 최적화 필수 도구.">
+    <meta name="keywords" content="WebP변환기, 이미지용량줄이기, JPGtoWebP, PNGtoWebP, 무료이미지변환, 사이트속도최적화, SEO도구, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="WebP Converter - 이미지 최적화 도구 🚀">
+    <meta property="og:description" content="서버 전송 없이 안전하게! 이미지를 1/10 용량으로 줄여보세요.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_webp.png">
+
+    <style>
+        /* Theme: Clean Light Mode */
+        :root {
+            --primary: #4361ee;
+            --primary-hover: #3753d6;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-sub: #666666;
+            --border: #e9ecef;
+            --success: #2ecc71;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-home {
+            display: inline-block;
+            margin-bottom: 10px;
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .nav-home:hover {
+            color: var(--primary);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #111;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        /* Controls */
+        .controls {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .quality-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quality-label {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .range-wrap {
+            flex-grow: 1;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .quality-val {
+            font-weight: bold;
+            color: var(--primary);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 3px dashed #cbd5e1;
+            background-color: #f1f5f9;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background-color: #eef2ff;
+        }
+
+        .drop-icon {
+            font-size: 4rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .drop-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #475569;
+            margin-bottom: 5px;
+        }
+
+        .drop-sub {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .security-badge {
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* File List */
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .file-item {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .file-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .savings {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .original-size {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .download-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .download-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .loading-spin {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Ad & Footer */
+        .ad-banner {
+            background-color: #eee;
+            border: 1px dashed #ccc;
+            text-align: center;
+            padding: 15px;
+            color: #777;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .seo-footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border);
+            padding-top: 30px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="nav-home">← DEV_TOOLS</a>
+            <h1>JPG/PNG to WebP Converter</h1>
+            <div class="subtitle">
+                이미지 용량을 최대 90%까지 줄여보세요.<br>
+                블로그 로딩 속도 향상 & SEO 점수 개선의 지름길!
+            </div>
+        </header>
+
+        <!-- Ad: Top -->
+
+
+        <div class="controls">
+            <div class="quality-wrapper">
+                <span class="quality-label">변환 품질 (Quality)</span>
+                <div class="range-wrap">
+                    <input type="range" id="quality-slider" min="0.1" max="1.0" step="0.1" value="0.8">
+                </div>
+                <span class="quality-val" id="quality-val">0.8</span>
+            </div>
+        </div>
+
+        <div class="drop-zone" id="drop-zone">
+            <div class="drop-icon">📂</div>
+            <div class="drop-text">여기에 이미지를 드래그하세요</div>
+            <div class="drop-sub">또는 여기를 클릭해서 PC 파일 선택 (JPG, PNG)</div>
+
+            <div class="security-badge">
+                🔒 안전함: 이미지가 서버로 전송되지 않습니다.
+            </div>
+
+            <input type="file" id="file-input" multiple accept="image/jpeg, image/png, image/jpg" style="display:none;">
+        </div>
+
+        <div class="file-list" id="file-list">
+            <!-- Items will be injected here -->
+        </div>
+
+        <div class="seo-footer">
+            <h3>왜 WebP를 써야 할까요?</h3>
+            <p>
+                구글이 개발한 <span class="highlight">WebP(웹피)</span> 포맷은 기존 JPG보다 약 25-34% 더 작은 용량을 가지면서도 동등한 화질을 제공합니다.
+                웹사이트의 로딩 속도를 올리면 방문자 이탈률이 줄어들고,
+                <span class="highlight">검색 엔진 최적화(SEO)</span> 점수도 올라갑니다.
+                특히 티스토리, 워드프레스 블로거라면 WebP 사용은 필수입니다!
+            </p>
+        </div>
+
+        <!-- Ad: Bottom -->
+
+
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileListEl = document.getElementById('file-list');
+        const qualitySlider = document.getElementById('quality-slider');
+        const qualityVal = document.getElementById('quality-val');
+
+        let currentQuality = 0.8;
+
+        // Quality Slider
+        qualitySlider.addEventListener('input', (e) => {
+            currentQuality = parseFloat(e.target.value);
+            qualityVal.innerText = currentQuality;
+        });
+
+        // Drag & Drop
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (!file.type.match('image.*')) return;
+                processFile(file);
+            });
+        }
+
+        function processFile(file) {
+            // Create List Item UI
+            const itemId = 'item-' + Math.random().toString(36).substr(2, 9);
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            item.id = itemId;
+            item.innerHTML = `
+                <div class="thumb" style="display:flex; align-items:center; justify-content:center;">
+                    <div class="loading-spin"></div>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-meta">변환 중...</div>
+                </div>
+            `;
+            // Add to top
+            fileListEl.insertBefore(item, fileListEl.firstChild);
+
+            // Read & Convert
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    // Convert to WebP
+                    const webpData = canvas.toDataURL('image/webp', currentQuality);
+
+                    // Calc Sizes
+                    const originalSize = file.size;
+                    const newSize = Math.round((webpData.length * 3) / 4); // Approx size from base64
+                    const savingPct = Math.round(100 - ((newSize / originalSize) * 100));
+
+                    // Update UI
+                    updateItemUI(itemId, webpData, file.name, originalSize, newSize, savingPct);
+                };
+            };
+        }
+
+        function updateItemUI(id, dataUrl, originalName, oldSize, newSize, savingPct) {
+            const item = document.getElementById(id);
+            if (!item) return;
+
+            const nameParts = originalName.split('.');
+            nameParts.pop(); // remove ext
+            const newName = nameParts.join('.') + '.webp';
+
+            item.innerHTML = `
+                <img src="${dataUrl}" class="thumb">
+                <div class="file-info">
+                    <div class="file-name">${newName}</div>
+                    <div class="file-meta">
+                        <span class="original-size">${formatBytes(oldSize)}</span>
+                        <span> → </span>
+                        <span>${formatBytes(newSize)}</span>
+                        <span class="savings">(${savingPct > 0 ? '-' + savingPct + '%' : '+'} )</span>
+                    </div>
+                </div>
+                <a href="${dataUrl}" download="${newName}" class="download-btn">⬇ 다운로드</a>
+            `;
+        }
+
+        function formatBytes(bytes, decimals = 1) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+    </script>
+</body>
+
+</html>

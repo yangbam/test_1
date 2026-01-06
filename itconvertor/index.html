@@ -1,1 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT 개발자 도구 - 필수 변환기 모음</title>
+    <meta name="description" content="개발자를 위한 무료 웹 도구 모음. JSON 포맷터, Base64 인코딩/디코딩, QR코드 생성 등. 설치 없이 브라우저에서 바로 사용하세요.">
+    <meta name="keywords" content="개발자도구, JSON포맷터, Base64인코더, QR코드생성, 웹툴, 개발툴">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://Yangbam-lab.com/itconvertor/">
+    <meta property="og:title" content="IT 개발자 도구 모음 💻">
+    <meta property="og:description" content="귀찮은 변환 작업, 이제 웹에서 1초 만에 해결하세요.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_it_hub.png">
+
+    <link rel="canonical" href="https://Yangbam-lab.com/itconvertor/index.html">
+    <style>
+        :root {
+            --primary: #009688;
+            /* Teal */
+            --primary-dark: #00796B;
+            --bg: #F0F2F5;
+            --card-bg: #FFFFFF;
+            --text: #263238;
+        }
+
+        /* RESET */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Apple SD Gothic Neo', sans-serif;
+            /* Monospace feel */
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        main {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Tool Card */
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s;
+            border-left: 5px solid var(--primary);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary-dark);
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .tool-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .tool-icon {
+            font-size: 1.5rem;
+        }
+
+        .tool-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            background: #eee;
+            color: #666;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .badge.new {
+            background: #E0F2F1;
+            color: var(--primary);
+        }
+
+        .disabled-card {
+            opacity: 0.6;
+            pointer-events: none;
+            filter: grayscale(1);
+            border-left-color: #ccc;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-size: 0.85rem;
+            border-top: 1px solid #eee;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <header>
+            <a href="../index.html" class="nav-home">←</a>
+            <h1>&lt;IT_Tools /&gt;</h1>
+            <p style="margin:5px 0 0 0; opacity:0.8; font-size:0.9rem;">Developers' Utility Kit</p>
+        </header>
+
+        <main>
+            <!-- 1. JSON Formatter -->
+            <a href="json_format.html" class="tool-card">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge new">HOT</span>JSON Formatter</span>
+                    <span class="tool-icon" style="color:#FBC02D;">{}</span>
+                </div>
+                <div class="tool-desc">JSON 유효성 검사, 정렬(Beautify), 압축(Minify) 및 XML/CSV 변환.</div>
+            </a>
+
+            <!-- 2. Base64 Converter -->
+            <a href="base64_encode.html" class="tool-card">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#263238; color:#00E676;">SECURE</span>Base64 Converter</span>
+                    <span class="tool-icon" style="color:#00E676;">64</span>
+                </div>
+                <div class="tool-desc">이미지/텍스트 ↔ Base64 양방향 변환. 서버 전송 없는 100% 클라이언트 보안 처리.</div>
+            </a>
+
+            <!-- 3. Case Converter -->
+            <a href="case_converter.html" class="tool-card">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#263238; color:#29B6F6;">DEV</span>Case Converter</span>
+                    <span class="tool-icon" style="color:#29B6F6;">Aa</span>
+                </div>
+                <div class="tool-desc">camelCase, snake_case 등 모든 변수명 포맷으로 실시간 자동 변환.</div>
+            </a>
+            <!-- 4. WebP Converter -->
+            <a href="webp_converter.html" class="tool-card">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#f1f5f9; color:#4361ee;">IMG</span>WebP Converter</span>
+                    <span class="tool-icon" style="color:#4361ee;">🚀</span>
+                </div>
+                <div class="tool-desc">JPG/PNG 이미지를 WebP로 변환하여 용량 줄이기. 블로그/SEO 최적화 필수.</div>
+            </a>
+            <!-- 5. CSV to SQL -->
+            <a href="csv_to_sql.html" class="tool-card">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge" style="background:#1E1F22; color:#3B82F6;">DB</span>CSV
+                        to SQL</span>
+                    <span class="tool-icon" style="color:#3B82F6;">💾</span>
+                </div>
+                <div class="tool-desc">엑셀/CSV 데이터를 Insert 쿼리로 자동 변환. 스마트 타입 감지 기능 포함.</div>
+            </a>
+
+            <!-- 6. Markdown Editor -->
+            <a href="markdown_editor.html" class="tool-card">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#586069; color:white;">DOCS</span>Markdown Editor</span>
+                    <span class="tool-icon" style="color:#24292e;">📝</span>
+                </div>
+                <div class="tool-desc">실시간 마크다운 미리보기 및 HTML 변환. 티스토리/블로그 포스팅용 에디터.</div>
+            </a>
+
+            <!-- 7. QR Code Generator -->
+            <a href="qr_generator.html" class="tool-card">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge" style="background:#4F46E5; color:white;">UTIL</span>QR
+                        Generator</span>
+                    <span class="tool-icon" style="color:#4F46E5;">📱</span>
+                </div>
+                <div class="tool-desc">URL 링크 및 와이파이(WiFi) 접속용 QR코드 생성. 매장/비즈니스 필수 도구.</div>
+            </a>
+        </main>
+
+        <footer>
+            &copy; Yangbam Lab.<br>Built for Developers.
+        </footer>
+    </div>
+</body>
+
+</html>
