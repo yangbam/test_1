@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 육아휴직 급여 & 근로시간 단축 계산기</title>
+    <meta name="description" content="2026년 최신 육아 지원 정책 완벽 분석! 6+6 부모육아휴직제 상한액, 근로시간 단축 급여, 정부 지원금을 한방에 계산하세요.">
+    <meta name="keywords" content="육아휴직급여, 육아기근로시간단축, 6+6육아휴직, 육아지원금, 부모급여, 출산휴가, 단축근무계산기, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="2026 우리 아이 육아수당 계산기 👶">
+    <meta property="og:description" content="단축근무하면 월급 얼마나 줄어들까? 정부 지원금까지 싹 다 계산해드립니다.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_parent.png">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Theme: Warm Pink & Soft Beige (Parenting/Care) */
+        :root {
+            --primary: #eba3a3;
+            /* Warm Pink */
+            --primary-dark: #d68787;
+            --secondary: #fdf6e3;
+            /* Soft Beige */
+            --accent: #ff9f43;
+            /* Orange Accent */
+            --text-main: #5d4037;
+            /* Brownish Text */
+            --text-sub: #a1887f;
+            --bg: #fff9f0;
+            --card-bg: #ffffff;
+            --border: #f2e0d5;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.03);
+            position: relative;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-home {
+            position: absolute;
+            top: 1.2rem;
+            left: 1.2rem;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-sub);
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary);
+            background-color: #fff5f5;
+        }
+
+        /* Content */
+        .content-area {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            text-align: right;
+            outline: none;
+            transition: border-color 0.2s;
+            color: var(--text-main);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+        }
+
+        /* Quick Buttons */
+        .quick-btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .q-btn {
+            flex: 1;
+            padding: 8px;
+            background-color: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .q-btn:hover {
+            background-color: #ffe0b2;
+        }
+
+        /* Main Button */
+        .btn-main {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(235, 163, 163, 0.4);
+        }
+
+        .btn-main:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Checkbox */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: var(--secondary);
+            border-radius: 8px;
+        }
+
+        .checkbox-wrapper input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+        }
+
+        /* Result Card */
+        .result-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .res-title {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .res-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-align: center;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .breakdown-table th {
+            text-align: left;
+            padding: 8px 0;
+            color: var(--text-sub);
+            font-weight: normal;
+        }
+
+        .breakdown-table td {
+            text-align: right;
+            padding: 8px 0;
+            font-weight: bold;
+        }
+
+        /* Chart */
+        .chart-container {
+            height: 200px;
+            margin-bottom: 20px;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 99;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--secondary);
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
+
+        /* Keyword Links */
+        .keyword-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .keyword-tag {
+            background-color: #fff3e0;
+            color: #e65100;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="nav-home">←</a>
+            <h1>육아 정책 계산기 (2026)</h1>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('reduced')">근로시간 단축</div>
+            <div class="tab" onclick="switchTab('leave')">육아휴직 급여</div>
+        </div>
+
+        <!-- Ad: Top -->
+
+
+        <!-- TAB 1: Reduced Hours -->
+        <div id="tab-reduced" class="content-area">
+            <div class="form-group">
+                <label class="label">현재 통상임금 (세전 월급)</label>
+                <div class="input-wrapper">
+                    <input type="text" id="red-salary" class="input-field" placeholder="3000000">
+                </div>
+            </div>
+
+            <div class="form-group" style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label class="label">현재 근무 (주)</label>
+                    <input type="number" id="red-current" class="input-field" value="40" readonly
+                        style="background:#f9f9f9;">
+                </div>
+                <div style="flex:1;">
+                    <label class="label">단축 후 근무 (주)</label>
+                    <input type="number" id="red-target" class="input-field" placeholder="30">
+                </div>
+            </div>
+
+            <div class="quick-btn-group">
+                <button class="q-btn" onclick="setReducedTime(35)">-5시간 (35H)</button>
+                <button class="q-btn" onclick="setReducedTime(30)">-10시간 (30H)</button>
+                <button class="q-btn" onclick="setReducedTime(25)">-15시간 (25H)</button>
+                <button class="q-btn" onclick="setReducedTime(15)">-25시간 (15H)</button>
+            </div>
+            <p style="font-size:0.8rem; color:#888; margin-top:5px; text-align:right;">* 주 15~35시간 범위 내 가능</p>
+
+            <button class="btn-main" onclick="calcReduced()">💰 월 수령액 계산하기</button>
+        </div>
+
+        <!-- TAB 2: Parental Leave -->
+        <div id="tab-leave" class="content-area hidden">
+            <div class="form-group">
+                <label class="label">통상임금 (세전 월급)</label>
+                <input type="text" id="leave-salary" class="input-field" placeholder="3000000">
+            </div>
+
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="check-6plus6">
+                <label for="check-6plus6" style="font-weight:bold; font-size:0.9rem;">
+                    '6+6 부모육아휴직제' 적용<br>
+                    <span style="font-size:0.8rem; font-weight:normal; color:#666;">부모 모두 휴직 시 첫 6개월 상한액 상향</span>
+                </label>
+            </div>
+
+            <!-- Ad: Middle -->
+
+
+            <div class="form-group">
+                <label class="label">휴직 개월 수 (예상)</label>
+                <input type="number" id="leave-months" class="input-field" value="12" max="12" min="1">
+            </div>
+
+            <button class="btn-main" style="background-color:#d68787;" onclick="calcLeave()">👶 육아휴직 급여 조회</button>
+        </div>
+
+        <!-- LOADING SCREEN -->
+        <div id="loading-screen" class="loading-overlay hidden flex-center">
+            <div class="loader"></div>
+            <h3>2026 노동부 정책 대조 중...</h3>
+            <p style="color:#888; font-size:0.9rem;">잠시만 기다려주세요.</p>
+        </div>
+
+        <!-- RESULTS POPUP -->
+        <div id="result-area" class="content-area hidden">
+            <h2 style="text-align:center; font-size:1.1rem; margin-top:0;">계산 결과</h2>
+
+            <div class="result-card">
+                <div class="res-title" id="res-main-title">총 월 수령액</div>
+                <div class="res-value" id="res-total">0원</div>
+                <div style="text-align:center; font-size:0.85rem; color:#e67e22; margin-top:5px;" id="res-sub">원래 월급의
+                    95% 수준!</div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+
+            <div class="result-card">
+                <table class="breakdown-table" id="res-table">
+                    <!-- Dynamic Rows -->
+                </table>
+            </div>
+
+            <div class="keyword-links">
+                <a href="#" class="keyword-tag">🍼 육아용품 최저가</a>
+                <a href="#" class="keyword-tag">🏥 태아 실비 보험</a>
+                <a href="#" class="keyword-tag">🏫 어린이집 대기 신청</a>
+                <a href="#" class="keyword-tag">🏛️ 정부 보조금 신청</a>
+            </div>
+
+            <button class="btn-main" style="background-color:#aaa; margin-top:20px;" onclick="location.reload()">다시
+                계산하기</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 2026 POLICY CONSTANTS ---
+        const limit2026 = {
+            reducedTier1Cap: 2000000, // Reduced Time Tier 1 Cap (First 10h reduction?) -> Based on prompt interpretation and recent trends.
+            reducedTier2Cap: 1500000, // Reduced Time Tier 2 Cap
+            leaveGeneralRate: 0.8,    // 80%
+            leaveGeneralCap: 1500000,
+            leaveGeneralFloor: 700000,
+            plus6Caps: [2000000, 2500000, 3000000, 3500000, 4000000, 4500000] // Months 1-6
+        };
+
+        // --- UTILS ---
+        function formatNumber(num) { return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+        function cleanNumber(str) { return Number(String(str).replace(/,/g, '')); }
+
+        // Input Formatting
+        ['red-salary', 'leave-salary'].forEach(id => {
+            document.getElementById(id).addEventListener('keyup', function (e) {
+                let val = cleanNumber(e.target.value);
+                if (val === 0) e.target.value = '';
+                else e.target.value = formatNumber(val);
+            });
+        });
+
+        // --- TAB LOGIC ---
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content-area').forEach(c => c.classList.add('hidden'));
+
+            if (tab === 'reduced') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document.getElementById('tab-reduced').classList.remove('hidden');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document.getElementById('tab-leave').classList.remove('hidden');
+            }
+            document.getElementById('result-area').classList.add('hidden'); // Reset result
+        }
+
+        // --- BUTTONS ---
+        function setReducedTime(h) {
+            document.getElementById('red-target').value = h;
+        }
+
+        // --- CALC: REDUCED HOURS ---
+        function calcReduced() {
+            const salary = cleanNumber(document.getElementById('red-salary').value);
+            const targetHours = Number(document.getElementById('red-target').value);
+
+            if (!salary || !targetHours) { alert("값을 확인해주세요."); return; }
+            if (targetHours < 15 || targetHours > 35) { alert("단축 후 근로시간은 주 15~35시간 사이여야 합니다."); return; }
+
+            showLoading(() => {
+                const normalHours = 40;
+                const reducedHours = normalHours - targetHours; // e.g. 40 - 30 = 10h reduced
+
+                // 1. Company Pay (Pro-rated)
+                // Salary * (WorkHours / 40)
+                const companyPay = Math.floor(salary * (targetHours / normalHours));
+
+                // 2. Gov Support
+                // Tier 1 (First 10h of REDUCTION, or up to 10h amount? Policy says "First 5h of reduction" in 2024, extended to 10h in 2025/26 plans)
+                // Let's implement User Rule: "First 10h reduction: Cap 2m, Rest: Cap 1.5m"
+
+                let govSupport = 0;
+                let tier1Hours = Math.min(reducedHours, 10);
+                let tier2Hours = Math.max(reducedHours - 10, 0);
+
+                // Tier 1 Logic
+                // Support = Min(Salary, 2m) * (Tier1Hours / 40)
+                const tier1Base = Math.min(salary, limit2026.reducedTier1Cap);
+                const tier1Pay = Math.floor(tier1Base * (tier1Hours / normalHours));
+
+                // Tier 2 Logic
+                // Support = Min(Salary, 1.5m) * (Tier2Hours / 40)
+                const tier2Base = Math.min(salary, limit2026.reducedTier2Cap);
+                const tier2Pay = Math.floor(tier2Base * (tier2Hours / normalHours));
+
+                govSupport = tier1Pay + tier2Pay;
+
+                const total = companyPay + govSupport;
+                const ratio = ((total / salary) * 100).toFixed(1);
+
+                // Render
+                document.getElementById('res-main-title').innerText = "예상 월 수령액 (회사+정부)";
+                document.getElementById('res-total').innerText = formatNumber(total) + "원";
+                document.getElementById('res-sub').innerText = `원래 급여의 ${ratio}% 수준 보전!`;
+
+                const tableHTML = `
+                    <tr><th>회사 지급분 (${targetHours}시간)</th><td>${formatNumber(companyPay)}원</td></tr>
+                    <tr><th>정부 지원금 (비과세)</th><td style="color:#e67e22;">+ ${formatNumber(govSupport)}원</td></tr>
+                    <tr style="border-top:1px dashed #ddd;"><th>원래 월급</th><td style="color:#aaa;">${formatNumber(salary)}원</td></tr>
+                `;
+                document.getElementById('res-table').innerHTML = tableHTML;
+
+                drawChart(['회사 지급분', '정부 지원금'], [companyPay, govSupport]);
+            });
+        }
+
+        // --- CALC: PARENTAL LEAVE ---
+        function calcLeave() {
+            const salary = cleanNumber(document.getElementById('leave-salary').value);
+            const months = Number(document.getElementById('leave-months').value);
+            const use6plus6 = document.getElementById('check-6plus6').checked;
+
+            if (!salary || !months) { alert("값을 확인해주세요."); return; }
+
+            showLoading(() => {
+                // Determine monthly amounts
+                // For simplicity, we calculate the average or the first month, 
+                // but since the chart can show trend, let's just show "Average or First Month" 
+                // or sum total?
+                // Request says "Monthly expected receipt".
+                // If 6+6, it changes every month. We should probably show a "Total for X months" or distinct 1st month.
+                // Let's calculate TOTAL for key output, and breakdown shows average.
+
+                let totalBenefit = 0;
+                let monthData = [];
+
+                for (let m = 1; m <= months; m++) {
+                    let monthlyCap = limit2026.leaveGeneralCap; // 1.5m
+                    let rate = limit2026.leaveGeneralRate; // 80%
+
+                    if (use6plus6 && m <= 6) {
+                        monthlyCap = limit2026.plus6Caps[m - 1]; // 2m ~ 4.5m
+                        rate = 1.0; // 100%
+                    }
+
+                    let benefit = Math.min(salary * rate, monthlyCap);
+                    if (!use6plus6) {
+                        // General leave has floor
+                        if (benefit < limit2026.leaveGeneralFloor) benefit = limit2026.leaveGeneralFloor;
+                    }
+
+                    totalBenefit += benefit;
+                    monthData.push(benefit);
+                }
+
+                const avgBenefit = Math.floor(totalBenefit / months);
+
+                // Render
+                document.getElementById('res-main-title').innerText = "총 예상 급여 (세전)";
+                document.getElementById('res-total').innerText = formatNumber(totalBenefit) + "원";
+                document.getElementById('res-sub').innerText = `월 평균 약 ${formatNumber(avgBenefit)}원`;
+
+                let tableHTML = "";
+                if (use6plus6) {
+                    tableHTML += `<tr><th>6+6 특례 적용</th><td style="color:#e67e22;">YES (상한 UP)</td></tr>`;
+                    if (months > 6) tableHTML += `<tr><th>1~6개월</th><td>100% (최대450)</td></tr><tr><th>7개월~</th><td>80% (최대150)</td></tr>`;
+                } else {
+                    tableHTML += `<tr><th>일반 육아휴직</th><td>통상임금 80%</td></tr>`;
+                    tableHTML += `<tr><th>월 상한액</th><td>150만원</td></tr>`;
+                }
+
+                // Sa-hoo ji-geup-geum Note
+                tableHTML += `<tr style="border-top:1px dashed #ddd;"><td colspan="2" style="font-size:0.8rem; color:#888; text-align:center; padding-top:10px;">* 사후지급금(25%) 공제 전 금액입니다.<br>복직 6개월 후 일시불로 받습니다.</td></tr>`;
+
+                document.getElementById('res-table').innerHTML = tableHTML;
+
+                // Chart: Simple bar for Average vs Salary
+                drawChart(['기존 월급', '월 평균 휴직급여'], [salary, avgBenefit], true);
+            });
+        }
+
+        // --- COMMON ---
+        function showLoading(callback) {
+            document.getElementById('loading-screen').classList.remove('hidden');
+            document.getElementById('loading-screen').classList.add('flex-center');
+            document.getElementById('tab-reduced').classList.add('hidden');
+            document.getElementById('tab-leave').classList.add('hidden');
+
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('result-area').classList.remove('hidden');
+                callback();
+            }, 2500);
+        }
+
+        let chartInstance = null;
+        function drawChart(labels, data, isLeave = false) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            // Config for Reduced: Stacked Bar (Comp vs Gov)
+            // But we passed data as [Comp, Gov]. We want ONE bar stacked.
+            // Wait, Chart.js Stacked needs datasets.
+
+            let config;
+
+            if (!isLeave) {
+                // Reduced: Single Bar, Stacked
+                // Labels: ['수령액 구성']
+                config = {
+                    type: 'bar',
+                    data: {
+                        labels: ['월 수령액 구성'],
+                        datasets: [
+                            { label: labels[0], data: [data[0]], backgroundColor: '#f2e0d5' }, // Company
+                            { label: labels[1], data: [data[1]], backgroundColor: '#eba3a3' }  // Gov
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { stacked: true }, y: { stacked: true, display: false } },
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                };
+            } else {
+                // Leave: Compare Salary vs Benefit
+                config = {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '금액',
+                            data: data,
+                            backgroundColor: ['#f2e0d5', '#eba3a3']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { display: false } },
+                        plugins: { legend: { display: false } }
+                    }
+                };
+            }
+
+            chartInstance = new Chart(ctx, config);
+        }
+
+    </script>
+</body>
+
+</html>

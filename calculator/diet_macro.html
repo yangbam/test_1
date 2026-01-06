@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDEE & 다이어트 매크로 계산기 - 탄단지 완벽 비율</title>
+    <meta name="description"
+        content="내 기초대사량(BMR)과 유지 칼로리(TDEE)를 계산하고, 다이어트 목적에 맞는 탄수화물, 단백질, 지방(매크로) 비율을 확인하세요. 닭가슴살 몇 팩 먹어야 하는지도 알려드립니다.">
+    <meta name="keywords" content="TDEE계산기, 기초대사량계산기, 다이어트식단, 탄단지비율, 매크로계산기, 닭가슴살추천, 단백질계산기, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="나만의 다이어트 식단 & TDEE 계산기 🥗">
+    <meta property="og:description" content="굶는 다이어트는 그만! 내 몸에 딱 맞는 탄단지 황금비율을 찾아보세요.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_diet.png">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Theme: Fresh Green & White (Health/Natural) */
+        :root {
+            --primary: #4CAF50;
+            /* Fresh Green */
+            --primary-dark: #388E3C;
+            --secondary: #E8F5E9;
+            /* Very Light Green */
+            --accent: #FF9800;
+            /* Orange for energy/emphasis */
+            --text-main: #333333;
+            --text-sub: #666666;
+            --bg: #F1F8E9;
+            --card-bg: #ffffff;
+            --border: #C8E6C9;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.2rem;
+            text-align: center;
+            position: relative;
+            background-image: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+        }
+
+        .nav-home {
+            position: absolute;
+            top: 1.2rem;
+            left: 1.2rem;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        /* Content */
+        .content-area {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            background-color: #FAFAFA;
+        }
+
+        /* Gender Radio */
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-sub);
+            transition: all 0.2s;
+        }
+
+        .gender-btn.active {
+            border-color: var(--primary);
+            background-color: var(--secondary);
+            color: var(--primary-dark);
+        }
+
+        /* Select */
+        .select-field {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            background-color: white;
+            outline: none;
+            color: var(--text-main);
+        }
+
+        /* Main Button */
+        .btn-main {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+            transition: background 0.2s;
+        }
+
+        .btn-main:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Results */
+        .result-section {
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .macro-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .macro-item {
+            background-color: #f9f9f9;
+            padding: 10px 5px;
+            border-radius: 8px;
+        }
+
+        .macro-val {
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .macro-lbl {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        /* Visual Food Conversions */
+        .food-visual {
+            background-color: var(--secondary);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .food-icon {
+            font-size: 2rem;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .food-text {
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .food-strong {
+            color: var(--primary-dark);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+
+
+        /* Loading */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 99;
+            flex-direction: column;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #C8E6C9;
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="nav-home">←</a>
+            <h1>다이어트 식단 계산기</h1>
+        </header>
+
+        <div id="input-area" class="content-area">
+
+            <!-- Ad: Top -->
+
+
+            <div class="radio-group">
+                <div class="gender-btn active" id="btn-male" onclick="setGender('male')">남성 👦</div>
+                <div class="gender-btn" id="btn-female" onclick="setGender('female')">여성 👩</div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-row">
+                    <div class="input-wrapper">
+                        <label class="label">나이 (세)</label>
+                        <input type="number" id="age" class="input-field" placeholder="30">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-row">
+                    <div class="input-wrapper">
+                        <label class="label">키 (cm)</label>
+                        <input type="number" id="height" class="input-field" placeholder="175">
+                    </div>
+                    <div class="input-wrapper">
+                        <label class="label">체중 (kg)</label>
+                        <input type="number" id="weight" class="input-field" placeholder="70">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="label">평소 활동량</label>
+                <select id="activity" class="select-field">
+                    <option value="1.2">숨만 쉼 (운동 안함/사무직)</option>
+                    <option value="1.375">가벼운 활동 (주 1~3회 운동)</option>
+                    <option value="1.55">보통 활동 (주 3~5회 운동)</option>
+                    <option value="1.725">많은 활동 (주 6~7회 운동)</option>
+                    <option value="1.9">선수급 활동 (매일 격렬한 운동)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="label">목표 설정</label>
+                <select id="goal" class="select-field" style="border-color:var(--accent);">
+                    <option value="cut">다이어트 (체지방 감량) 🔥</option>
+                    <option value="maintain">현재 체중 유지 ⚖️</option>
+                    <option value="bulk">벌크업 (근육량 증가) 💪</option>
+                </select>
+            </div>
+
+            <button class="btn-main" onclick="calculateMacros()">🥗 내 식단표 계산하기</button>
+        </div>
+
+        <!-- LOADING SCREEN -->
+        <div id="loading-screen" class="loading-overlay hidden flex-center">
+            <div class="loader"></div>
+            <h3>체형 분석 중입니다...</h3>
+            <p style="color:#666; font-size:0.9rem;">당신에게 딱 맞는 탄단지 비율을 찾는 중</p>
+            <!-- Ad Interstitial -->
+
+        </div>
+
+        <!-- RESULT AREA -->
+        <div id="result-area" class="content-area hidden">
+
+            <div class="result-card">
+                <h3 style="margin:0; color:#555; font-size:1rem;">일일 목표 섭취량</h3>
+                <div style="font-size:2.2rem; font-weight:800; color:var(--primary-dark); margin:10px 0;">
+                    <span id="res-cal">0</span> <span style="font-size:1rem; color:#888;">kcal</span>
+                </div>
+                <p style="margin:0; font-size:0.9rem; color:#888;">기초대사량(BMR): <span id="res-bmr">0</span> kcal</p>
+            </div>
+
+            <div class="result-card">
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; font-weight:bold;">탄단지 황금비율</h3>
+                <div style="width:180px; height:180px; margin:0 auto;">
+                    <canvas id="macroChart"></canvas>
+                </div>
+
+                <div class="macro-grid">
+                    <div class="macro-item">
+                        <span class="macro-val" style="color:#FFB74D;" id="val-carb">0g</span>
+                        <span class="macro-lbl">탄수화물</span>
+                    </div>
+                    <div class="macro-item">
+                        <span class="macro-val" style="color:#81C784;" id="val-prot">0g</span>
+                        <span class="macro-lbl">단백질</span>
+                    </div>
+                    <div class="macro-item">
+                        <span class="macro-val" style="color:#64B5F6;" id="val-fat">0g</span>
+                        <span class="macro-lbl">지방</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Conversions -->
+            <div class="food-visual">
+                <div class="food-icon">🐔</div>
+                <div class="food-text">
+                    하루 단백질 채우려면<br>
+                    <span class="food-strong">닭가슴살 약 <span id="cnt-chicken">0</span>팩</span>
+                    <br><span style="font-size:0.8rem; color:#888;">* 100g 1팩 (단백질 20g) 기준</span>
+                </div>
+            </div>
+
+            <div class="food-visual">
+                <div class="food-icon">🍚</div>
+                <div class="food-text">
+                    하루 탄수화물 채우려면<br>
+                    <span class="food-strong">햇반 약 <span id="cnt-rice">0</span>개</span>
+                    <br><span style="font-size:0.8rem; color:#888;">* 210g 1개 (탄수화물 70g) 기준</span>
+                </div>
+            </div>
+
+
+
+            <!-- Ad: Bottom -->
+
+
+            <button class="btn-main" style="background-color:#999; margin-top:20px;" onclick="location.reload()">다시
+                계산하기</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const foodData = {
+            chickenProtein: 20, // 20g per pack
+            eggProtein: 6,      // 6g per egg (unused in UI but good for Logic)
+            riceCarb: 70        // 70g per bowl
+        };
+
+        const macroRatios = {
+            cut: { c: 0.3, p: 0.5, f: 0.2, cal: -500 }, // Low Carb, High Protein
+            maintain: { c: 0.4, p: 0.3, f: 0.3, cal: 0 },
+            bulk: { c: 0.5, p: 0.3, f: 0.2, cal: 300 }
+        };
+
+        // --- STATE ---
+        let gender = 'male';
+
+        // --- EVENTS ---
+        function setGender(g) {
+            gender = g;
+            if (g === 'male') {
+                document.getElementById('btn-male').classList.add('active');
+                document.getElementById('btn-female').classList.remove('active');
+            } else {
+                document.getElementById('btn-female').classList.add('active');
+                document.getElementById('btn-male').classList.remove('active');
+            }
+        }
+
+        // --- CALCULATION ---
+        function calculateMacros() {
+            const age = Number(document.getElementById('age').value);
+            const height = Number(document.getElementById('height').value);
+            const weight = Number(document.getElementById('weight').value);
+            const activity = Number(document.getElementById('activity').value);
+            const goal = document.getElementById('goal').value;
+
+            if (!age || !height || !weight) {
+                alert("나이, 키, 체중을 모두 입력해주세요.");
+                return;
+            }
+
+            // Show Loading
+            document.getElementById('loading-screen').classList.remove('hidden');
+            document.getElementById('loading-screen').classList.add('flex-center');
+            document.getElementById('input-area').classList.add('hidden');
+
+            setTimeout(() => {
+                // Mifflin-St Jeor Equation
+                // Men: (10 × weight) + (6.25 × height) - (5 × age) + 5
+                // Women: (10 × weight) + (6.25 × height) - (5 × age) - 161
+                let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+                if (gender === 'male') bmr += 5;
+                else bmr -= 161;
+
+                const tdee = bmr * activity;
+
+                // Goal Adjustment
+                const targetCal = Math.round(tdee + macroRatios[goal].cal);
+
+                // Macros (grams)
+                // Protein: 4kcal/g, Carb: 4kcal/g, Fat: 9kcal/g
+                const pGram = Math.round((targetCal * macroRatios[goal].p) / 4);
+                const cGram = Math.round((targetCal * macroRatios[goal].c) / 4);
+                const fGram = Math.round((targetCal * macroRatios[goal].f) / 9);
+
+                // Render Results
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('result-area').classList.remove('hidden');
+
+                document.getElementById('res-cal').innerText = formatNumber(targetCal);
+                document.getElementById('res-bmr').innerText = formatNumber(Math.round(bmr));
+
+                document.getElementById('val-carb').innerText = cGram + "g";
+                document.getElementById('val-prot').innerText = pGram + "g";
+                document.getElementById('val-fat').innerText = fGram + "g";
+
+                // Visual Conversion
+                const chickenCount = (pGram / foodData.chickenProtein).toFixed(1);
+                const riceCount = (cGram / foodData.riceCarb).toFixed(1);
+
+                document.getElementById('cnt-chicken').innerText = chickenCount;
+                document.getElementById('cnt-rice').innerText = riceCount;
+
+                // Chart
+                drawPieChart(cGram, pGram, fGram);
+
+            }, 2000); // 2s Loading
+        }
+
+        // --- CHART ---
+        let myChart = null;
+        function drawPieChart(c, p, f) {
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['탄수화물', '단백질', '지방'],
+                    datasets: [{
+                        data: [c, p, f],
+                        backgroundColor: ['#FFB74D', '#81C784', '#64B5F6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false } // Hide legend to save space, custom grid used
+                    }
+                }
+            });
+        }
+
+        // --- UTIL ---
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+    </script>
+</body>
+
+</html>

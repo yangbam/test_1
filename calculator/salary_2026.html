@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 연봉 실수령액 계산기 & 구매력 측정기</title>
+    <meta name="description" content="2026년 최신 세율 반영! 내 연봉의 실수령액은 얼마일까? 치킨 몇 마리, 아파트 구매까지 몇 년? 재미있는 경제 지표로 확인해보세요.">
+    <meta name="keywords" content="연봉계산기, 실수령액계산기, 2026연봉, 연봉테이블, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="2026 연봉 실수령액 & 구매력 테스트 💸">
+    <meta property="og:description" content="내 월급으로 서울 아파트 사는데 걸리는 시간은? 충격적인 진실 확인하기.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_salary.png">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Financial Theme: Blue & White (Trustworthy) */
+        :root {
+            --primary-blue: #0056b3;
+            --light-blue: #e3f2fd;
+            --dark-blue: #003366;
+            --text-dark: #333333;
+            --text-gray: #666666;
+            --bg-gray: #f8f9fa;
+            --white: #ffffff;
+            --border: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .main-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Input Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-blue);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 18px;
+            text-align: right;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+        }
+
+        .input-suffix {
+            text-align: right;
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-top: 5px;
+        }
+
+        .btn-calc {
+            width: 100%;
+            padding: 18px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 86, 179, 0.3);
+            margin-top: 20px;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--dark-blue);
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 10;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-blue);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Result Section */
+        .result-box {
+            background-color: var(--light-blue);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #bbdefb;
+        }
+
+        .result-label {
+            font-size: 16px;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary-blue);
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .detail-table th,
+        .detail-table td {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-table th {
+            text-align: left;
+            color: var(--text-gray);
+            font-weight: normal;
+        }
+
+        .detail-table td {
+            text-align: right;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .detail-table .deduction-row td {
+            color: #d63031;
+        }
+
+        /* Infographic Cards */
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-icon {
+            font-size: 30px;
+            margin-right: 15px;
+            width: 50px;
+            height: 50px;
+            background-color: #f1f8e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-text {
+            flex-grow: 1;
+        }
+
+        .info-title {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .highlight {
+            color: var(--primary-blue);
+        }
+
+
+
+        .dummy-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-outline {
+            flex: 1;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Navbar */
+        .nav-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <a href="../index.html" class="nav-home">←</a>
+            <h1>2026 연봉 실수령액 계산기</h1>
+        </header>
+
+        <!-- INPUT SCREEN -->
+        <div id="input-screen" class="main-content">
+
+
+
+            <div
+                style="background-color: #e3f2fd; padding:15px; border-radius:10px; margin-bottom:20px; font-size:14px; color:#003366;">
+                📢 2026년 예상 세율이 반영되었습니다.<br>
+                (국민연금 4.75%, 건강보험 3.595%, 장기요양 13.14%)
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">연봉 (원)</label>
+                <input type="number" id="salary" class="form-input" placeholder="예: 40000000" inputmode="numeric">
+                <div class="input-suffix" id="salary-text">4,000만원</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">비과세액 (월/원)</label>
+                <input type="number" id="tax-free" class="form-input" value="200000" inputmode="numeric">
+                <div class="input-suffix">기본 식대 등 (기본값: 20만원)</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">부양가족 수 (본인 포함)</label>
+                <input type="number" id="dependents" class="form-input" value="1" inputmode="numeric">
+            </div>
+
+            <button class="btn-calc" onclick="app.calculate()">내 실수령액 확인하기</button>
+
+            <!-- Ad: Bottom -->
+
+        </div>
+
+        <!-- LOADING SCREEN (Interstitial) -->
+        <div id="loading-screen" class="loading-screen hidden flex-center">
+            <div class="spinner"></div>
+            <h2 style="color:var(--primary-blue); font-size:18px;">2026년 세율 정보를 불러오는 중...</h2>
+            <p style="color:#888; font-size:14px;">국세청 간이세액표 분석 중</p>
+
+            <!-- Ad: Interstitial -->
+
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="result-screen" class="main-content hidden">
+            <h2 style="margin:0 0 20px 0; font-size:20px; text-align:center;">당신의 월 실수령액은?</h2>
+
+            <div class="result-box">
+                <div class="result-label">예상 월 수령액</div>
+                <div class="result-value" id="res-net">0원</div>
+            </div>
+
+            <!-- Donut Chart -->
+            <div style="width:200px; height:200px; margin:0 auto 30px auto;">
+                <canvas id="salaryChart"></canvas>
+            </div>
+            <p style="text-align:center; color:#888; font-size:12px; margin-top:-20px; margin-bottom:30px;">* 실수령액 vs
+                공제액 비율</p>
+
+            <!-- Detail Table -->
+            <table class="detail-table">
+                <tr>
+                    <th>국민연금 (4.75%)</th>
+                    <td id="res-pension">0원</td>
+                </tr>
+                <tr>
+                    <th>건강보험 (3.595%)</th>
+                    <td id="res-health">0원</td>
+                </tr>
+                <tr>
+                    <th>장기요양 (13.14%)</th>
+                    <td id="res-care">0원</td>
+                </tr>
+                <tr>
+                    <th>고용보험 (0.9%)</th>
+                    <td id="res-emp">0원</td>
+                </tr>
+                <tr>
+                    <th>소득세 (지방세 포함)</th>
+                    <td id="res-tax">0원</td>
+                </tr>
+                <tr style="border-top:2px solid #aaa;">
+                    <th>총 공제액</th>
+                    <td id="res-total-deduct" style="color:#d63031;">0원</td>
+                </tr>
+            </table>
+
+            <!-- Infographics -->
+            <h3 style="font-size:18px; margin-bottom:15px;">📊 내 월급의 구매력</h3>
+
+            <div class="info-card">
+                <div class="info-icon" style="background-color:#fff3e0; color:#ff9800;">🍗</div>
+                <div class="info-text">
+                    <div class="info-title">치킨 (2.5만원 기준)</div>
+                    <div class="info-value">매달 <span class="highlight" id="info-chicken">0</span>마리 가능 🍖</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon" style="background-color:#e0f2f1; color:#009688;">☕</div>
+                <div class="info-text">
+                    <div class="info-title">스타벅스 (4,500원 기준)</div>
+                    <div class="info-value">매달 <span class="highlight" id="info-coffee">0</span>잔 수혈 가능</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon" style="background-color:#f3e5f5; color:#9c27b0;">🏢</div>
+                <div class="info-text">
+                    <div class="info-title">서울 아파트 (12억 기준)</div>
+                    <div class="info-value">숨만 쉬고 <span class="highlight" id="info-apt">0</span>년 모아야 함 😱</div>
+                </div>
+            </div>
+
+            <!-- Dummy Buttons -->
+            <div class="dummy-btns">
+                <button class="btn-outline" onclick="alert('준비 중입니다.')">📉 대출 한도 조회</button>
+                <button class="btn-outline" onclick="location.reload()">🔄 다시 계산하기</button>
+            </div>
+
+            <!-- Ad: Bottom -->
+
+        </div>
+    </div>
+
+    <script>
+        // Constants (2025-2026 Estimations)
+        const rates = {
+            pension: 0.0475, // Cap applies to monthly income max ~5.9m (but simple % for logic)
+            pension_max_income: 6170000, // 2024.7~ standard (approx)
+            health: 0.03595,
+            care: 0.1314, // % of health tax
+            emp: 0.009,
+        };
+
+        const prices = {
+            chicken: 25000,
+            coffee: 4500,
+            apartment: 1200000000
+        };
+
+        const app = {
+            chart: null,
+
+            calculate: function () {
+                const salaryInput = document.getElementById('salary').value;
+                const taxFreeInput = document.getElementById('tax-free').value;
+                const dependentsInput = document.getElementById('dependents').value;
+
+                if (!salaryInput || salaryInput <= 0) {
+                    alert('연봉을 정확히 입력해주세요.');
+                    return;
+                }
+
+                // 1. Show Loading
+                document.getElementById('input-screen').classList.add('hidden');
+                document.getElementById('loading-screen').classList.remove('hidden');
+                document.getElementById('loading-screen').classList.add('flex-center');
+
+                setTimeout(() => {
+                    this.processCalculation(Number(salaryInput), Number(taxFreeInput), Number(dependentsInput));
+                }, 2000); // 2s Loading
+            },
+
+            processCalculation: function (salary, taxFree, dependents) {
+                // 2. Logic
+                const monthlySalary = salary / 12;
+                const monthlyTaxFree = taxFree;
+                const monthlyTaxable = monthlySalary - monthlyTaxFree;
+
+                // A. Pension (Max cap check)
+                // Pension is based on monthly income, capped at ~6.17m (2025 est)
+                // Max pension = 6,170,000 * 0.045 = 277,650
+                // Min pension = 390,000 * 0.045 = 17,550
+                let pensionBase = monthlySalary;
+                if (pensionBase > rates.pension_max_income) pensionBase = rates.pension_max_income;
+                if (pensionBase < 390000) pensionBase = 390000; // Min cap
+                const pension = Math.floor(pensionBase * rates.pension / 10) * 10;
+
+                // B. Health
+                const health = Math.floor(monthlyTaxable * rates.health / 10) * 10;
+
+                // C. Care
+                const care = Math.floor(health * rates.care / 10) * 10;
+
+                // D. Employment
+                const emp = Math.floor(monthlyTaxable * rates.emp / 10) * 10;
+
+                // E. Income Tax (Simplified)
+                // Standard deduction + Progressive rates
+                // This is a VERY rough approximation of the "Gan-i-se-aek-pyo" logic
+                const incomeTax = this.getSimplifiedTax(monthlyTaxable, dependents);
+                const localIncomeTax = Math.floor(incomeTax * 0.1 / 10) * 10;
+
+                const totalTax = incomeTax + localIncomeTax;
+                const totalDeduct = pension + health + care + emp + totalTax;
+                const netPay = Math.floor((monthlySalary - totalDeduct) / 10) * 10;
+
+                // 3. Render
+                this.render(netPay, pension, health, care, emp, totalTax, totalDeduct, monthlySalary);
+            },
+
+            getSimplifiedTax: function (income, dependents) {
+                // Simplified progressive tax approximation for monthly withholding
+                // Based on standard deduction curves
+                // income is monthly taxable income
+
+                // 1. Earned Income Deduction (Approx)
+                let deduction = 0;
+                const annual = income * 12;
+                if (annual <= 5000000) deduction = annual * 0.7;
+                else if (annual <= 15000000) deduction = 3500000 + (annual - 5000000) * 0.4;
+                else if (annual <= 45000000) deduction = 7500000 + (annual - 15000000) * 0.15;
+                else if (annual <= 100000000) deduction = 12000000 + (annual - 45000000) * 0.05;
+                else deduction = 14750000 + (annual - 100000000) * 0.02;
+
+                // 2. Personal Deduction
+                // Basic 1.5m per person
+                const personalDeduct = dependents * 1500000;
+
+                // 3. Tax Base
+                let taxBase = annual - deduction - personalDeduct;
+                if (taxBase < 0) taxBase = 0;
+
+                // 4. Tax Rates (2024-2025)
+                let calculatedTax = 0;
+                if (taxBase <= 14000000) calculatedTax = taxBase * 0.06;
+                else if (taxBase <= 50000000) calculatedTax = 840000 + (taxBase - 14000000) * 0.15;
+                else if (taxBase <= 88000000) calculatedTax = 6240000 + (taxBase - 50000000) * 0.24;
+                else if (taxBase <= 150000000) calculatedTax = 15360000 + (taxBase - 88000000) * 0.35;
+                else calculatedTax = 37060000 + (taxBase - 150000000) * 0.38;
+
+                // 5. Tax Credit (Simplified)
+                // Standard tax credit ~ 660k limit logic
+                let taxCredit = 0;
+                if (calculatedTax <= 1300000) taxCredit = calculatedTax * 0.55;
+                else taxCredit = 715000 + (calculatedTax - 1300000) * 0.30;
+                if (taxCredit > 660000) taxCredit = 660000; // Cap (varies by income)
+
+                const finalAnnualTax = calculatedTax - taxCredit;
+                let finalMonthlyTax = finalAnnualTax / 12;
+                if (finalMonthlyTax < 0) finalMonthlyTax = 0;
+
+                return Math.floor(finalMonthlyTax / 10) * 10;
+            },
+
+            render: function (netPay, pension, health, care, emp, tax, totalDeduct, grossPay) {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('loading-screen').classList.remove('flex-center');
+                document.getElementById('result-screen').classList.remove('hidden');
+
+                // Values
+                document.getElementById('res-net').innerText = netPay.toLocaleString() + '원';
+                document.getElementById('res-pension').innerText = pension.toLocaleString() + '원';
+                document.getElementById('res-health').innerText = health.toLocaleString() + '원';
+                document.getElementById('res-care').innerText = care.toLocaleString() + '원';
+                document.getElementById('res-emp').innerText = emp.toLocaleString() + '원';
+                document.getElementById('res-tax').innerText = tax.toLocaleString() + '원';
+                document.getElementById('res-total-deduct').innerText = '-' + totalDeduct.toLocaleString() + '원';
+
+                // Chart
+                const ctx = document.getElementById('salaryChart').getContext('2d');
+                if (this.chart) this.chart.destroy();
+                this.chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['실수령액', '세금/공제'],
+                        datasets: [{
+                            data: [netPay, totalDeduct],
+                            backgroundColor: ['#0056b3', '#d63031'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        cutout: '70%',
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+
+                // Infographics
+                document.getElementById('info-chicken').innerText = Math.floor(netPay / prices.chicken).toLocaleString();
+                document.getElementById('info-coffee').innerText = Math.floor(netPay / prices.coffee).toLocaleString();
+
+                const aptMonths = prices.apartment / netPay;
+                const aptYears = (aptMonths / 12).toFixed(1);
+                document.getElementById('info-apt').innerText = aptYears;
+            }
+        };
+
+        // Number Input Formatting
+        const salaryInput = document.getElementById('salary');
+        salaryInput.addEventListener('input', function (e) {
+            const val = Number(e.target.value);
+            const text = (val / 10000).toLocaleString();
+            document.getElementById('salary-text').innerText = text + '만원';
+        });
+    </script>
+</body>
+
+</html>

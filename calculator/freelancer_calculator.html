@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프리랜서 3.3% & 부가세 계산기 - 종합 세금 관리</title>
+    <meta name="description" content="프리랜서, 알바, 개인사업자를 위한 필수 도구. 3.3% 원천징수 실수령액 계산과 부가세(VAT) 계산을 한곳에서! 실수령액 역산 기능 포함.">
+    <meta name="keywords" content="3.3%계산기, 원천징수계산기, 부가세계산기, 프리랜서계산기, 알바월급계산기, 실수령액계산기, 종합소득세, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="프리랜서 & 사업자 세금 계산기 (3.3% + VAT)">
+    <meta property="og:description" content="내가 받을 돈은 얼마? 떼인 세금은 얼마? 1초 만에 확인하세요.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_tax.png">
+
+    <style>
+        /* Theme: Dark Navy & White (Trustworthy/Professional) */
+        :root {
+            --primary: #1a2530;
+            /* Dark Navy */
+            --secondary: #34495e;
+            /* Lighter Navy */
+            --accent: #e74c3c;
+            /* Red Accent */
+            --bg: #ecf0f1;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-light: #ecf0f1;
+            --border: #bdc3c7;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary);
+            color: var(--text-light);
+            padding: 1.2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-home {
+            position: absolute;
+            top: 1.2rem;
+            left: 1.2rem;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            transition: all 0.2s;
+            background-color: #f8f9fa;
+        }
+
+        .tab.active {
+            color: var(--text-light);
+            background-color: var(--primary);
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .radio-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            background-color: white;
+            transition: all 0.2s;
+        }
+
+        .radio-btn.active {
+            border-color: var(--primary);
+            background-color: var(--secondary);
+            color: white;
+            font-weight: bold;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .main-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: right;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            color: var(--primary);
+        }
+
+        .main-input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Result Section */
+        .result-box {
+            background-color: #f4f6f7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #dfe6e9;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .result-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .res-label {
+            color: #7f8c8d;
+        }
+
+        .res-value {
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .res-highlight {
+            font-size: 1.4rem;
+            color: var(--primary);
+            border-top: 1px solid #bdc3c7;
+            padding-top: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
+        /* Buttons */
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-reset {
+            flex: 1;
+            padding: 15px;
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+
+
+        /* Footer SEO */
+        .footer-seo {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .footer-seo strong {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="nav-home">←</a>
+            <h1>세금 계산기 (3.3% / VAT)</h1>
+        </header>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('freelancer')">프리랜서 3.3%</div>
+            <div class="tab" onclick="switchTab('vat')">부가세 (VAT)</div>
+        </div>
+
+        <div class="content">
+
+            <!-- Ad: Top -->
+
+
+            <!-- TAB 1: FREELANCER -->
+            <div id="tab-freelancer">
+                <div class="radio-group">
+                    <div class="radio-btn active" id="btn-free-normal" onclick="setFreeMode('normal')">
+                        3.3% 떼고 계산<br><span style="font-size:0.8em; font-weight:normal;">(총 지급액 → 실수령)</span>
+                    </div>
+                    <div class="radio-btn" id="btn-free-reverse" onclick="setFreeMode('reverse')">
+                        실수령액 역산<br><span style="font-size:0.8em; font-weight:normal;">(실수령 → 청구금액)</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="label" id="free-label">총 지급액 (세전)</label>
+                    <input type="text" id="free-amount" class="main-input" placeholder="0" inputmode="numeric">
+                </div>
+
+                <div class="result-box">
+                    <div class="result-row">
+                        <span class="res-label" id="lbl-total">총 지급액</span>
+                        <div class="res-value"><span id="res-free-total">0</span>원</div>
+                    </div>
+                    <div class="result-row">
+                        <span class="res-label">원천징수세액 (3.3%)</span>
+                        <div class="res-value" style="color:#e74c3c;">- <span id="res-free-tax">0</span>원</div>
+                    </div>
+                    <div class="res-highlight">
+                        <span style="font-size:1rem; color:#7f8c8d;">실수령액</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="res-free-net">0</span>원
+                            <button class="copy-btn" onclick="copyText('res-free-net')">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: VAT -->
+            <div id="tab-vat" class="hidden">
+                <div class="radio-group">
+                    <div class="radio-btn active" id="btn-vat-excl" onclick="setVatMode('exclusive')">
+                        부가세 별도<br><span style="font-size:0.8em; font-weight:normal;">(공급가 → 합계)</span>
+                    </div>
+                    <div class="radio-btn" id="btn-vat-incl" onclick="setVatMode('inclusive')">
+                        부가세 포함<br><span style="font-size:0.8em; font-weight:normal;">(합계 → 공급가)</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="label" id="vat-label">공급가액 입력</label>
+                    <input type="text" id="vat-amount" class="main-input" placeholder="0" inputmode="numeric">
+                </div>
+
+                <div class="result-box" style="border-color:#3498db;">
+                    <div class="result-row">
+                        <span class="res-label">공급가액</span>
+                        <div class="res-value"><span id="res-vat-supply">0</span>원</div>
+                    </div>
+                    <div class="result-row">
+                        <span class="res-label">부가세 (10%)</span>
+                        <div class="res-value" style="color:#3498db;">+ <span id="res-vat-tax">0</span>원</div>
+                    </div>
+                    <div class="res-highlight" style="color:#3498db;">
+                        <span style="font-size:1rem; color:#7f8c8d;">합계금액</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="res-vat-total">0</span>원
+                            <button class="copy-btn" onclick="copyText('res-vat-total')">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-btns">
+                <button class="btn-reset" onclick="resetAll()">C 초기화</button>
+            </div>
+
+            <!-- SEO Footer -->
+            <div class="footer-seo">
+                <strong>💡 세금 신고안내</strong><br>
+                <ul>
+                    <li><strong>3.3% 프리랜서:</strong> 매년 5월 종합소득세 신고 필수 (환급 가능성 있음).</li>
+                    <li><strong>부가세 신고:</strong>
+                        <ul>
+                            <li>일반과세자: 1월/7월 (연 2회)</li>
+                            <li>간이과세자: 1월 (연 1회)</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>계산 결과는 참고용이며, 정확한 세무 처리는 홈택스 또는 세무사와 상담하세요.</p>
+            </div>
+
+            <!-- Ad: Bottom -->
+
+
+        </div>
+    </div>
+
+    <script>
+        // TYPE: 'freelancer' | 'vat'
+        let currentTab = 'freelancer';
+
+        // MODES
+        let freeMode = 'normal'; // normal (gross->net), reverse (net->gross)
+        let vatMode = 'exclusive'; // exclusive (supply->total), inclusive (total->supply)
+
+        // INPUTS
+        const freeInput = document.getElementById('free-amount');
+        const vatInput = document.getElementById('vat-amount');
+
+        // EVENTS
+        freeInput.addEventListener('keyup', (e) => { formatInput(e.target); calcFree(); });
+        vatInput.addEventListener('keyup', (e) => { formatInput(e.target); calcVat(); });
+
+        // TABS
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (tab === 'freelancer') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document.getElementById('tab-freelancer').classList.remove('hidden');
+                document.getElementById('tab-vat').classList.add('hidden');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document.getElementById('tab-vat').classList.remove('hidden');
+                document.getElementById('tab-freelancer').classList.add('hidden');
+            }
+        }
+
+        // FREELANCER LOGIC
+        function setFreeMode(mode) {
+            freeMode = mode;
+            const btnNorm = document.getElementById('btn-free-normal');
+            const btnRev = document.getElementById('btn-free-reverse');
+            const label = document.getElementById('free-label');
+
+            if (mode === 'normal') {
+                btnNorm.classList.add('active'); btnRev.classList.remove('active');
+                label.innerText = "총 지급액 (세전)";
+            } else {
+                btnRev.classList.add('active'); btnNorm.classList.remove('active');
+                label.innerText = "목표 실수령액 (통장에 찍힐 돈)";
+            }
+            calcFree();
+        }
+
+        function calcFree() {
+            const val = cleanNumber(freeInput.value);
+            if (!val) { updateFree(0, 0, 0); return; }
+
+            let total, tax, net;
+
+            if (freeMode === 'normal') {
+                total = val;
+                tax = Math.floor(total * 0.033); // 3.3% cut (local income tax included logic usually calls for floor or truncation)
+                // Actually 3% income + 0.3% local. Usually truncated by 10 won but simplified here.
+                // More precise: IncomeTax = floor(total * 3%), Local = floor(IncomeTax * 10%)
+                // Simplified 3.3% is common for estimation.
+                net = total - tax;
+            } else {
+                // Reverse: Net = Total * 0.967 => Total = Net / 0.967
+                net = val;
+                total = Math.ceil(net / 0.967 / 10) * 10; // Round up to 10 won usually preferred for invoicing
+                tax = total - net;
+            }
+
+            updateFree(total, tax, net);
+        }
+
+        function updateFree(total, tax, net) {
+            document.getElementById('res-free-total').innerText = formatNumber(total);
+            document.getElementById('res-free-tax').innerText = formatNumber(tax);
+            document.getElementById('res-free-net').innerText = formatNumber(net);
+        }
+
+        // VAT LOGIC
+        function setVatMode(mode) {
+            vatMode = mode;
+            const btnExcl = document.getElementById('btn-vat-excl');
+            const btnIncl = document.getElementById('btn-vat-incl');
+            const label = document.getElementById('vat-label');
+
+            if (mode === 'exclusive') {
+                btnExcl.classList.add('active'); btnIncl.classList.remove('active');
+                label.innerText = "공급가액 입력";
+            } else {
+                btnIncl.classList.add('active'); btnExcl.classList.remove('active');
+                label.innerText = "합계금액(부가세포함) 입력";
+            }
+            calcVat();
+        }
+
+        function calcVat() {
+            const val = cleanNumber(vatInput.value);
+            if (!val) { updateVat(0, 0, 0); return; }
+
+            let supply, tax, total;
+
+            if (vatMode === 'exclusive') {
+                supply = val;
+                tax = Math.floor(supply * 0.1);
+                total = supply + tax;
+            } else {
+                total = val;
+                supply = Math.round(total / 1.1);
+                tax = total - supply;
+            }
+            updateVat(supply, tax, total);
+        }
+
+        function updateVat(supply, tax, total) {
+            document.getElementById('res-vat-supply').innerText = formatNumber(supply);
+            document.getElementById('res-vat-tax').innerText = formatNumber(tax);
+            document.getElementById('res-vat-total').innerText = formatNumber(total);
+        }
+
+
+        // UTILS
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        function cleanNumber(str) {
+            return Number(str.replace(/,/g, ''));
+        }
+        function formatInput(el) {
+            let val = cleanNumber(el.value);
+            if (val === 0) el.value = '';
+            else el.value = formatNumber(val);
+        }
+        function resetAll() {
+            freeInput.value = '';
+            vatInput.value = '';
+            calcFree();
+            calcVat();
+        }
+        function copyText(id) {
+            const text = cleanNumber(document.getElementById(id).innerText);
+            navigator.clipboard.writeText(text);
+            // Visual feedback could be added here
+        }
+
+    </script>
+</body>
+
+</html>

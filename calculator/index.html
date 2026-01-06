@@ -1,1 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>편리한 계산기 연구소 - 생활 유틸리티 모음</title>
+    <meta name="description" content="2026 연봉 실수령액, 더치페이, 적금 이자 계산기 등 실생활에 꼭 필요한 편리한 계산 도구 모음. Yangbam Lab.">
+    <meta name="keywords" content="계산기, 연봉계산기, 실수령액, 더치페이, 이자계산기, 2026연봉, 생활도구">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph / Facebook / Kakao -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://Yangbam-lab.com/calculator/">
+    <meta property="og:title" content="편리한 계산기 연구소 🧮">
+    <meta property="og:description" content="연봉 실수령액부터 더치페이까지! 생활 속 모든 계산, 여기서 해결하세요.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_calc_hub.png">
+
+    <link rel="canonical" href="https://Yangbam-lab.com/calculator/index.html">
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --bg: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text: #2D3436;
+        }
+
+        /* RESET & BOX-SIZING */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Mobile Container Wrapper */
+        .mobile-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Home Button Style */
+        .nav-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        main {
+            width: 100%;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Tool Card Style (Unified) */
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s;
+            border-left: 5px solid var(--primary);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-color: #555;
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .tool-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .tool-icon {
+            font-size: 1.5rem;
+        }
+
+        .tool-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            background: #eee;
+            color: #666;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .badge.new {
+            background: #E0F7FA;
+            color: #00BCD4;
+        }
+
+        .disabled-card {
+            opacity: 0.6;
+            pointer-events: none;
+            filter: grayscale(1);
+            border-left-color: #ccc;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #b2bec3;
+            font-size: 0.85rem;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <header>
+            <a href="../index.html" class="nav-home">←</a>
+            <h3>편리한 계산기 연구소</h3>
+        </header>
+
+        <main>
+            <!-- Calc Item 1: Salary Calculator -->
+            <a href="salary_2026.html" class="tool-card" style="border-left-color: #0056b3;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#e3f2fd; color:#0056b3;">HOT</span>2026 연봉 실수령액</span>
+                    <span class="tool-icon">💸</span>
+                </div>
+                <div class="tool-desc">내 월급의 진실은? 세금 다 떼고 통장에 꽂히는 진짜 금액 확인!</div>
+            </a>
+
+            <!-- Calc Item 2: Loan Calculator -->
+            <a href="loan_interest.html" class="tool-card" style="border-left-color: #1565C0;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge" style="background:#e3f2fd; color:#1565c0;">NEW</span>대출
+                        이자 & DSR 계산기</span>
+                    <span class="tool-icon">🏦</span>
+                </div>
+                <div class="tool-desc">영끌 전 필수 체크! 월 납입금과 DSR, 중도상환 수수료까지.</div>
+            </a>
+
+            <!-- Calc Item 3: Freelancer & VAT Calculator -->
+            <a href="freelancer_calculator.html" class="tool-card" style="border-left-color: #2c3e50;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#ecf0f1; color:#2c3e50;">ESSENTIAL</span>프리랜서 & 부가세 계산기</span>
+                    <span class="tool-icon">👔</span>
+                </div>
+                <div class="tool-desc">알바, 프리랜서 실수령액 계산과 부가세 계산을 하나로! 역산 기능 포함.</div>
+            </a>
+
+            <!-- Reduced Hours & Parental Leave -->
+            <a href="parental_leave.html" class="tool-card" style="border-left-color: #eba3a3;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#fff5f5; color:#eba3a3;">PARENTS</span>육아휴직 & 단축근무</span>
+                    <span class="tool-icon">👶</span>
+                </div>
+                <div class="tool-desc">2026 최신 정책! 6+6 육아휴직제와 근로시간 단축 급여, 얼마나 받을까?</div>
+            </a>
+
+            <!-- Diet & Macro -->
+            <a href="diet_macro.html" class="tool-card" style="border-left-color: #4CAF50;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#e8f5e9; color:#388e3c;">HEALTH</span>다이어트 식단 & TDEE</span>
+                    <span class="tool-icon">🥗</span>
+                </div>
+                <div class="tool-desc">닭가슴살 몇 개 먹어야 할까? 내 몸에 딱 맞는 탄단지 황금비율 계산.</div>
+            </a>
+
+            <!-- Calc Item 4: Dutch Pay (Coming Soon) -->
+            <div class="tool-card disabled-card">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge" style="background:#eee; color:#777;">OPEN SOON</span>N빵
+                        더치페이 계산기</span>
+                    <span class="tool-icon">🍣</span>
+                </div>
+                <div class="tool-desc">10원 단위 절사? 술 안 마신 사람 제외? 복잡한 정산을 한방에.</div>
+            </div>
+        </main>
+
+        <footer>
+            &copy; Yangbam Lab. All rights reserved.
+        </footer>
+    </div>
+</body>
+
+</html>
