@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심리테스트 연구소 - 무료 성향 분석</title>
+    <meta name="description" content="직장인 꼰대력, 연애 세포, 퍼스널 컬러 등 무료로 즐기는 다양한 심리테스트 모음.">
+    <meta name="keywords" content="심리테스트, MBTI, 성향검사, 무료운세, Yangbam Lab">
+    <meta name="author" content="Yangbam Lab">
+
+    <!-- Open Graph / Facebook / Kakao -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://Yangbam-lab.com/test/">
+    <meta property="og:title" content="심리테스트 연구소 🧠">
+    <meta property="og:description" content="나도 몰랐던 내 본캐 찾기! 1분 만에 진단 완료.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_test_hub.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="심리테스트 연구소">
+    <meta property="twitter:description" content="심심할 때 하는 꿀잼 테스트 모음!">
+
+    <link rel="canonical" href="https://Yangbam-lab.com/test/index.html">
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --bg: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text: #2D3436;
+        }
+
+        /* RESET & BOX-SIZING */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Mobile Container Wrapper */
+        .mobile-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .nav-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        main {
+            width: 100%;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Tool Card Style (Unified) */
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s;
+            border-left: 5px solid var(--primary);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-color: #555;
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .tool-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .tool-icon {
+            font-size: 1.5rem;
+        }
+
+        .tool-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            background: #eee;
+            color: #666;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .badge.new {
+            background: #E0F7FA;
+            color: #00BCD4;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #b2bec3;
+            font-size: 0.85rem;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <header>
+            <a href="../index.html" class="nav-home">←</a>
+            <h3>심리테스트 연구소</h3>
+        </header>
+
+        <main>
+            <!-- Test Item 8: Fortune Test -->
+            <a href="fortune_test.html" class="tool-card" style="border-left-color: #7b1fa2;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#f3e5f5; color:#7b1fa2;">LUCK</span>2026 AI 금전운</span>
+                    <span class="tool-icon">🔮</span>
+                </div>
+                <div class="tool-desc">올해 로또 1등은 나? AI가 분석해주는 대박 운세와 행운의 숫자!</div>
+            </a>
+
+            <!-- Test Item 11: Color Test -->
+            <a href="color_test.html" class="tool-card" style="border-left-color: #c51162;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#ffebee; color:#c51162;">BEAUTY</span>퍼스널 컬러 진단</span>
+                    <span class="tool-icon">🎨</span>
+                </div>
+                <div class="tool-desc">웜톤? 쿨톤? 1분 만에 찾는 내 인생 컬러와 추천 아이템!</div>
+            </a>
+
+            <!-- Test Item 2: Love Cell -->
+            <a href="love_cell_test.html" class="tool-card" style="border-left-color: #E91E63;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge new">NEW</span>연애세포 생존 테스트</span>
+                    <span class="tool-icon">💖</span>
+                </div>
+                <div class="tool-desc">내 심장은 아직 뛰고 있을까? 죽어가는 연애세포 심폐소생술!</div>
+            </a>
+
+            <!-- Test Item 3: Parenting Style -->
+            <a href="parenting_style.html" class="tool-card" style="border-left-color: #FFA000;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#FFF8E1; color:#FFA000;">KIDS</span>실전 육아 성향</span>
+                    <span class="tool-icon">🧸</span>
+                </div>
+                <div class="tool-desc">나는 꼰대 부모일까? 12가지 상황으로 알아보는 현실 육아 타입.</div>
+            </a>
+
+            <!-- Test Item 5: Office Survival -->
+            <a href="office_survival.html" class="tool-card" style="border-left-color: #607D8B;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#ECEFF1; color:#607D8B;">WORK</span>직장인 생존 유형</span>
+                    <span class="tool-icon">🏢</span>
+                </div>
+                <div class="tool-desc">상사의 헛소리에 대처하는 나의 생존 본능은? (사직서 준비 전 필수)</div>
+            </a>
+
+            <!-- Test Item 6: Spending Test -->
+            <a href="spending_test.html" class="tool-card" style="border-left-color: #4CAF50;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#E8F5E9; color:#4CAF50;">MONEY</span>거지 DNA 테스트</span>
+                    <span class="tool-icon">💸</span>
+                </div>
+                <div class="tool-desc">이번 달도 텅장? 영수증으로 분석하는 나의 소비 패턴 팩트 폭격.</div>
+            </a>
+
+            <!-- Test Item 7: Kkondae Test -->
+            <a href="kkondae_test.html" class="tool-card" style="border-left-color: #F44336;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge" style="background:#FFEBEE; color:#F44336;">FUN</span>젊은
+                        꼰대 테스트</span>
+                    <span class="tool-icon">👺</span>
+                </div>
+                <div class="tool-desc">"나 정도면 쿨하지"라고 생각한다면? 당신의 꼰대력 측정 결과 공개.</div>
+            </a>
+
+            <!-- Test Item 9: English Survival -->
+            <a href="english_survival.html" class="tool-card" style="border-left-color: #3F51B5;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#E8EAF6; color:#3F51B5;">TRAVEL</span>해외여행 생존 영어</span>
+                    <span class="tool-icon">✈️</span>
+                </div>
+                <div class="tool-desc">이 영어 실력으로 입국 심사 통과 가능? 공항에서 식당까지 실전 테스트.</div>
+            </a>
+
+            <!-- Test Item 10: Dopamine -->
+            <a href="dopamine_test.html" class="tool-card" style="border-left-color: #9C27B0;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#F3E5F5; color:#9C27B0;">HEALTH</span>도파민 중독 검사</span>
+                    <span class="tool-icon">🧠</span>
+                </div>
+                <div class="tool-desc">숏폼 없이 못 사는 당신! 팝콘 브레인 자가 진단 및 처방.</div>
+            </a>
+
+            <!-- Test Item 12: Body Age -->
+            <a href="body_age_test.html" class="tool-card" style="border-left-color: #8BC34A;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#F1F8E9; color:#689F38;">BODY</span>신체 나이 테스트</span>
+                    <span class="tool-icon">🏥</span>
+                </div>
+                <div class="tool-desc">주민등록 나이 vs 신체 나이. 당신의 몸은 안녕하십니까?</div>
+            </a>
+
+            <!-- Test Item 13: Hidden Talent -->
+            <a href="talent_test.html" class="tool-card" style="border-left-color: #009688;">
+                <div class="tool-header">
+                    <span class="tool-title"><span class="badge"
+                            style="background:#E0F2F1; color:#009688;">JOB</span>숨겨진 재능 찾기</span>
+                    <span class="tool-icon">🚀</span>
+                </div>
+                <div class="tool-desc">개발자? 유튜버? 내 성향에 딱 맞는 찰떡 직업 추천.</div>
+            </a>
+
+        </main>
+
+        <footer>
+            &copy; Yangbam Lab. All rights reserved.
+        </footer>
+    </div>
+</body>
+
+</html>
