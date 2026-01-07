@@ -42,7 +42,8 @@
             background-color: var(--bg-black);
             color: var(--text-white);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -56,6 +57,30 @@
             box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
             border-left: 1px solid #222;
             border-right: 1px solid #222;
+        }
+
+        /* Header logic from implementation plan */
+        .test-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: transparent;
+            margin-bottom: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .nav-back {
+            text-decoration: none;
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            font-weight: bold;
+            margin-right: 15px;
+            cursor: pointer;
+            text-shadow: 0 0 5px var(--neon-green);
         }
 
         /* Utility */
@@ -384,6 +409,9 @@
 <body>
 
     <div id="app">
+        <header class="test-header">
+            <a href="index.html" class="nav-back">&larr;</a>
+        </header>
         <!-- 1. START SCREEN -->
         <div id="start-screen" class="start-container">
 
@@ -455,6 +483,67 @@
             <div style="height: 50px;"></div>
         </div>
     </div>
+
+    </div>
+
+    <!-- SEO Content -->
+    <article class="seo-footer"
+        style="padding: 3rem 1.5rem; background: #080808; border-top: 1px solid #39FF14; color: #E0E0E0; line-height: 1.8; text-align: left; margin: 3rem auto; font-family: 'Hack', monospace; max-width: 500px; width: 100%;">
+        <h2
+            style="font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; color: #39FF14; text-shadow: 0 0 5px #39FF14;">
+            [칼럼] 당신의 뇌는 지금 '팝콘'입니까?</h2>
+
+        <h3 style="font-size: 1.2rem; margin-top: 2rem; margin-bottom: 1rem; color: #BC13FE;">1. 1분도 집중 못 하는 '금붕어 인류'의
+            탄생</h3>
+        <p style="margin-bottom: 1.5rem;">
+            엘리베이터를 기다리는 30초를 못 참아 스마트폰을 꺼내시나요? 축하합니다. 당신은 이미 <strong>숏폼 중독(Short-form Addiction)</strong> 초기 단계입니다. 현대인의
+            뇌는 빠르고 강렬한 자극(도파민)에 길들여져, 현실의 느리고 지루한 자극을 견디지 못하게 변하고 있습니다. 이를 <strong>팝콘 브레인(Popcorn Brain)</strong> 현상이라고
+            합니다. 팝콘처럼 톡톡 튀는 자극에만 반응하고, 깊은 사고와 인내심은 사라지는 것이죠.
+        </p>
+
+        <h3 style="font-size: 1.2rem; margin-top: 2rem; margin-bottom: 1rem; color: #BC13FE;">2. 진단 원리: 전두엽의 기능 저하 측정
+        </h3>
+        <p style="margin-bottom: 1.5rem;">
+            본 테스트는 <strong>전두엽(Frontal Lobe)</strong>의 실행 기능 중 '충동 조절'과 '주의력 유지' 능력을 간접적으로 평가합니다.
+        </p>
+        <ul style="list-style-type: none; padding-left: 0; margin-bottom: 1.5rem;">
+            <li style="margin-bottom: 10px;">
+                <strong style="color: #39FF14;">📉 내성(Tolerance):</strong> 같은 자극으로는 만족하지 못하고 더 자극적인 것을 찾는다.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <strong style="color: #39FF14;">🚫 금단(Withdrawal):</strong> 폰이 없으면 불안하고 안절부절못한다.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <strong style="color: #39FF14;">🔄 강박(Compulsion):</strong> 무의식적으로 SNS 피드를 새로고침한다.
+            </li>
+        </ul>
+
+        <h3 style="font-size: 1.2rem; margin-top: 2rem; margin-bottom: 1rem; color: #BC13FE;">3. 망가진 뇌를 회복하는 '디지털 디톡스'
+            레시피</h3>
+        <ul style="list-style-type: disc; padding-left: 1.2rem; margin-bottom: 1.5rem; color: #aaa;">
+            <li style="margin-bottom: 10px;"><strong>멍때리기(Spacing Out):</strong> 아무것도 하지 않는 시간이야말로 뇌가 청소(Glith)되는 시간입니다.
+                하루 10분, 창밖을 보세요.</li>
+            <li style="margin-bottom: 10px;"><strong>흑백 모드 설정:</strong> 스마트폰 화면을 흑백으로 바꾸면 도파민 분비가 확연히 줄어듭니다. 지금 당장
+                설정해보세요.</li>
+            <li style="margin-bottom: 10px;"><strong>종이책 읽기:</strong> 스크롤이 아닌, 페이지를 넘기는 물리적 감각이 전두엽을 다시 깨웁니다.</li>
+        </ul>
+
+        <h3 style="font-size: 1.2rem; margin-top: 2rem; margin-bottom: 1rem; color: #BC13FE;">FAQ: 디지털 헬스케어 Q&A</h3>
+        <p style="margin-bottom: 0.5rem;"><strong>Q. ADHD랑 스마트폰 중독이랑 다른가요?</strong></p>
+        <p style="margin-bottom: 1.5rem; font-size: 0.9rem; color: #888;">
+            A. 증상은 비슷하지만 원인이 다릅니다. 후천적인 스마트폰 과의존은 '가짜 ADHD' 증상을 유발할 수 있습니다. 다행인 건, 디지털 기기를 멀리하면 뇌 기능은 충분히 회복될 수 있다는
+            점입니다.
+        </p>
+
+        <div style="margin-top: 2rem; padding: 1rem; border: 1px solid #FF00FF; background: #0D0D0D;">
+            <p style="font-size: 0.8rem; text-align: center; margin: 0; color: #FF00FF;">
+                <strong>[Disclaimer]</strong><br>
+                본 테스트는 과도한 디지털 기기 사용에 대한 경각심을 위한 자가 진단입니다.<br>
+                의학적인 진단이 아니며, 심각한 우울증이나 불안 장애가 의심될 경우<br>
+                반드시 정신건강의학과 전문의의 상담을 받으시길 바랍니다. 🏥
+            </p>
+        </div>
+    </article>
 
     <script>
         // --- DATA ---

@@ -451,214 +451,274 @@
 
             <div style="height: 50px;"></div>
         </div>
-    </div>
 
-    <script>
-        // --- DATA ---
-        // 점수: 높을수록 금전운 좋음 (1~5점 분포)
-        const quizData = [
-            {
-                q: "길을 걷다 반짝이는 물건을 주웠다. 무엇일까?",
-                choices: [
-                    { text: "오래된 금화 (5점)", val: 5 },
-                    { text: "최신형 스마트폰 (3점)", val: 3 },
-                    { text: "누군가 잃어버린 열쇠 (2점)", val: 2 },
-                    { text: "예쁜 유리조각 (1점)", val: 1 }
-                ]
-            },
-            {
-                q: "꿈속에서 누군가 나에게 봉투를 건넨다. 어떤 봉투일까?",
-                choices: [
-                    { text: "두툼한 현금 봉투 (5점)", val: 5 },
-                    { text: "로또 복권 한 장 (4점)", val: 4 },
-                    { text: "편지가 든 편지봉투 (2점)", val: 2 },
-                    { text: "텅 빈 봉투 (1점)", val: 1 }
-                ]
-            },
-            {
-                q: "2026년에 가장 사고 싶은 것은?",
-                choices: [
-                    { text: "한강 뷰 아파트 (5점)", val: 5 },
-                    { text: "럭셔리 슈퍼카 (4점)", val: 4 },
-                    { text: "최신 가전제품 (3점)", val: 3 },
-                    { text: "소소한 맛집 투어 (2점)", val: 2 }
-                ]
-            },
-            {
-                q: "갑자기 하늘에서 돈이 떨어진다면?",
-                choices: [
-                    { text: "미친 듯이 줍는다 (5점)", val: 5 },
-                    { text: "경찰에 신고한다 (2점)", val: 2 },
-                    { text: "꿈이겠거니 하고 구경한다 (3점)", val: 3 },
-                    { text: "무서워서 도망간다 (1점)", val: 1 }
-                ]
-            },
-            {
-                q: "내 통장 잔고가 '0원'이 된다면?",
-                choices: [
-                    { text: "당장 알바라도 구한다 (4점)", val: 4 },
-                    { text: "부모님/친구에게 빌린다 (2점)", val: 2 },
-                    { text: "어떻게든 되겠지... (1점)", val: 1 },
-                    { text: "투자한 게 곧 오를 거야 (3점)", val: 3 }
-                ]
-            },
-            {
-                q: "숲속에서 동물을 만났다. 어떤 동물인가?",
-                choices: [
-                    { text: "황금 돼지 (5점)", val: 5 },
-                    { text: "부지런한 다람쥐 (3점)", val: 3 },
-                    { text: "화려한 공작새 (4점)", val: 4 },
-                    { text: "느긋한 나무늘보 (1점)", val: 1 }
-                ]
-            },
-            {
-                q: "당신이 생각하는 '부자'의 기준은?",
-                choices: [
-                    { text: "일 안 해도 돈이 들어오는 것 (5점)", val: 5 },
-                    { text: "사고 싶은 거 다 사는 것 (4점)", val: 4 },
-                    { text: "빚 없이 사는 것 (3점)", val: 3 },
-                    { text: "마음이 편안한 것 (2점)", val: 2 }
-                ]
-            }
-        ];
+        <!-- SEO Content -->
+        <article class="seo-footer"
+            style="padding: 40px 20px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255, 215, 0, 0.2); color: #e0e0e0; font-size: 15px; line-height: 1.8; text-align: left;">
+            <h2
+                style="color: var(--gold); font-size: 1.5rem; margin-bottom: 25px; text-shadow: 0 0 10px rgba(255,215,0,0.3); text-align: center;">
+                [칼럼] 2026년 부의 흐름, 빅데이터는 알고 있다</h2>
 
-        const results = [
-            {
-                // range: 28 ~ 35
-                type: "최고의 행운",
-                title: "황금알을 낳는 거위",
-                desc: "축하합니다! 2026년은 당신의 해입니다.\n숨만 쉬어도 돈이 굴러들어오는 형국이네요.\n\n재물운이 폭발하여 무엇을 하든 대박이 날 징조입니다.\n이런 운세에는 <span class='keyword-highlight'>로또 구매</span>나 <span class='keyword-highlight'>과감한 투자</span>를 노려봐도 좋습니다.\n\n단, 들어오는 만큼 나갈 수도 있으니 자물쇠를 잘 채우세요!"
-            },
-            {
-                // range: 22 ~ 27
-                type: "노력의 결실",
-                title: "걸어 다니는 ATM",
-                desc: "성실함이 무기인 당신!\n2026년에는 일한 만큼, 아니 그 이상으로 보상받습니다.\n\n승진이나 연봉 인상, 보너스 등 땀 흘린 대가가 통장에 꽂힐 거예요.\n요행보다는 <span class='keyword-highlight'>적금 풍차돌리기</span>나 <span class='keyword-highlight'>안전한 주식</span> 투자를 추천합니다.\n\n지갑이 두둑해져서 주변에 밥 살 일이 많아지겠네요."
-            },
-            {
-                // range: 16 ~ 21
-                type: "귀인의 도움",
-                title: "귀인이 돕는 운세",
-                desc: "올해는 '사람'이 곧 '돈'입니다.\n주변 지인이나 뜻밖의 인물이 당신에게 좋은 기회를 가져다줍니다.\n\n밥 약속을 거절하지 마세요. 그 자리에 횡재수가 있습니다.\n<span class='keyword-highlight'>부동산 정보</span>나 <span class='keyword-highlight'>알짜배기 재테크</span> 팁을 얻을 수 있습니다.\n\n인맥 관리에 투자하면 몇 배로 돌아올 운세입니다."
-            },
-            {
-                // range: 7 ~ 15
-                type: "절약만이 살길",
-                title: "티끌 모아 태산",
-                desc: "2026년은 내실을 다지는 해입니다.\n큰돈을 벌려고 욕심부리다가는 쪽박 찰 수 있습니다.\n\n새는 돈을 막는 것이 돈 버는 길입니다.\n<span class='keyword-highlight'>가계부 쓰기</span>와 <span class='keyword-highlight'>짠테크</span>로 방어력을 높이세요.\n\n지금 아끼면 하반기에는 웃을 일이 생길 겁니다. 소확행을 즐기세요!"
-            }
-        ];
+            <h3 style="color: #d1c4e9; font-size: 1.2rem; margin-top: 30px; margin-bottom: 15px;">1. 왜 지금 'AI 운세'인가?
+                (The Era of Data-Driven Fortune)</h3>
+            <p style="margin-bottom: 20px;">
+                불확실성의 시대, 현대인들은 미래에 대한 불안감을 해소하기 위해 점술에 의존하곤 합니다. 하지만 <strong>2026년 재물운 분석</strong>은 단순한 미신이 아닙니다. 이것은
+                수천 년간 축적된 <strong>사주 명리학(Four Pillars)</strong>의 통계적 패턴과 현대의 행동 경제학 데이터를 결합한 '확률 게임'입니다. 본 테스트는 당신의 무의식적
+                소비 성향과 리스크 감수 성향을 진단하여, 2026년 당신에게 다가올 금전적 기회(Financial Flow)를 예측합니다.
+            </p>
 
-        // --- APP LOGIC ---
-        const app = {
-            score: 0,
-            current: 0,
+            <h3 style="color: #d1c4e9; font-size: 1.2rem; margin-top: 30px; margin-bottom: 15px;">2. 진단 원리: 운(Luck)을
+                관리하는 기술</h3>
+            <p style="margin-bottom: 20px;">
+                부자들은 '운'을 기다리지 않고 '운'이 들어올 길을 닦습니다. 이 <strong>AI 금전운 테스트</strong>는 당신의 선택 패턴을 통해 <strong>빅데이터
+                    알고리즘</strong>이 잠재된 부의 그릇을 측정합니다.
+            </p>
+            <ul style="list-style-type: disc; padding-left: 20px; margin-bottom: 20px; color: #b39ddb;">
+                <li><strong>행동 패턴 분석:</strong> 지출 통제력과 투자 대담성 측정.</li>
+                <li><strong>운세 주기율표:</strong> 2026년 청룡/적사(Red Snake)의 기운과 개인 바이오리듬 매칭.</li>
+                <li><strong>자산 관리 조언:</strong> 결과에 따른 맞춤형 포트폴리오(적금, 주식, 부동산) 제안.</li>
+            </ul>
 
-            start: function () {
-                document.getElementById('start-screen').classList.add('hidden');
-                document.getElementById('quiz-screen').classList.remove('hidden');
-                this.render();
-            },
+            <h3 style="color: #d1c4e9; font-size: 1.2rem; margin-top: 30px; margin-bottom: 15px;">3. 유형별 2026년 재테크 전략
+            </h3>
+            <p style="margin-bottom: 20px;">
+                테스트 결과는 단순한 재미를 넘어 현실적인 <strong>자산 관리 가이드</strong>를 제공합니다.
+            </p>
+            <ul style="list-style-type: none; padding-left: 0; margin-bottom: 20px;">
+                <li style="margin-bottom: 15px;">
+                    <strong style="color: var(--gold);">🏆 황금알을 낳는 거위 (공격 투자형):</strong> 천부적인 재물복이 트인 시기입니다. <strong>미국
+                        주식</strong>이나 <strong>성장주 ETF</strong> 등 공격적인 포트폴리오 비중을 늘리세요. 로또 1등 당첨 확률도 통계적으로 상승하는 구간입니다.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    <strong style="color: var(--gold);">🐜 걸어 다니는 ATM (안전 지향형):</strong> 근로 소득이 가장 빛나는 시기입니다.
+                    <strong>고금리 예적금</strong>과 <strong>세액 공제 연금 저축</strong>으로 '시드 머니' 1억 만들기에 집중하세요. '복리의 마법'이 당신 편입니다.
+                </li>
+            </ul>
 
-            render: function () {
-                const data = quizData[this.current];
-                const percent = ((this.current) / quizData.length) * 100;
+            <h3 style="color: #d1c4e9; font-size: 1.2rem; margin-top: 30px; margin-bottom: 15px;">FAQ: 자주 묻는 질문</h3>
+            <p style="margin-bottom: 10px;"><strong>Q. 추천해주는 로또 번호는 과학적인가요?</strong></p>
+            <p style="margin-bottom: 20px; color: #9fa8da; font-size: 14px;">
+                A. 본 AI는 과거 당첨 번호의 빈도수 패턴과 가우시안 분포(Gaussian Distribution)를 기반으로 번호를 생성합니다. 하지만 독립 시행의 원칙에 따라 당첨을 보장하지는
+                않습니다. 재미와 행운의 부적으로 활용하세요.
+            </p>
 
-                document.getElementById('progress-bar').style.width = percent + '%';
-                document.getElementById('q-num').innerText = this.current + 1;
-                document.getElementById('q-text').innerText = data.q;
+            <div
+                style="margin-top: 40px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; background: rgba(0,0,0,0.2);">
+                <p style="font-size: 12px; color: #888; text-align: center; margin: 0;">
+                    <strong>[Disclaimer]</strong><br>
+                    본 테스트 결과는 빅데이터 패턴 분석에 기반한 엔터테인먼트 콘텐츠입니다.<br>
+                    구체적인 금융 상품 가입이나 투자 결정은 반드시 전문 자산 운용가와 상담하시기 바랍니다.<br>
+                    당신의 2026년 대박을 기원합니다! 🙏
+                </p>
+            </div>
+        </article>
 
-                const choicesArea = document.getElementById('choices-area');
-                choicesArea.innerHTML = '';
+        <script>
+            // --- DATA ---
+            // 점수: 높을수록 금전운 좋음 (1~5점 분포)
+            const quizData = [
+                {
+                    q: "길을 걷다 반짝이는 물건을 주웠다. 무엇일까?",
+                    choices: [
+                        { text: "오래된 금화 (5점)", val: 5 },
+                        { text: "최신형 스마트폰 (3점)", val: 3 },
+                        { text: "누군가 잃어버린 열쇠 (2점)", val: 2 },
+                        { text: "예쁜 유리조각 (1점)", val: 1 }
+                    ]
+                },
+                {
+                    q: "꿈속에서 누군가 나에게 봉투를 건넨다. 어떤 봉투일까?",
+                    choices: [
+                        { text: "두툼한 현금 봉투 (5점)", val: 5 },
+                        { text: "로또 복권 한 장 (4점)", val: 4 },
+                        { text: "편지가 든 편지봉투 (2점)", val: 2 },
+                        { text: "텅 빈 봉투 (1점)", val: 1 }
+                    ]
+                },
+                {
+                    q: "2026년에 가장 사고 싶은 것은?",
+                    choices: [
+                        { text: "한강 뷰 아파트 (5점)", val: 5 },
+                        { text: "럭셔리 슈퍼카 (4점)", val: 4 },
+                        { text: "최신 가전제품 (3점)", val: 3 },
+                        { text: "소소한 맛집 투어 (2점)", val: 2 }
+                    ]
+                },
+                {
+                    q: "갑자기 하늘에서 돈이 떨어진다면?",
+                    choices: [
+                        { text: "미친 듯이 줍는다 (5점)", val: 5 },
+                        { text: "경찰에 신고한다 (2점)", val: 2 },
+                        { text: "꿈이겠거니 하고 구경한다 (3점)", val: 3 },
+                        { text: "무서워서 도망간다 (1점)", val: 1 }
+                    ]
+                },
+                {
+                    q: "내 통장 잔고가 '0원'이 된다면?",
+                    choices: [
+                        { text: "당장 알바라도 구한다 (4점)", val: 4 },
+                        { text: "부모님/친구에게 빌린다 (2점)", val: 2 },
+                        { text: "어떻게든 되겠지... (1점)", val: 1 },
+                        { text: "투자한 게 곧 오를 거야 (3점)", val: 3 }
+                    ]
+                },
+                {
+                    q: "숲속에서 동물을 만났다. 어떤 동물인가?",
+                    choices: [
+                        { text: "황금 돼지 (5점)", val: 5 },
+                        { text: "부지런한 다람쥐 (3점)", val: 3 },
+                        { text: "화려한 공작새 (4점)", val: 4 },
+                        { text: "느긋한 나무늘보 (1점)", val: 1 }
+                    ]
+                },
+                {
+                    q: "당신이 생각하는 '부자'의 기준은?",
+                    choices: [
+                        { text: "일 안 해도 돈이 들어오는 것 (5점)", val: 5 },
+                        { text: "사고 싶은 거 다 사는 것 (4점)", val: 4 },
+                        { text: "빚 없이 사는 것 (3점)", val: 3 },
+                        { text: "마음이 편안한 것 (2점)", val: 2 }
+                    ]
+                }
+            ];
 
-                data.choices.forEach(choice => {
-                    const btn = document.createElement('button');
-                    btn.className = 'choice-btn';
-                    btn.innerText = choice.text;
-                    btn.onclick = () => this.select(choice.val);
-                    choicesArea.appendChild(btn);
-                });
-            },
+            const results = [
+                {
+                    // range: 28 ~ 35
+                    type: "최고의 행운",
+                    title: "황금알을 낳는 거위",
+                    desc: "축하합니다! 2026년은 당신의 해입니다.\n숨만 쉬어도 돈이 굴러들어오는 형국이네요.\n\n재물운이 폭발하여 무엇을 하든 대박이 날 징조입니다.\n이런 운세에는 <span class='keyword-highlight'>로또 구매</span>나 <span class='keyword-highlight'>과감한 투자</span>를 노려봐도 좋습니다.\n\n단, 들어오는 만큼 나갈 수도 있으니 자물쇠를 잘 채우세요!"
+                },
+                {
+                    // range: 22 ~ 27
+                    type: "노력의 결실",
+                    title: "걸어 다니는 ATM",
+                    desc: "성실함이 무기인 당신!\n2026년에는 일한 만큼, 아니 그 이상으로 보상받습니다.\n\n승진이나 연봉 인상, 보너스 등 땀 흘린 대가가 통장에 꽂힐 거예요.\n요행보다는 <span class='keyword-highlight'>적금 풍차돌리기</span>나 <span class='keyword-highlight'>안전한 주식</span> 투자를 추천합니다.\n\n지갑이 두둑해져서 주변에 밥 살 일이 많아지겠네요."
+                },
+                {
+                    // range: 16 ~ 21
+                    type: "귀인의 도움",
+                    title: "귀인이 돕는 운세",
+                    desc: "올해는 '사람'이 곧 '돈'입니다.\n주변 지인이나 뜻밖의 인물이 당신에게 좋은 기회를 가져다줍니다.\n\n밥 약속을 거절하지 마세요. 그 자리에 횡재수가 있습니다.\n<span class='keyword-highlight'>부동산 정보</span>나 <span class='keyword-highlight'>알짜배기 재테크</span> 팁을 얻을 수 있습니다.\n\n인맥 관리에 투자하면 몇 배로 돌아올 운세입니다."
+                },
+                {
+                    // range: 7 ~ 15
+                    type: "절약만이 살길",
+                    title: "티끌 모아 태산",
+                    desc: "2026년은 내실을 다지는 해입니다.\n큰돈을 벌려고 욕심부리다가는 쪽박 찰 수 있습니다.\n\n새는 돈을 막는 것이 돈 버는 길입니다.\n<span class='keyword-highlight'>가계부 쓰기</span>와 <span class='keyword-highlight'>짠테크</span>로 방어력을 높이세요.\n\n지금 아끼면 하반기에는 웃을 일이 생길 겁니다. 소확행을 즐기세요!"
+                }
+            ];
 
-            select: function (val) {
-                this.score += val;
-                this.current++;
+            // --- APP LOGIC ---
+            const app = {
+                score: 0,
+                current: 0,
 
-                if (this.current < quizData.length) {
+                start: function () {
+                    document.getElementById('start-screen').classList.add('hidden');
+                    document.getElementById('quiz-screen').classList.remove('hidden');
                     this.render();
-                } else {
-                    this.showLoading();
-                }
-            },
+                },
 
-            showLoading: function () {
-                document.getElementById('quiz-screen').classList.add('hidden');
-                document.getElementById('loading-screen').classList.remove('hidden');
+                render: function () {
+                    const data = quizData[this.current];
+                    const percent = ((this.current) / quizData.length) * 100;
 
-                setTimeout(() => {
-                    this.showResult();
-                }, 4000); // 4s
-            },
+                    document.getElementById('progress-bar').style.width = percent + '%';
+                    document.getElementById('q-num').innerText = this.current + 1;
+                    document.getElementById('q-text').innerText = data.q;
 
-            showResult: function () {
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('result-screen').classList.remove('hidden');
+                    const choicesArea = document.getElementById('choices-area');
+                    choicesArea.innerHTML = '';
 
-                let type = 3; // Default
-                // Max 35. Min 7.
-                // 28-35: 0 (Good)
-                // 22-27: 1
-                // 16-21: 2
-                // 7-15: 3 (Bad)
-                if (this.score >= 28) type = 0;
-                else if (this.score >= 22) type = 1;
-                else if (this.score >= 16) type = 2;
-                else type = 3;
-
-                const res = results[type];
-
-                document.getElementById('res-type').innerText = res.type;
-                document.getElementById('res-title').innerText = res.title;
-                document.getElementById('res-desc').innerHTML = res.desc;
-
-                this.generateLuckyNumbers();
-            },
-
-            generateLuckyNumbers: function () {
-                const numbers = new Set();
-                while (numbers.size < 6) {
-                    numbers.add(Math.floor(Math.random() * 45) + 1);
-                }
-                const sorted = Array.from(numbers).sort((a, b) => a - b);
-
-                const container = document.getElementById('lucky-numbers');
-                container.innerHTML = '';
-
-                sorted.forEach((num, index) => {
-                    const ball = document.createElement('div');
-                    ball.className = 'ball';
-                    if (index === 5) ball.className += ' gold'; // Bonus ball style
-                    ball.innerText = num;
-                    container.appendChild(ball);
-                });
-            },
-
-            share: function () {
-                const title = document.getElementById('res-title').innerText;
-                const text = `2026년 내 금전운 결과: [${title}]\n\n올해 당신은 부자가 될 수 있을까요? 행운의 숫자도 확인해보세요! 💰`;
-
-                if (navigator.share) {
-                    navigator.share({
-                        title: '2026 AI 대박 금전운 테스트',
-                        text: text,
-                        url: window.location.href,
+                    data.choices.forEach(choice => {
+                        const btn = document.createElement('button');
+                        btn.className = 'choice-btn';
+                        btn.innerText = choice.text;
+                        btn.onclick = () => this.select(choice.val);
+                        choicesArea.appendChild(btn);
                     });
-                } else {
-                    alert('결과가 복사되었습니다. 대박 기운을 공유하세요!\n\n' + text);
+                },
+
+                select: function (val) {
+                    this.score += val;
+                    this.current++;
+
+                    if (this.current < quizData.length) {
+                        this.render();
+                    } else {
+                        this.showLoading();
+                    }
+                },
+
+                showLoading: function () {
+                    document.getElementById('quiz-screen').classList.add('hidden');
+                    document.getElementById('loading-screen').classList.remove('hidden');
+
+                    setTimeout(() => {
+                        this.showResult();
+                    }, 4000); // 4s
+                },
+
+                showResult: function () {
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('result-screen').classList.remove('hidden');
+
+                    let type = 3; // Default
+                    // Max 35. Min 7.
+                    // 28-35: 0 (Good)
+                    // 22-27: 1
+                    // 16-21: 2
+                    // 7-15: 3 (Bad)
+                    if (this.score >= 28) type = 0;
+                    else if (this.score >= 22) type = 1;
+                    else if (this.score >= 16) type = 2;
+                    else type = 3;
+
+                    const res = results[type];
+
+                    document.getElementById('res-type').innerText = res.type;
+                    document.getElementById('res-title').innerText = res.title;
+                    document.getElementById('res-desc').innerHTML = res.desc;
+
+                    this.generateLuckyNumbers();
+                },
+
+                generateLuckyNumbers: function () {
+                    const numbers = new Set();
+                    while (numbers.size < 6) {
+                        numbers.add(Math.floor(Math.random() * 45) + 1);
+                    }
+                    const sorted = Array.from(numbers).sort((a, b) => a - b);
+
+                    const container = document.getElementById('lucky-numbers');
+                    container.innerHTML = '';
+
+                    sorted.forEach((num, index) => {
+                        const ball = document.createElement('div');
+                        ball.className = 'ball';
+                        if (index === 5) ball.className += ' gold'; // Bonus ball style
+                        ball.innerText = num;
+                        container.appendChild(ball);
+                    });
+                },
+
+                share: function () {
+                    const title = document.getElementById('res-title').innerText;
+                    const text = `2026년 내 금전운 결과: [${title}]\n\n올해 당신은 부자가 될 수 있을까요? 행운의 숫자도 확인해보세요! 💰`;
+
+                    if (navigator.share) {
+                        navigator.share({
+                            title: '2026 AI 대박 금전운 테스트',
+                            text: text,
+                            url: window.location.href,
+                        });
+                    } else {
+                        alert('결과가 복사되었습니다. 대박 기운을 공유하세요!\n\n' + text);
+                    }
                 }
-            }
-        };
-    </script>
+            };
+        </script>
 
 </body>
 
