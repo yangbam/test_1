@@ -252,21 +252,80 @@
             <!-- Cards will be injected here -->
         </div>
 
-        <div class="seo-footer">
-            <h3>Optimize Your Workflow</h3>
-            <p>
-                Switching naming conventions manually is tedious. Use this <strong>Universal Case Converter</strong> to
-                instantly transform `strings` into
-                programmatic identifiers. Supports smart tokenization for mixed inputs like `User-Id` or `first_name`.
-                Ideal for migrating DB columns to JSON keys or CSS classes.
+        <!-- SEO Content -->
+        <article class="seo-footer" style="padding-top: 30px; border-top: 1px solid var(--border);">
+            <h2 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 20px;">[서론] 개발자의 영원한 난제, '이름 짓기' (Naming)
+            </h2>
+            <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+                "컴퓨터 과학에서 가장 어려운 두 가지는 캐시 무효화와 이름 짓기다."라는 유명한 말이 있습니다. <strong>변수 명명 규칙(Counting Convention)</strong>을
+                지키지 않은 코드는 가독성을 떨어뜨리고, 협업 시 치명적인 버그를 유발할 수 있습니다. 본 도구는 복잡한 변수명을 <strong>클린 코드 작성법</strong>에 맞게 즉시 변환하여
+                여러분의 생산성을 높여줍니다.
             </p>
-            <div style="margin-top:10px;">
-                <a href="#" class="tag">#VariableGenerator</a>
-                <a href="#" class="tag">#CamelCase</a>
-                <a href="#" class="tag">#SnakeCase</a>
-                <a href="#" class="tag">#KebabCase</a>
+
+            <h2 style="color: var(--accent); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px;">[본론 1] 언어별 표준
+                케이스 총정리</h2>
+            <ul style="line-height: 1.8; color: var(--text-main); margin-bottom: 20px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;">
+                    <strong>CamelCase (카멜 케이스):</strong> `myVariableName`처럼 첫 단어는 소문자, 이후 단어의 첫 글자는 대문자로 씁니다.
+                    <strong>Java, JavaScript</strong>, Swift 등 대부분의 언어에서 변수 및 함수명으로 사용합니다.
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <strong>Snake_case (스네이크 케이스):</strong> `my_variable_name`처럼 단어 사이를 언더바(_)로 연결합니다.
+                    <strong>Python</strong>, Ruby, 그리고 대부분의 <strong>DB 컬럼명</strong>에서 표준으로 채택하고 있습니다.
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <strong>PascalCase (파스칼 케이스):</strong> `MyClassName`처럼 모든 단어의 첫 글자를 대문자로 씁니다. Java의 클래스명, C#의 네임스페이스
+                    등에 사용됩니다.
+                </li>
+                <li>
+                    <strong>Kebab-case (케밥 케이스):</strong> `my-class-name`처럼 단어 사이를 하이픈(-)으로 연결합니다. <strong>HTML 태그
+                        ID/Class</strong>, CSS 속성, URL 주소(Slug)에 주로 사용됩니다. (일부 언어에서는 뺄셈 연산자와 혼동되어 변수명으로 불가능합니다.)
+                </li>
+            </ul>
+
+            <h2 style="color: var(--accent); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px;">[본론 2] 특수 케이스와
+                활용</h2>
+            <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+                일반적인 변수 외에도 특수한 상황을 위한 규칙이 있습니다.
+                <br>- <strong>Screaming Snake Case (CONSTANT_CASE):</strong> `MAX_RETRY_COUNT`처럼 모두 대문자와 언더바를 사용하며, 절대
+                변하지 않는 <strong>상수(Constant)</strong>나 환경 변수를 선언할 때 씁니다.
+                <br>- <strong>Train-Case (HTTP-Header-Case):</strong> `Content-Type`처럼 대문자로 시작하고 하이픈으로 연결하며, HTTP 헤더의 표준
+                형식입니다.
+            </p>
+
+            <h2 style="color: var(--accent); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px;">[팁] 좋은 변수명을 짓는
+                5가지 원칙 (Clean Code)</h2>
+            <ul style="line-height: 1.8; color: var(--text-main); margin-bottom: 20px; padding-left: 20px;">
+                <li><strong>의도를 분명히 밝혀라:</strong> `d` 대신 `daysSinceCreation`이 낫습니다.</li>
+                <li><strong>정보를 담아라:</strong> 리스트라면 `userList` 혹은 `users` 복수형을 사용하세요.</li>
+                <li><strong>불필요한 축약 금지:</strong> `genYmd`보다 `generatedDate`가 오해를 줄입니다.</li>
+            </ul>
+
+            <h2 style="color: var(--accent); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px;">[FAQ] 네이밍 관련 질문
+            </h2>
+            <ul style="line-height: 1.8; color: var(--text-main); margin-bottom: 30px; padding-left: 20px;">
+                <li style="margin-bottom: 15px;">
+                    <strong>Q. 왜 공백 대신 언더바(_)나 대문자를 쓰나요?</strong><br>
+                    A. 컴파일러는 공백을 '명령어의 끝'이나 '구분자'로 인식하기 때문에, 하나의 이름으로 인식시키기 위해 공백 없는 표기법을 사용합니다.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    <strong>Q. DB 컬럼명은 대소문자를 구분하나요?</strong><br>
+                    A. MySQL(Windows) 등 일부 환경은 대소문자를 구분하지 않지만(Case Insensitive), PostgreSQL 등은 구분합니다. 호환성을 위해 DB에서는 보통
+                    **Snake_case(소문자+언더바)**를 가장 권장합니다.
+                </li>
+            </ul>
+
+            <div style="margin-top:20px; padding-top:20px; border-top:1px dashed var(--border);">
+                <a href="#" class="tag"
+                    style="color:var(--text-sub); text-decoration:none; margin-right:10px;">#VariableGenerator</a>
+                <a href="#" class="tag"
+                    style="color:var(--text-sub); text-decoration:none; margin-right:10px;">#CamelCase</a>
+                <a href="#" class="tag"
+                    style="color:var(--text-sub); text-decoration:none; margin-right:10px;">#SnakeCase</a>
+                <a href="#" class="tag"
+                    style="color:var(--text-sub); text-decoration:none; margin-right:10px;">#KebabCase</a>
             </div>
-        </div>
+        </article>
 
         <!-- Ad: Bottom -->
 

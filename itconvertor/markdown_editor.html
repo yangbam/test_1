@@ -354,10 +354,58 @@
     </div>
 
     <!-- SEO & Footer -->
-    <div class="seo-footer">
-        Use this <b>Markdown Editor</b> to generate clean HTML for your Tistory, Velog, or GitHub Readme. Real-time
-        conversion with <b>marked.js</b> and code highlighting with <b>Prism.js</b>.
-    </div>
+    <!-- SEO Content -->
+    <article class="seo-footer"
+        style="background:var(--bg-color); border-top:1px solid var(--border-color); padding:40px 20px; text-align:left;">
+        <h2 style="color:#24292e; font-size:1.5rem; margin-bottom:20px; text-align:center;">[서론] 개발자가 '마크다운'을 사랑하는 이유
+        </h2>
+        <p style="line-height:1.7; color:#586069; margin-bottom:30px;">
+            혹시 블로그 포스팅을 할 때 HTML 태그에 파묻혀 정작 글쓰기에는 집중하지 못했던 적이 있나요? <strong>마크다운(Markdown) 문법</strong>은 오직 '작성'과 '읽기'에만
+            집중할 수 있도록 고안된 경량 <strong>마크업 언어</strong>입니다. 복잡한 서식 도구 없이 심플한 텍스트만으로 제목, 목록, 코드 등을 구조화할 수 있어 전 세계 개발자와 테크니컬
+            라이터들의 표준 글쓰기 도구로 자리 잡았습니다.
+        </p>
+
+        <h2 style="color:#24292e; font-size:1.5rem; margin-top:40px; margin-bottom:20px;">[본론 1] 필수 마크다운 문법 5분 완성</h2>
+        <div
+            style="background:#fff; padding:20px; border-radius:6px; border:1px solid var(--border-color); margin-bottom:30px;">
+            <ul style="line-height:1.8; color:#24292e; padding-left:20px; margin:0;">
+                <li><strong>제목(Headings):</strong> `#` 개수로 크기 조절 (예: `# H1`, `## H2`)</li>
+                <li><strong>목록(List):</strong> 하이픈(`-`)이나 숫자(`1.`)로 자동 생성</li>
+                <li><strong>강조(Emphasis):</strong> `**굵게**`, `_이탤릭_`, `~~취소선~~`</li>
+                <li><strong>코드 블럭:</strong> 백틱 기호(```) 3개로 감싸면 <strong>Syntax Highlighting</strong> 적용</li>
+                <li><strong>링크 & 이미지:</strong> `[텍스트](주소)` / `![설명](이미지주소)`</li>
+            </ul>
+        </div>
+
+        <h2 style="color:#24292e; font-size:1.5rem; margin-top:40px; margin-bottom:20px;">[본론 2] 블로그 & 깃허브 활용 꿀팁</h2>
+        <p style="line-height:1.7; color:#586069; margin-bottom:25px;">
+            본 에디터는 <strong>GitHub Flavored Markdown (GFM)</strong>을 지원하여, 작성한 내용을 바로 <strong>깃허브
+                리드미(README.md)</strong>에 붙여넣을 수 있습니다. 또한, 우측의 'HTML Source' 패널에서 변환된 코드를 복사하면 <strong>티스토리 스킨</strong>이나
+            워드프레스, 벨로그(Velog) 등에 서식 깨짐 없이 완벽하게 이식할 수 있습니다. <strong>Notion과 마크다운</strong> 간의 호환성도 좋아 초안 작성용으로도 훌륭합니다.
+        </p>
+
+        <h2 style="color:#24292e; font-size:1.5rem; margin-top:40px; margin-bottom:20px;">[FAQ] 에디터 사용 Q&A</h2>
+        <ul style="line-height:1.8; color:#586069; margin-bottom:30px; padding-left:20px;">
+            <li style="margin-bottom:15px;">
+                <strong>Q. 이미지는 어떻게 업로드하나요?</strong><br>
+                A. 본 도구는 텍스트 변환 전용이므로, 이미지는 외부 호스팅(Imgur, S3 등)이나 깃허브 저장소에 올린 후 주소(URL)만 가져와서 `![](URL)` 형태로 입력하세요.
+            </li>
+            <li style="margin-bottom:15px;">
+                <strong>Q. 표(Table) 만들기가 너무 어려워요.</strong><br>
+                A. 마크다운의 표 문법(`|---|`)이 익숙하지 않다면, 엑셀에서 복사하여 [Tables Generator] 같은 외부 도구를 이용해 마크다운 코드로 변환한 뒤 붙여넣는 것을
+                추천합니다.
+            </li>
+        </ul>
+
+        <div style="text-align:center; margin-top:40px; border-top:1px dashed var(--border-color); padding-top:20px;">
+            <span
+                style="background:#f1f8ff; color:#0366d6; padding:4px 8px; border-radius:4px; font-size:0.8rem; margin:0 5px;">#MarkdownEditor</span>
+            <span
+                style="background:#f1f8ff; color:#0366d6; padding:4px 8px; border-radius:4px; font-size:0.8rem; margin:0 5px;">#BlogTool</span>
+            <span
+                style="background:#f1f8ff; color:#0366d6; padding:4px 8px; border-radius:4px; font-size:0.8rem; margin:0 5px;">#ReadmeGen</span>
+        </div>
+    </article>
 
     <!-- Ad: Bottom -->
 

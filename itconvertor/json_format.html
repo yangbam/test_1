@@ -281,18 +281,56 @@
 
     <div id="status-bar" class="status-bar" style="display:none;">Ready</div>
 
-    <div class="seo-footer">
-        <strong>Developer's Note:</strong>
-        <p>This tool performs all conversions locally in your browser. No data is sent to any server.</p>
-        <div class="tag-cloud">
-            <a href="#" class="tag">#JSONFormatter</a>
-            <a href="#" class="tag">#JSONValidator</a>
-            <a href="#" class="tag">#XMLConverter</a>
-            <a href="#" class="tag">#CSVtoJSON</a>
-            <a href="#" class="tag">#AWSLambdaJSON</a>
-            <a href="#" class="tag">#RESTAPI</a>
-        </div>
-    </div>
+    <!-- SEO Content -->
+    <article class="seo-footer" style="background-color: #1e1e1e; padding: 30px; border-top: 1px solid var(--border);">
+        <h2 style="color: var(--keyword); font-size: 1.5rem; margin-bottom: 20px;">[서론] 현대 웹 통신의 표준, JSON</h2>
+        <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+            <strong>JSON(JavaScript Object Notation)</strong>은 데이터를 저장하거나 전송할 때 사용하는 경량의 데이터 교환 형식입니다. 과거에는 XML이 주로
+            사용되었으나, JSON은 불필요한 태그를 줄여 용량이 가볍고, <strong>키-값 쌍(Key-Value Pair)</strong> 구조로 되어 있어 사람과 기계 모두 읽기 쉽다는 장점 덕분에
+            <strong>REST API 응답 형식</strong>의 글로벌 표준으로 자리 잡았습니다.
+        </p>
+
+        <h2 style="color: var(--keyword); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px;">[본론 1] 왜
+            'Beautify(예쁘게 보기)'가 필요할까?</h2>
+        <h3 style="color: var(--text-sub); font-size: 1.1rem; margin-bottom: 10px;">Minify된 데이터의 가독성 확보</h3>
+        <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+            서버 최적화를 위해 공백을 모두 제거한(Minify) JSON 데이터는 한 줄로 이어져 있어 사람이 읽기 매우 어렵습니다. 이때 본 도구의 'Beautify' 기능을 사용하면 들여쓰기가 적용된
+            트리 구조로 변환되어, <strong>데이터 직렬화(Serialization)</strong> 상태를 쉽게 파악하고 로직 오류를 빠르게 디버깅할 수 있습니다.
+        </p>
+
+        <h2 style="color: var(--keyword); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px;">[본론 2] JSON 문법
+            검사(Validation)의 핵심</h2>
+        <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+            API 연동 중 가장 흔한 오류는 콤마(,) 누락, 잘못된 따옴표 사용(" "), 닫는 괄호 실수입니다. 이러한 <strong>구문 오류 검사(Linting)</strong>를 수행하지 않고
+            서버에 전송하면 500 에러를 유발할 수 있습니다. 본 검사기는 입력과 동시에 실시간으로 문법을 체크하여 정확한 위치와 원인을 알려줍니다.
+        </p>
+
+        <h2 style="color: var(--keyword); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px;">[심화] JSON을 다른 포맷으로
+            (XML, CSV)</h2>
+        <ul style="line-height: 1.8; color: var(--text-main); margin-bottom: 20px; padding-left: 20px;">
+            <li style="margin-bottom: 10px;"><strong>CSV 변환 필요성:</strong> 개발자가 아닌 기획자나 마케터가 데이터를 분석해야 할 때, JSON을 엑셀에서 열
+                수 있는 CSV 포맷으로 변환하여 전달하면 협업 효율이 높아집니다.</li>
+            <li><strong>XML vs JSON 차이:</strong> 레거시 시스템 연동을 위해 XML 변환이 필요한 경우에도 원클릭으로 태그 구조로 변환할 수 있습니다.</li>
+        </ul>
+
+        <h2 style="color: var(--keyword); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px;">[FAQ] 개발자 Q&A</h2>
+        <ul style="line-height: 1.8; color: var(--text-main); margin-bottom: 30px; padding-left: 20px;">
+            <li style="margin-bottom: 15px;">
+                <strong>Q. 주석(Comment)을 넣을 수 있나요?</strong><br>
+                A. 표준 JSON 규격에는 주석을 지원하지 않습니다. 하지만 VS Code 등 일부 편집기 환경(JSONC)에서는 허용하기도 합니다. 본 도구는 표준을 준수하므로 주석 포함 시 에러로
+                처리될 수 있습니다.
+            </li>
+            <li style="margin-bottom: 15px;">
+                <strong>Q. JSON 파일의 최대 크기는?</strong><br>
+                A. 브라우저 메모리가 허용하는 한 제한은 없으나, 수십 MB 이상의 대용량 파일은 브라우저 성능 저하를 일으킬 수 있습니다.
+            </li>
+        </ul>
+
+        <p
+            style="color: var(--text-sub); font-size: 0.85rem; margin-top: 50px; border-top: 1px solid var(--border); padding-top: 20px;">
+            ※ 보안 안내: 본 도구는 서버 전송 없이 브라우저 내부 엔진(V8)을 사용하여 처리합니다. 개인정보나 민감한 비즈니스 로직이 포함된 데이터도 외부로 유출되지 않으니 안심하고 사용하세요.
+        </p>
+    </article>
 
     <!-- Ad: Bottom -->
     <!-- <div class="ad-banner">Google Cloud Platform $300 Credit (광고 Area)</div> -->

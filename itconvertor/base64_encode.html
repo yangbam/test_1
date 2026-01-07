@@ -369,17 +369,63 @@
             </div>
         </div>
 
-        <div class="seo-section">
-            <h3>Why use this tool?</h3>
-            <p>
-                This <strong>Base64 All-in-One Converter</strong> performs all encoding and decoding operations locally
-                in your browser.
-                Unlike server-based tools, your images never leave your device, ensuring maximum privacy and speed.
-                Perfect for developers needing `Data URI` generation for CSS or rapid prototyping.
+        <!-- SEO Content -->
+        <article style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 30px;">
+            <h2
+                style="color: var(--primary); font-size: 1.5rem; margin-bottom: 20px; text-shadow: 0 0 5px rgba(0,230,118,0.2);">
+                [서론] Base64란 무엇인가?</h2>
+            <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+                <strong>Base64 인코딩 원리</strong>는 8비트 이진 데이터(Binary)를 문자 코드에 영향을 받지 않는 공통 ASCII 문자 64개로 변환하는 방식입니다.
+                'Base64'라는 이름은 64진법(2^6)을 사용한다는 뜻에서 왔으며, A-Z, a-z, 0-9, +, /(또는 -_) 등 64개의 안전한 문자를 사용해 데이터를 표현합니다. 이 과정을
+                통해 <strong>바이너리 데이터 텍스트 변환</strong>이 가능해지며, 시스템 간 통신 시 데이터 손실을 방지합니다.
             </p>
-            <p>Supported features: <strong>UTF-8 Text Encoding</strong> (Korean/Emoji safe), <strong>Image directly to
-                    Base64</strong>, and one-click copying for HTML/CSS formats.</p>
-        </div>
+
+            <h2
+                style="color: var(--primary); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px; text-shadow: 0 0 5px rgba(0,230,118,0.2);">
+                [본론 1] 프론트엔드 개발자가 Base64를 쓰는 이유</h2>
+            <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 10px;">이미지 최적화와 Data URI Scheme</h3>
+            <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+                웹 퍼포먼스 최적화를 위해 작은 아이콘이나 이미지를 <strong>Data URI Scheme</strong>(data:image/png;base64,...) 형태로 변환하여 HTML이나
+                CSS에 직접 삽입합니다. 이렇게 하면 브라우저가 이미지를 다운로드하기 위해 서버에 별도로 요청을 보내지 않아도 되므로 <strong>HTTP 요청 감소</strong> 효과가 있어 로딩
+                속도가 빨라집니다.
+            </p>
+            <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 10px;">이메일 템플릿과 첨부파일</h3>
+            <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+                HTML 이메일을 보낼 때 외부 이미지가 보안 정책상 차단되는 경우가 많습니다. 이때 이미지를 Base64로 인코딩하여 <strong>이미지 HTML 삽입</strong>을 하면, 외부
+                링크 없이도 이미지가 본문에 바로 표시되어 수신율과 가독성을 높일 수 있습니다. 또한 <strong>이메일 첨부파일 전송</strong> 프로토콜(MIME)에서도 바이너리 파일을 전송하기
+                위해 이 기술이 필수적으로 사용됩니다.
+            </p>
+
+            <h2
+                style="color: var(--primary); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px; text-shadow: 0 0 5px rgba(0,230,118,0.2);">
+                [정보] 한글 깨짐 방지와 UTF-8</h2>
+            <p style="line-height: 1.6; color: var(--text-main); margin-bottom: 20px;">
+                기본적인 Base64 함수(`btoa`, `atob`)는 ASCII 문자셋만 지원하므로 한글을 그대로 넣으면 에러가 발생합니다. 본 도구는 이를 해결하기 위해 <strong>UTF-8
+                    문자셋 인코딩</strong> 과정을 거쳐(Percent-encoding), 한글이나 이모지가 포함된 텍스트도 깨짐 없이 완벽하게 변환합니다. 단, Base64로 변환 시 원본보다
+                용량이 약 33% 증가하므로 대용량 파일에는 주의해서 사용해야 합니다.
+            </p>
+
+            <h2
+                style="color: var(--primary); font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px; text-shadow: 0 0 5px rgba(0,230,118,0.2);">
+                [FAQ] 자주 묻는 질문</h2>
+            <ul style="line-height: 1.8; color: var(--text-main); margin-bottom: 30px; padding-left: 20px;">
+                <li style="margin-bottom: 15px;">
+                    <strong>Q. Base64로 변환하면 보안이 강화되나요?</strong><br>
+                    A. 아니요, Base64는 '인코딩(표현 방식 변경)'이지 '암호화'가 아닙니다. 누구나 쉽게 디코딩하여 원본을 확인할 수 있으므로 비밀번호나 중요 정보 전송용으로는 적합하지
+                    않습니다.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    <strong>Q. btoa와 atob 함수의 차이는?</strong><br>
+                    A. 자바스크립트에서 `btoa()`는 데이터를 Base64로 인코딩(Binary to ASCII)하고, `atob()`는 Base64를 다시 원본으로 디코딩(ASCII to
+                    Binary)하는 함수입니다.
+                </li>
+            </ul>
+
+            <p
+                style="color: var(--text-muted); font-size: 0.85rem; margin-top: 50px; border-top: 1px solid var(--border); padding-top: 20px;">
+                ※ 보안 안내: 본 도구는 서버로 데이터를 전송하지 않으며, 모든 변환 과정이 사용자의 브라우저 내에서 안전하게 처리됩니다. 안심하고 사용하세요.
+            </p>
+        </article>
 
         <!-- Ad: Bottom -->
 
