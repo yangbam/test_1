@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모니터 무결점 테스트 - 불량화소, 빛샘, 멍 확인</title>
+    <meta name="description"
+        content="모니터, 노트북, 스마트폰 액정의 불량화소(데드픽셀), 빛샘, 멍, 번인 현상을 무료로 테스트하세요. 별도 설치 없이 전체화면으로 정밀 진단이 가능합니다.">
+    <meta name="keywords" content="모니터무결점테스트, 불량화소체크, 데드픽셀확인, 빛샘테스트, 모니터멍, 번인확인, 액정테스트">
+    <meta property="og:title" content="모니터 무결점 테스트 🖥️">
+    <meta property="og:description" content="클릭 한 번으로 내 모니터의 불량화소를 찾아보세요.">
+    <meta property="og:type" content="website">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-18HBM95WEK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-18HBM95WEK');
+    </script>
+
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --bg: #f5f6fa;
+            --text: #2d3436;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        header {
+            margin: 40px 0 20px 0;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .notice-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary);
+            text-align: left;
+        }
+
+        .notice-box h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .notice-box ul {
+            padding-left: 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Color Buttons Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .color-btn {
+            height: 80px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .btn-red {
+            background-color: #ff0000;
+        }
+
+        .btn-green {
+            background-color: #00ff00;
+        }
+
+        .btn-blue {
+            background-color: #0000ff;
+        }
+
+        .btn-white {
+            background-color: #ffffff;
+            color: #333;
+            text-shadow: none;
+            border-color: #ccc;
+        }
+
+        .btn-black {
+            background-color: #000000;
+        }
+
+        .btn-gray {
+            background-color: #808080;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s;
+            margin-bottom: 40px;
+        }
+
+        .btn-start:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(108, 92, 231, 0.4);
+        }
+
+
+
+        /* Fullscreen Test Layer */
+        #testLayer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: none;
+            cursor: none;
+            /* Hide cursor logic handled by JS class */
+        }
+
+        #testLayer.cursor-hidden {
+            cursor: none;
+        }
+
+        #testLayer.cursor-visible {
+            cursor: default;
+        }
+
+        .overlay-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            pointer-events: none;
+            animation: fadeOut 3s forwards;
+            text-align: center;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* SEO Content */
+        .seo-content {
+            text-align: left;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .seo-content h2 {
+            color: #2d3436;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .seo-content h3 {
+            color: var(--primary);
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .seo-content p {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Top Ad Area -->
+
+
+        <header>
+            <h1>모니터 무결점 테스트</h1>
+            <p style="color: #636e72;">Dead Pixel Test & Screen Check</p>
+        </header>
+
+        <section class="notice-box">
+            <h3>⚠️ 테스트 전 체크리스트</h3>
+            <ul>
+                <li>화면에 묻은 먼지를 부드러운 천으로 깨끗이 닦아주세요. (먼지를 불량화소로 오해할 수 있습니다)</li>
+                <li>브라우저의 확대/축소 비율을 100%로 설정해주세요.</li>
+                <li>F11 키를 눌러 전체화면 모드로 전환하면 더 정확합니다. (모바일은 자동 적용)</li>
+            </ul>
+        </section>
+
+        <!-- Control Panel -->
+        <div class="color-grid">
+            <button class="color-btn btn-red" onclick="startTest(0)">RED</button>
+            <button class="color-btn btn-green" onclick="startTest(1)">GREEN</button>
+            <button class="color-btn btn-blue" onclick="startTest(2)">BLUE</button>
+            <button class="color-btn btn-white" onclick="startTest(3)">WHITE</button>
+            <button class="color-btn btn-black" onclick="startTest(4)">BLACK</button>
+            <button class="color-btn btn-gray" onclick="startTest(5)">GRAY</button>
+        </div>
+
+        <button class="btn-start" onclick="startTest(0)">▶ 전체 테스트 시작</button>
+
+
+
+        <!-- SEO Content -->
+        <article class="seo-content">
+            <h2>불량화소와 핫픽셀, 차이점이 무엇인가요?</h2>
+            <p>
+                모니터는 수백만 개의 작은 점(Pixel)으로 이루어져 있습니다. 이 중 하나라도 제대로 작동하지 않으면 눈에 거슬리는 점으로 나타나는데, 이를 통칭하여 결점이라 합니다. 하지만 증상에
+                따라 <strong>Dead Pixel(데드픽셀/암점)</strong>과 <strong>Stuck Pixel(스턱픽셀/휘점)</strong>로 나뉩니다.
+            </p>
+            <h3>1. 데드픽셀 (암점)</h3>
+            <p>
+                말 그대로 픽셀이 죽어서 전원이 들어오지 않는 상태입니다. 검은색 화면에서는 보이지 않지만, 흰색이나 원색 배경에서 <strong>검은 점</strong>으로 나타납니다. 트랜지스터
+                고장으로 발생하며, 자가 수리가 거의 불가능합니다.
+            </p>
+            <h3>2. 스턱픽셀 (휘점/핫픽셀)</h3>
+            <p>
+                항상 켜져 있는 상태의 픽셀입니다. 검은색 배경에서 빨강, 초록, 파랑 등의 <strong>빛나는 점</strong>으로 나타납니다. 이는 액정 결정이 한 자리에 고착된 경우로, 빠르고
+                강하게 변경되는 색상 전환(플래싱) 영상을 장시간 재생하거나 가벼운 압력을 주어(주의 필요) <strong>소프트웨어적으로 복구될 가능성</strong>이 있습니다.
+            </p>
+
+            <h2>제조사별 무결점(Zero Dead Pixel) 정책 기준</h2>
+            <p>
+                모니터를 구매할 때 몇천 원 더 비싼 '무결점 옵션'을 선택하셨나요? 제조사마다 교환/반품 기준이 다르므로 꼭 확인해야 합니다.
+            </p>
+            <ul>
+                <li><strong>일반 불량 기준:</strong> 보통 휘점(빛나는 점) 1~3개, 암점(검은 점) 3~5개 이상일 때 불량으로 판정합니다. 중앙부냐 가장자리냐에 따라 기준이
+                    달라지기도 합니다.</li>
+                <li><strong>LG/삼성 등 대기업:</strong> 비교적 관대한 기준을 적용합니다. 보통 구입 후 6개월 이내 휘점 0개, 암점 5개 초과 시 패널 교체를 지원하는 경우가
+                    많습니다.</li>
+                <li><strong>Dell(델):</strong> 프리미엄 패널 보장(Premium Panel Guarantee) 모델의 경우, 휘점이 단 1개라도 발견되면 모니터를 교체해주는 강력한
+                    정책을 가지고 있습니다.</li>
+            </ul>
+
+            <h2>빛샘 현상과 IPS 패널의 특징</h2>
+            <p>
+                컴퓨터로 영화를 볼 때 어두운 장면에서 모니터 가장자리가 희뿌옇게 보이는 현상을 <strong>빛샘(Backlight Bleeding)</strong>이라고 합니다. 이는 LCD 패널의
+                구조적 특성상 백라이트의 빛이 패널 틈새로 새어 나오는 현상입니다. 특히 <strong>IPS 패널</strong>에서 두드러지게 나타나며, 시야각이 넓고 색감이 좋은 IPS의
+                반대급부라고 볼 수 있습니다. 약간의 빛샘은 정상 범주로 보지만, 특정 부위만 강하게 빛나거나 색이 왜곡될 정도라면 불량일 수 있습니다. 'BLACK' 테스트 화면에서 방 불을 끄고
+                확인해보세요.
+            </p>
+
+            <h2>번인(Burn-in)과 잔상 확인법</h2>
+            <p>
+                OLED 스마트폰이나 모니터에서 주로 발생하는 <strong>번인</strong>은 같은 이미지를 장시간 띄워놓았을 때 소자가 타버려 영구적인 얼룩이 남는 현상입니다. 'GRAY' 색상
+                테스트에서 화면을 전체적으로 띄워놓고, 상단바나 하단 내비게이션 바 위치에 미세한 자국이 남지 않았는지 살펴보세요. LCD에서는 '이미지 리텐션(Image Retention)'이라는
+                일시적 잔상이 생길 수 있는데, 이는 화면을 끄고 쉬면 대부분 사라집니다.
+            </p>
+        </article>
+
+        <!-- Bottom Ad Area -->
+
+    </div>
+
+    <!-- Fullscreen Test Layer -->
+    <div id="testLayer" onclick="nextColor()">
+        <div id="guideMsg" class="overlay-guide">
+            화면을 클릭하면 색상이 변경됩니다.<br>
+            <span style="font-size:0.9rem; opacity:0.8;">(종료하려면 ESC 키를 누르세요)</span>
+        </div>
+    </div>
+
+    <script>
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffffff', '#000000', '#808080'];
+        let currentIndex = 0;
+        let isTesting = false;
+        let cursorTimeout;
+
+        const testLayer = document.getElementById('testLayer');
+        const guideMsg = document.getElementById('guideMsg');
+
+        function startTest(startIndex = 0) {
+            currentIndex = startIndex;
+            isTesting = true;
+
+            // Activate Fullscreen
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+
+            // Show Layer
+            testLayer.style.display = 'block';
+            updateColor();
+
+            // Reset Guide Animation
+            guideMsg.style.animation = 'none';
+            guideMsg.offsetHeight; /* trigger reflow */
+            guideMsg.style.animation = 'fadeOut 3s forwards';
+
+            hideCursorAfterDelay();
+        }
+
+        function nextColor() {
+            if (!isTesting) return;
+            currentIndex++;
+            if (currentIndex >= colors.length) {
+                currentIndex = 0; // Loop or Exit? Normally loop is better to check repeatedly.
+                // Let's loop.
+            }
+            updateColor();
+            resetCursor();
+        }
+
+        function updateColor() {
+            testLayer.style.backgroundColor = colors[currentIndex];
+        }
+
+        function endTest() {
+            isTesting = false;
+            testLayer.style.display = 'none';
+
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => {
+                    // Ignore error if already not fullscreen
+                });
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+
+            // Show Recommendation
+
+        }
+
+        // Hide Cursor Logic
+        function hideCursorAfterDelay() {
+            clearTimeout(cursorTimeout);
+            testLayer.classList.remove('cursor-hidden');
+            testLayer.classList.add('cursor-visible');
+
+            cursorTimeout = setTimeout(() => {
+                if (isTesting) {
+                    testLayer.classList.remove('cursor-visible');
+                    testLayer.classList.add('cursor-hidden');
+                }
+            }, 2000);
+        }
+
+        function resetCursor() {
+            hideCursorAfterDelay();
+        }
+
+        // Event Listeners
+        document.addEventListener('mousemove', () => {
+            if (isTesting) resetCursor();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                endTest();
+            }
+            if (isTesting && (e.key === 'ArrowRight' || e.key === ' ')) {
+                nextColor();
+            }
+            if (isTesting && e.key === 'ArrowLeft') {
+                currentIndex = (currentIndex - 1 + colors.length) % colors.length;
+                updateColor();
+                resetCursor();
+            }
+        });
+
+        // Detect Fullscreen Exit (user pressed ESC native)
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                endTest();
+            }
+        });
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (!document.webkitFullscreenElement) {
+                endTest();
+            }
+        });
+    </script>
+</body>
+
+</html>
