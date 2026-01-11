@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고정밀 마우스 테스터 - 폴링레이트 & 더블클릭 진단</title>
+    <meta name="description" content="게이밍 마우스의 폴링레이트(Hz)를 실시간으로 측정하고, 스위치 고장으로 인한 더블클릭 증상을 진단하는 고정밀 웹 도구입니다.">
+    <meta name="keywords" content="마우스테스트, 폴링레이트측정, 마우스Hz, 더블클릭테스트, 마우스고장확인, 게이밍마우스, 로지텍더블클릭">
+    <meta property="og:title" content="고정밀 마우스 테스터 🖱️">
+    <meta property="og:description" content="내 마우스의 정확한 성능과 고장 여부를 지금 확인하세요.">
+    <meta property="og:type" content="website">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-18HBM95WEK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-18HBM95WEK');
+    </script>
+
+    <style>
+        :root {
+            --primary: #FF5252;
+            --accent: #448AFF;
+            --bg: #212121;
+            --card-bg: #333333;
+            --text-main: #ffffff;
+            --text-sub: #bdbdbd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            /* Prevent selection during fast clicking */
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin: 30px 0 40px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #FF5252, #FF4081);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+        }
+
+        /* SECTION 1: Polling Rate */
+        .section-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #555;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hz-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .hz-value {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--accent);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hz-unit {
+            font-size: 1.5rem;
+            color: var(--text-sub);
+        }
+
+        .hz-status {
+            font-size: 1.1rem;
+            color: #4CAF50;
+            margin-top: 5px;
+            height: 24px;
+        }
+
+        .tracking-area {
+            width: 100%;
+            height: 200px;
+            background: repeating-linear-gradient(45deg,
+                    #2a2a2a,
+                    #2a2a2a 10px,
+                    #333 10px,
+                    #333 20px);
+            border: 2px dashed #666;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: crosshair;
+            color: #aaa;
+            margin-bottom: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .tracking-area:hover {
+            border-color: var(--accent);
+            color: white;
+            background: #252525;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100px;
+            background-color: #000;
+            border-radius: 4px;
+        }
+
+        /* SECTION 2: Double Click */
+        .click-test-area {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .click-btn {
+            height: 100px;
+            background-color: #424242;
+            border: 2px solid #555;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .click-btn:active {
+            transform: scale(0.98);
+            background-color: #616161;
+            border-color: var(--text-main);
+        }
+
+        .click-btn.warning {
+            background-color: #3e2723;
+            /* Dark Red tint */
+            border-color: #FF5252;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            50% {
+                transform: translateX(5px);
+            }
+
+            75% {
+                transform: translateX(-5px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .stat-badge {
+            font-size: 0.8rem;
+            background: #212121;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            color: #ccc;
+        }
+
+        .log-console {
+            height: 150px;
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Consolas', monospace;
+            padding: 10px;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .log-entry {
+            margin-bottom: 2px;
+        }
+
+        .log-error {
+            color: #ff5252;
+            font-weight: bold;
+        }
+
+        /* SEO Content */
+        .seo-section {
+            background-color: #2b2b2b;
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 50px;
+            color: #e0e0e0;
+            line-height: 1.7;
+        }
+
+        .seo-section h2 {
+            color: var(--accent);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .seo-section h3 {
+            color: #ffab40;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .seo-section p {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .click-test-area {
+                grid-template-columns: 1fr;
+            }
+
+            .hz-value {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>High Precision Mouse Tester</h1>
+            <p class="subtitle">Polling Rate Analyzer & Double Click Detector</p>
+        </header>
+
+        <!-- Polling Rate Section -->
+        <section class="section-card">
+            <div class="section-title">
+                <span>⚡ Polling Rate (Hz)</span>
+                <span style="font-size:0.9rem; color:#aaa;">마우스를 박스 안에서 빠르게 흔드세요</span>
+            </div>
+
+            <div class="hz-display">
+                <span id="hzValue" class="hz-value">0</span>
+                <span class="hz-unit">Hz</span>
+                <div id="hzStatus" class="hz-status">-</div>
+                <div id="maxHz" style="color: #777; font-size: 0.9rem;">Max: 0 Hz</div>
+            </div>
+
+            <div id="trackArea" class="tracking-area">
+                MOVE MOUSE HERE RAPIDLY
+            </div>
+
+            <canvas id="rateChart" width="800" height="100"></canvas>
+        </section>
+
+        <!-- Double Click Test Section -->
+        <section class="section-card">
+            <div class="section-title">
+                <span>🖱️ Switch & Click Test</span>
+                <button onclick="clearLog()"
+                    style="background:none; border:1px solid #666; color:#aaa; padding:2px 10px; border-radius:4px; cursor:pointer;">Clear
+                    Log</button>
+            </div>
+
+            <div class="click-test-area">
+                <div id="btnLeft" class="click-btn" onmousedown="handleClick(event, 'Left')"
+                    oncontextmenu="return false;">
+                    Left Button
+                    <div id="countLeft" class="stat-badge">Clicks: 0 | Dbl: 0</div>
+                </div>
+                <div id="btnWheel" class="click-btn" onmousedown="handleClick(event, 'Wheel')">
+                    Wheel (Middle)
+                    <div id="countWheel" class="stat-badge">Clicks: 0 | Dbl: 0</div>
+                </div>
+                <div id="btnRight" class="click-btn" onmousedown="handleClick(event, 'Right')"
+                    oncontextmenu="return false;">
+                    Right Button
+                    <div id="countRight" class="stat-badge">Clicks: 0 | Dbl: 0</div>
+                </div>
+            </div>
+
+            <div id="clickLog" class="log-console">
+                <div class="log-entry" style="color:#aaa;">> Ready to detect double clicks...</div>
+            </div>
+        </section>
+
+        <!-- SEO Content -->
+        <article class="seo-section">
+            <h2>마우스 폴링레이트(Polling Rate)란?</h2>
+            <p>
+                폴링레이트(Hz)는 마우스가 컴퓨터에 "나 여기 있어!"라고 위치 정보를 보고하는 빈도를 의미합니다.
+                예를 들어 <strong>125Hz</strong>는 1초에 125번, <strong>1000Hz</strong>는 1초에 1000번 신호를 보냅니다.
+                숫자가 높을수록 마우스 커서의 움직임이 더 부드럽고 정교해지며, 입력 지연(Input Lag)이 줄어듭니다.
+                FPS 게임(배틀그라운드, 발로란트 등)을 즐기는 게이머라면 최소 500Hz 이상, 권장 1000Hz 설정을 사용하는 것이 좋습니다. 최근에는 4000Hz(4K), 8000Hz(8K)를
+                지원하는 초고성능 마우스도 등장하고 있습니다.
+            </p>
+
+            <h2>마우스 더블클릭 현상과 자가 진단</h2>
+            <p>
+                마우스를 한 번만 클릭했는데 두 번 클릭되는 현상은 스위치 내부의 접점(Metal Contact)이 산화되거나 금속 탄성이 약해져서 발생합니다. 이를
+                '채터링(Chattering)'이라고도 합니다.
+                본 테스트 도구는 <strong>50ms(0.05초) 미만</strong>의 아주 빠른 간격으로 연속 입력이 들어오면 이를 비정상으로 간주하고 경고를 띄웁니다.
+                인간의 손가락으로는 아무리 빨리 광클해도 보통 80~100ms 간격을 유지하기 때문입니다.
+            </p>
+
+            <h3>더블클릭 자가 수리법</h3>
+            <p>
+                AS 기간이 끝났다면 직접 수리해볼 수 있습니다. 가장 쉬운 방법은 <strong>접점부활제(BW-100)</strong>를 스위치 틈새로 살짝 뿌려주는 것입니다. 접점의 산화막을
+                제거하여 일시적으로 증상을 개선할 수 있습니다. 하지만 이는 임시방편이며, 가장 확실한 방법은 인두기를 사용하여 옴론(Omron), 카일(Kailh), 후아노(Huano) 등의 새
+                스위치로 교체하는 것입니다.
+            </p>
+
+            <h2>게이밍 마우스 선택 기준: DPI vs 폴링레이트</h2>
+            <p>
+                DPI(Dots Per Inch)는 마우스 민감도(이동 거리)를 나타내고, 폴링레이트는 보고 주기를 나타냅니다.
+                많은 분들이 높은 DPI가 좋다고 생각하지만, 사실 16000 DPI 같은 수치는 마케팅 용어에 가깝습니다. 실제 프로게이머들은 정밀한 에임 제어를 위해 400~800 DPI(저감도)를
+                주로 사용합니다.
+                반면 폴링레이트는 높을수록 좋지만, 1000Hz를 넘어가면 CPU 점유율이 상승할 수 있어 PC 사양에 맞춰 설정해야 합니다.
+            </p>
+        </article>
+    </div>
+
+    <script>
+        // --- Polling Rate Logic ---
+        const trackArea = document.getElementById('trackArea');
+        const hzValue = document.getElementById('hzValue');
+        const hzStatus = document.getElementById('hzStatus');
+        const maxHzLabel = document.getElementById('maxHz');
+        const canvas = document.getElementById('rateChart');
+        const ctx = canvas.getContext('2d');
+
+        let timestamps = [];
+        let maxHz = 0;
+        let isTracking = false;
+        const historySize = 50; // Points to plot
+        let hzHistory = new Array(historySize).fill(0);
+
+        trackArea.addEventListener('mouseenter', () => { isTracking = true; timestamps = []; });
+        trackArea.addEventListener('mouseleave', () => { isTracking = false; hzValue.textContent = '0'; hzStatus.textContent = 'Stopped'; });
+
+        trackArea.addEventListener('mousemove', (e) => {
+            if (!isTracking) return;
+
+            const now = performance.now();
+            timestamps.push(now);
+
+            // Keep only last 1 second of data for averaging, or just last N samples for stability
+            // Real measuring tools often calculate rolling average of gap between updates.
+
+            // Clean old timestamps (> 1s ago)
+            timestamps = timestamps.filter(t => now - t <= 500); // 0.5s window for faster update
+
+            if (timestamps.length < 5) return;
+
+            // Average interval calculation
+            // We need inter-event intervals
+            let sumInterval = 0;
+            for (let i = 1; i < timestamps.length; i++) {
+                sumInterval += (timestamps[i] - timestamps[i - 1]);
+            }
+            const avgInterval = sumInterval / (timestamps.length - 1);
+
+            if (avgInterval > 0) {
+                const currentHz = Math.round(1000 / avgInterval);
+
+                // Update Max
+                if (currentHz > maxHz) {
+                    maxHz = currentHz;
+                    maxHzLabel.textContent = `Max: ${maxHz} Hz`;
+                }
+
+                // Smooth display update (limit text rendering frequency if needed, but modern browsers handle this ok)
+                hzValue.textContent = currentHz;
+
+                // Status Text
+                if (currentHz < 130) hzStatus.textContent = "Standard (125Hz)";
+                else if (currentHz < 550) hzStatus.textContent = "Gaming (500Hz)";
+                else if (currentHz < 1100) hzStatus.textContent = "High Performance (1000Hz)";
+                else hzStatus.textContent = "Ultra High (1000Hz+)";
+
+                updateChart(currentHz);
+            }
+        });
+
+        function updateChart(val) {
+            hzHistory.push(val);
+            hzHistory.shift();
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#448AFF';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            const step = canvas.width / (historySize - 1);
+            // Auto scale Y? Or fixed 0-1200? Fixed is better for visual comparison
+            const scaleY = canvas.height / 1200;
+
+            for (let i = 0; i < historySize; i++) {
+                const h = hzHistory[i];
+                const x = i * step;
+                const y = canvas.height - (h * scaleY);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        // --- Double Click Logic ---
+        const lastClickTime = { Left: 0, Right: 0, Wheel: 0 };
+        const clickCounts = {
+            Left: { total: 0, dbl: 0 },
+            Right: { total: 0, dbl: 0 },
+            Wheel: { total: 0, dbl: 0 }
+        };
+
+        const clickLog = document.getElementById('clickLog');
+
+        function handleClick(e, type) {
+            // e.button: 0=Left, 1=Middle(Wheel), 2=Right
+            // But we pass type manually for clarity because wheel click is button 1
+            e.preventDefault(); // Prevent default selection or menu
+            e.stopPropagation();
+
+            const now = performance.now();
+            const timeDiff = now - lastClickTime[type];
+            lastClickTime[type] = now;
+
+            clickCounts[type].total++;
+
+            let isDouble = false;
+            // 50ms threshold is standard for debounce logic
+            if (timeDiff < 50 && timeDiff > 0) {
+                isDouble = true;
+                clickCounts[type].dbl++;
+                log(`⚠️ [${type}] Double Click Detected! Interval: ${timeDiff.toFixed(2)}ms`, true);
+                triggerWarning(type);
+            } else {
+                log(`[${type}] Click. Interval: ${timeDiff > 2000 ? '>2000' : timeDiff.toFixed(2)}ms`);
+            }
+
+            updateStats(type);
+        }
+
+        function triggerWarning(type) {
+            const btn = document.getElementById('btn' + type);
+            btn.classList.add('warning');
+            setTimeout(() => btn.classList.remove('warning'), 500);
+        }
+
+        function updateStats(type) {
+            const el = document.getElementById('count' + type);
+            const { total, dbl } = clickCounts[type];
+            el.textContent = `Clicks: ${total} | Dbl: ${dbl}`;
+            if (dbl > 0) el.style.color = '#FF5252';
+        }
+
+        function log(msg, isError = false) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + (isError ? 'log-error' : '');
+
+            const time = new Date().toLocaleTimeString().split(' ')[0];
+            entry.textContent = `[${time}] ${msg}`;
+
+            clickLog.prepend(entry);
+            // Limit log entries
+            if (clickLog.children.length > 50) clickLog.lastChild.remove();
+        }
+
+        function clearLog() {
+            clickLog.innerHTML = '<div class="log-entry" style="color:#aaa;">> Log Cleared</div>';
+            ['Left', 'Right', 'Wheel'].forEach(t => {
+                clickCounts[t] = { total: 0, dbl: 0 };
+                updateStats(t);
+                document.getElementById('count' + t).style.color = '#ccc';
+            });
+        }
+    </script>
+</body>
+
+</html>

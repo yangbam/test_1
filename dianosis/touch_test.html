@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>터치스크린 & 멀티터치 진단 도구</title>
+    <meta name="description" content="스마트폰, 태블릿의 터치 패널 불량과 멀티터치 성능을 진단하는 웹 도구입니다. 터치 끊김(데드존), 고스트 터치 현상을 시각적으로 확인하세요.">
+    <meta name="keywords" content="터치테스트, 멀티터치테스트, 터치스크린진단, 액정불량확인, 고스트터치, 터치끊김, 아이폰터치테스트, 갤럭시터치테스트">
+    <meta property="og:title" content="터치스크린 정밀 진단기 👆">
+    <meta property="og:description" content="내 폰의 터치는 정상일까? 멀티터치와 드로잉 테스트로 확인해보세요.">
+    <meta property="og:type" content="website">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-18HBM95WEK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-18HBM95WEK');
+    </script>
+
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --panel-bg: rgba(30, 30, 30, 0.8);
+            --accent-color: #00e5ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            touch-action: none; /* Critical: Disable default browser gestures */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden;
+            height: 100dvh; /* Dynamic Viewport Height */
+            display: flex;
+            flex-direction: column;
+        }
+
+        #drawCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            z-index: 1;
+        }
+
+        /* HUD Overlay */
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            background-color: var(--panel-bg);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            border: 1px solid #444;
+            pointer-events: none; /* Let touches pass through */
+        }
+
+        .touch-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: block;
+        }
+
+        .touch-status {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        .good-status {
+            color: #00e676; /* Green */
+            font-weight: bold;
+        }
+
+        /* Touch Points Indicators (Created dynamically or drawn on canvas) */
+        /* We will draw them on canvas for synchronized updates */
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s;
+        }
+
+        .btn:active {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* SEO Content (Hidden by default, shown via modal or below fold if not fullscreen app style) 
+           For this specific tool, since it's full-screen canvas, we put content in a lower section 
+           that might be visible if we allowed scrolling, BUT we disabled scrolling.
+           Solution: Use a "Read Info" button to toggle an overlay or put it below the fold 
+           and enable scrolling ONLY on the info container. 
+        */
+        
+        .info-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 20;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .info-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100;
+            overflow-y: auto;
+            padding: 40px 20px;
+            display: none; /* Hidden by default */
+            touch-action: auto; /* Enable scroll here */
+        }
+        
+        .info-overlay.active { display: block; }
+        .close-info { float: right; font-size: 2rem; cursor: pointer; color: #fff; }
+
+        .seo-content {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #ddd;
+        }
+        .seo-content h2 { color: var(--accent-color); border-bottom: 1px solid #444; padding-bottom: 10px; margin-top: 30px; }
+        .seo-content h3 { color: #ffab40; margin-top: 25px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="hud">
+        <span id="countDisplay" class="touch-count">터치 대기 중...</span>
+        <div id="statusMsg" class="touch-status">화면을 터치해보세요</div>
+    </div>
+
+    <button class="info-btn" onclick="toggleInfo()">ℹ️</button>
+
+    <canvas id="drawCanvas"></canvas>
+
+    <div class="controls">
+        <button class="btn" onclick="clearCanvas()">🧹 화면 지우기</button>
+    </div>
+
+    <!-- SEO & Info Overlay -->
+    <div id="infoOverlay" class="info-overlay">
+        <div class="seo-content">
+            <span class="close-info" onclick="toggleInfo()">&times;</span>
+            <h1>스마트폰 터치스크린 자가 진단</h1>
+            
+            <p>
+                이 도구는 스마트폰, 태블릿, 혹은 터치 지원 노트북의 패널 상태를 점검하는 웹 기반 유틸리티입니다. 별도의 앱 설치 없이 브라우저(Chrome, Safari, Samsung Internet 등)만으로 즉시 테스트가 가능합니다.
+            </p>
+
+            <h2>1. 터치 불량의 종류와 진단법</h2>
+            <h3>터치 튐 / 고스트 터치 (Ghost Touch)</h3>
+            <p>
+                손을 대지 않았는데도 스스로 눌리거나, 내가 누른 곳과 다른 곳이 터치되는 현상입니다. 충전기를 꽂은 상태에서 발생하는 경우 접지(Grounding) 문제일 가능성이 높습니다. 이 도구를 켜놓고 가만히 지켜보며 제멋대로 점이 찍히는지 확인해보세요.
+            </p>
+            
+            <h3>터치 끊김 / 데드존 (Dead Zone)</h3>
+            <p>
+                화면의 특정 영역이 터치를 인식하지 못하는 현상입니다. 캔버스에 그물망처럼 선을 촘촘하게 그려보세요. 선이 뚝뚝 끊기거나 그려지지 않는 구간이 있다면 하드웨어 결함일 수 있습니다. 주로 낙하 충격으로 인한 디지타이저 손상이 원인입니다.
+            </p>
+
+            <h2>2. 멀티터치 성능 확인</h2>
+            <p>
+                대부분의 최신 스마트폰은 10개까지의 멀티터치를 지원합니다. 하지만 일부 저가형 기기나 액정 교체 수리를 받은 기기(가품 액정 사용 시)는 2~5개까지만 인식되거나, 여러 개를 누르면 점이 합쳐지는 현상이 발생할 수 있습니다. 열 손가락을 모두 사용하여 테스트해보세요. 5개 이상 동시에 정상 인식되면 "멀티터치 정상(Good)" 메시지가 뜹니다.
+            </p>
+
+            <h2>3. 액정 보호 필름과 터치 감도</h2>
+            <p>
+                두꺼운 강화유리 필름은 터치 민감도를 떨어뜨릴 수 있습니다. 갤럭시 휴대폰의 경우 [설정] > [디스플레이] > [터치 민감도] 옵션을 켜면 개선될 수 있습니다. 만약 필름 부착 후 터치 오류가 잦다면 필름을 제거하고 다시 테스트해보는 것이 좋습니다.
+            </p>
+
+            <h2>4. 아이폰 vs 갤럭시 터치 샘플링 레이트</h2>
+            <p>
+                화면 주사율(120Hz)과는 별개로, 터치 입력을 감지하는 속도를 '터치 샘플링 레이트'라고 합니다. 보통 게이밍 폰은 240Hz~480Hz까지 지원하여 미세한 손가락 움직임을 더 빠르고 정확하게 추적합니다. 이 도구에서 매우 빠르게 원을 그렸을 때 선이 각지지 않고 부드러운 곡선으로 나타날수록 샘플링 레이트가 좋은 기기입니다.
+            </p>
+            <br><br>
+            <button class="btn" style="width:100%;" onclick="toggleInfo()">테스트로 돌아가기</button>
+            <br><br><br>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        const countDisplay = document.getElementById('countDisplay');
+        const statusMsg = document.getElementById('statusMsg');
+
+        // Color palette for different fingers (Touch IDs)
+        // Using distinct neon colors
+        const colors = [
+            '#FF1744', '#00E676', '#2979FF', '#FFEA00', '#D500F9',
+            '#FF9100', '#00B0FF', '#76FF03', '#F50057', '#651FFF'
+        ];
+
+        // Store active touches
+        let activeTouches = {}; // key: identifier, value: {x, y, color}
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Redraw persistent paths if we were storing them (optional, but clearing is safer for simplicity)
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function getTouchColor(id) {
+            // Simple hash or modulo to pick consistent color for ID
+            // Identifiers can be large integers on some devices
+            // We'll use a persistent random assignment or simple index for sequential touches?
+            // Let's rely on modulo of ID, though IDs might not be sequential.
+            // Better: Assign based on how many touches are active or random but cached?
+            // Actually, standard is usually sequential 0..N in Touch List? No, identifiers are unique.
+            // Let's just use modulo.
+            return colors[Math.abs(id) % colors.length];
+        }
+
+        // --- Touch Event Handlers ---
+        
+        function handleStart(e) {
+            e.preventDefault();
+            const touches = e.changedTouches;
+            
+            for (let i = 0; i < touches.length; i++) {
+                const touch = touches[i];
+                activeTouches[touch.identifier] = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    color: getTouchColor(touch.identifier)
+                };
+                
+                // Draw initial dot
+                ctx.beginPath();
+                ctx.arc(touch.clientX, touch.clientY, 10, 0, 2 * Math.PI);
+                ctx.fillStyle = activeTouches[touch.identifier].color;
+                ctx.fill();
+            }
+            updateHUD(e.touches.length);
+        }
+
+        function handleMove(e) {
+            e.preventDefault();
+            const touches = e.changedTouches;
+
+            for (let i = 0; i < touches.length; i++) {
+                const touch = touches[i];
+                const prev = activeTouches[touch.identifier];
+                
+                if (prev) {
+                    // Draw Line
+                    ctx.beginPath();
+                    ctx.moveTo(prev.x, prev.y);
+                    ctx.lineTo(touch.clientX, touch.clientY);
+                    ctx.strokeStyle = prev.color;
+                    ctx.lineWidth = 6;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.stroke();
+
+                    // Update pos
+                    prev.x = touch.clientX;
+                    prev.y = touch.clientY;
+                }
+            }
+            
+            // Re-render cursors on top? 
+            // Canvas logic: If we just draw lines, the old cursors are overdrawn. 
+            // For a paint app, just lines are fine. 
+            // For diagnostics, seeing the CURRENT point is helpful.
+            // We can rely on drawing the "current" indicator in an animation loop or 
+            // just draw a circle at the end of every move.
+            // Let's draw a small indicator at tip.
+            
+            // To do this cleanly without smearing, we usually need two layers:
+            // 1. Persistent Drawing Layer (Canvas)
+            // 2. Transient Cursor Layer (DOM or 2nd Canvas)
+            // For simplicity in single file, we will just draw circles on top of the line. 
+            // It leaves a "trail" of circles, which is actually fine/good for density checking.
+        }
+
+        function handleEnd(e) {
+            e.preventDefault();
+            const touches = e.changedTouches;
+            for (let i = 0; i < touches.length; i++) {
+                delete activeTouches[touches[i].identifier];
+            }
+            updateHUD(e.touches.length);
+        }
+
+        canvas.addEventListener('touchstart', handleStart, {passive: false});
+        canvas.addEventListener('touchmove', handleMove, {passive: false});
+        canvas.addEventListener('touchend', handleEnd);
+        canvas.addEventListener('touchcancel', handleEnd);
+        
+        // Mouse Fallback for testing on PC
+        let isMouseDown = false;
+        canvas.addEventListener('mousedown', (e) => {
+            isMouseDown = true;
+            activeTouches['mouse'] = { x: e.clientX, y: e.clientY, color: colors[0] };
+            ctx.beginPath();
+            ctx.arc(e.clientX, e.clientY, 10, 0, 2*Math.PI);
+            ctx.fillStyle = colors[0];
+            ctx.fill();
+            updateHUD(1);
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            if(!isMouseDown) return;
+            const prev = activeTouches['mouse'];
+            ctx.beginPath();
+            ctx.moveTo(prev.x, prev.y);
+            ctx.lineTo(e.clientX, e.clientY);
+            ctx.strokeStyle = prev.color;
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            prev.x = e.clientX;
+            prev.y = e.clientY;
+        });
+        canvas.addEventListener('mouseup', () => { isMouseDown = false; delete activeTouches['mouse']; updateHUD(0); });
+        canvas.addEventListener('mouseleave', () => { isMouseDown = false; delete activeTouches['mouse']; updateHUD(0); });
+
+
+        function updateHUD(count) {
+            countDisplay.innerText = `인식된 손가락: ${count}개`;
+            
+            if (count === 0) {
+                statusMsg.innerText = "화면을 터치해보세요";
+                statusMsg.classList.remove('good-status');
+            } else if (count >= 5) {
+                statusMsg.innerText = "✨ 멀티터치 정상 (Excellent!)";
+                statusMsg.classList.add('good-status');
+            } else {
+                statusMsg.innerText = "터치 추적 중...";
+                statusMsg.classList.remove('good-status');
+            }
+            
+            // Visualization of coordinates? (Optional per requirement 2: "ID and Coordinates")
+            // Since we use Canvas for drawing, showing text near finger is hard without clearing/redrawing whole frame.
+            // Requirement says "Draw circles and show ID/Coords NEXT to them". 
+            // If strictly following this, we need an Animation Frame loop to clear/redraw cursors over independent background layer.
+            // BUT user also asked for "Trajectory Drawing" (Line). 
+            // If we clear frame, we lose the line.
+            // Solution: Use DOM elements for the live cursors to overlay text/circle, use Canvas for the permanent line trail.
+            updateCursorOverlays();
+        }
+
+        // --- DOM Cursor Overlay System ---
+        // We need an overlay container
+        const cursorContainer = document.createElement('div');
+        cursorContainer.style.position = 'absolute';
+        cursorContainer.style.top = '0';
+        cursorContainer.style.left = '0';
+        cursorContainer.style.width = '100%';
+        cursorContainer.style.height = '100%';
+        cursorContainer.style.pointerEvents = 'none'; // Click-through
+        cursorContainer.style.zIndex = '5';
+        document.body.appendChild(cursorContainer);
+
+        function updateCursorOverlays() {
+            // This function is tricky to sync perfectly with events without lag,
+            // but we can update DOM positions in the `handleMove` directly or use requestAnimationFrame.
+            // Let's use `activeTouches` data.
+            // We need to sync the DOM elements with activeTouches.
+        }
+
+        // Let's enhance handleMove to update DOM cursors.
+        // We will create specific DOM elements for each touch.
+        // Rewriting handler logic slightly to support DOM cursors.
+        
+        function getOrCreateCursor(id, color) {
+            let el = document.getElementById('cursor-' + id);
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'cursor-' + id;
+                el.style.position = 'absolute';
+                el.style.width = '60px'; // larger touch target visual
+                el.style.height = '60px';
+                el.style.border = `3px solid ${color}`;
+                el.style.borderRadius = '50%';
+                el.style.transform = 'translate(-50%, -50%)';
+                el.style.display = 'flex';
+                el.style.alignItems = 'center';
+                el.style.justifyContent = 'center';
+                el.style.color = 'white';
+                el.style.fontWeight = 'bold';
+                el.style.textShadow = '0 0 4px black';
+                el.style.pointerEvents = 'none';
+                
+                const info = document.createElement('span');
+                info.style.position = 'absolute';
+                info.style.top = '-25px';
+                info.style.fontSize = '12px';
+                info.style.whiteSpace = 'nowrap';
+                info.className = 'cursor-info';
+                
+                el.appendChild(info);
+                cursorContainer.appendChild(el);
+            }
+            return el;
+        }
+
+        function removeCursor(id) {
+            const el = document.getElementById('cursor-' + id);
+            if (el) el.remove();
+        }
+
+        // Hooking DOM updates into events
+        // We'll wrap the logic:
+        
+        const originalStart = handleStart; // backup
+        canvas.removeEventListener('touchstart', handleStart, {passive:false});
+        // We already assigned listeners, let's just override or add inside.
+        
+        // Easier: Just rewrite the handlers logic in one place since I am authoring the file now.
+        // Implementing proper DOM sync inside handlers now.
+        
+    </script>
+    
+    <!-- Reloading script logic correctly for DOM + Canvas hybrid -->
+    <script>
+        // Clean slate for Logic
+        const cursors = {}; // DOM elements map
+
+        function updateTouchDOM(id, x, y, color) {
+            let el = cursors[id];
+            if (!el) {
+                el = document.createElement('div');
+                el.style.position = 'absolute';
+                el.style.border = `2px solid ${color}`; // Ring
+                el.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                el.style.width = '50px';
+                el.style.height = '50px';
+                el.style.borderRadius = '50%';
+                el.style.transform = 'translate(-50%, -50%)';
+                
+                // Label
+                let label = document.createElement('div');
+                label.className = 'info-label';
+                label.style.position = 'absolute';
+                label.style.top = '-20px';
+                label.style.left = '50%';
+                label.style.transform = 'translateX(-50%)';
+                label.style.color = '#fff';
+                label.style.fontSize = '12px';
+                label.style.textShadow = '0 1px 2px #000';
+                label.style.whiteSpace = 'nowrap';
+                el.appendChild(label);
+                
+                cursorContainer.appendChild(el);
+                cursors[id] = el;
+            }
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.querySelector('.info-label').innerText = `${id} (${Math.round(x)},${Math.round(y)})`;
+        }
+        
+        function removeTouchDOM(id) {
+            if (cursors[id]) {
+                cursors[id].remove();
+                delete cursors[id];
+            }
+        }
+
+        // Re-bind Events knowing we have DOM logic
+        canvas.ontouchstart = (e) => {
+            e.preventDefault();
+            const touches = e.changedTouches;
+            for(let i=0; i<touches.length; i++) {
+                const t = touches[i];
+                const c = getTouchColor(t.identifier);
+                activeTouches[t.identifier] = {x: t.clientX, y: t.clientY, color: c};
+                
+                // Canvas Dot
+                ctx.beginPath();
+                ctx.arc(t.clientX, t.clientY, 8, 0, Math.PI*2); // Start dot
+                ctx.fillStyle = c;
+                ctx.fill();
+
+                // DOM Cursor
+                updateTouchDOM(t.identifier, t.clientX, t.clientY, c);
+            }
+            updateHUD(e.touches.length);
+        };
+
+        canvas.ontouchmove = (e) => {
+            e.preventDefault();
+            const touches = e.changedTouches;
+            for(let i=0; i<touches.length; i++) {
+                const t = touches[i];
+                const prev = activeTouches[t.identifier];
+                if(prev) {
+                    // Line
+                    ctx.beginPath();
+                    ctx.moveTo(prev.x, prev.y);
+                    ctx.lineTo(t.clientX, t.clientY);
+                    ctx.strokeStyle = prev.color;
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+
+                    prev.x = t.clientX;
+                    prev.y = t.clientY;
+
+                    // DOM Overlay Update
+                    updateTouchDOM(t.identifier, t.clientX, t.clientY, prev.color);
+                }
+            }
+        };
+
+        canvas.ontouchend = (e) => {
+            e.preventDefault();
+            const touches = e.changedTouches;
+            for(let i=0; i<touches.length; i++) {
+                const t = touches[i];
+                delete activeTouches[t.identifier];
+                removeTouchDOM(t.identifier);
+            }
+            updateHUD(e.touches.length);
+        };
+        
+        canvas.ontouchcancel = canvas.ontouchend;
+
+        // Mouse (Mock) overrides
+        // ... (Already implemented above, just ensure it calls updateTouchDOM too if we want mouse cursor visual)
+        // For production touch tool, mouse is less critical but good for debugging.
+        
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function toggleInfo() {
+            const el = document.getElementById('infoOverlay');
+            el.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

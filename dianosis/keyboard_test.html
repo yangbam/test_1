@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>키보드 무한 동시입력(NKRO) & 고스팅 테스터</title>
+    <meta name="description"
+        content="기계식 키보드의 무한 동시입력(N-Key Rollover) 성능을 테스트하고, 안 눌리는 키(고스팅) 현상을 정밀 진단하는 온라인 웹 도구입니다.">
+    <meta name="keywords" content="키보드테스트, 무한동시입력, 키보드고스팅, NKRO테스트, 기계식키보드테스트, 키보드반응속도, 안눌리는키">
+    <meta property="og:title" content="키보드 무한 동시입력 테스터 ⌨️">
+    <meta property="og:description" content="내 키보드는 몇 개까지 동시에 눌릴까? 지금 바로 확인해보세요.">
+    <meta property="og:type" content="website">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-18HBM95WEK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-18HBM95WEK');
+    </script>
+
+    <style>
+        :root {
+            --bg: #121212;
+            --key-bg: #222;
+            --key-border: #444;
+            --key-text: #ccc;
+            --active-bg: #6200ea;
+            --active-shadow: 0 0 15px #651fff;
+            --history-bg: #333;
+            --history-text: #888;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+            background-color: var(--bg);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            /* Wider for full keyboard */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(98, 0, 234, 0.5);
+            margin-bottom: 10px;
+        }
+
+        /* DASHBOARD */
+        .dashboard {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+            background: #1e1e1e;
+            padding: 20px 40px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .counter-box {
+            text-align: center;
+        }
+
+        .counter-label {
+            display: block;
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .counter-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00e676;
+            /* Green */
+        }
+
+        .counter-value.max {
+            color: #ff4081;
+            /* Pink */
+        }
+
+        /* KEYBOARD LAYOUT */
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(23, 1fr);
+            /* Granular grid for precise layout */
+            gap: 6px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 2px solid #333;
+            user-select: none;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 1100px;
+            position: relative;
+        }
+
+        .key {
+            background-color: var(--key-bg);
+            border: 1px solid var(--key-border);
+            border-radius: 5px;
+            color: var(--key-text);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.05s;
+            position: relative;
+        }
+
+        .key.active {
+            background-color: var(--active-bg);
+            border-color: #aa00ff;
+            color: #fff;
+            box-shadow: var(--active-shadow);
+            transform: translateY(2px);
+            z-index: 10;
+        }
+
+        .key.pressed-history {
+            background-color: var(--history-bg);
+            color: var(--history-text);
+            border-color: #555;
+        }
+
+        /* KEY SIZES (Span classes) */
+        .w-2 {
+            grid-column: span 2;
+        }
+
+        .w-3 {
+            grid-column: span 3;
+        }
+
+        .w-4 {
+            grid-column: span 4;
+        }
+
+        .w-5 {
+            grid-column: span 5;
+        }
+
+        .w-6 {
+            grid-column: span 6;
+        }
+
+        .w-space {
+            grid-column: span 13;
+        }
+
+        /* Spacebar */
+
+        /* Separation Gaps */
+        .gap-1 {
+            grid-column: span 1;
+            visibility: hidden;
+        }
+
+        .gap-05 {
+            grid-column: span 1;
+            width: 50%;
+            visibility: hidden;
+        }
+
+        /* Row management via grid auto-flow usually handles it, but explicit rows help for standard layout */
+
+        /* Options */
+        .options {
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        .options label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* SEO Section */
+        .seo-section {
+            width: 100%;
+            max-width: 900px;
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 12px;
+            color: #ccc;
+            line-height: 1.7;
+        }
+
+        .seo-section h2 {
+            color: #b388ff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .seo-section h3 {
+            color: #fff;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .seo-section p {
+            margin-bottom: 15px;
+        }
+
+        .seo-section ul {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .keyboard {
+                overflow-x: auto;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .key {
+                width: 40px;
+                height: 40px;
+                font-size: 0.7rem;
+                margin: 2px;
+            }
+
+            /* Simplified mobile view fallback - Grid is hard on mobile */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Keyboard N-Key Rollover Tester</h1>
+            <p style="color:#888;">Test Ghosting & Simultaneous Inputs</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="counter-box">
+                <span class="counter-label">Current Pressing</span>
+                <span id="currentCount" class="counter-value">0</span>
+            </div>
+            <div class="counter-box">
+                <span class="counter-label">Max Record</span>
+                <span id="maxCount" class="counter-value max">0</span>
+            </div>
+        </div>
+
+        <div class="options">
+            <label>
+                <input type="checkbox" id="preventDef" checked>
+                Block Shortcuts (e.g. F5, Alt+Tab prevention)
+            </label>
+            <button onclick="resetHistory()"
+                style="margin-left:20px; padding:5px 15px; background:#333; border:1px solid #555; color:#fff; cursor:pointer; border-radius:4px;">Reset
+                History</button>
+        </div>
+
+        <!-- KEYBOARD RENDERING -->
+        <!-- We will construct specific rows for standard 104 ANSI layout -->
+        <!-- Using a container with flex-wrap rows is easier than pure grid for the uneven keys -->
+        <div id="keyboard" class="keyboard" style="display:flex; flex-direction:column; gap:6px;">
+            <!-- Row 1: Esc, F1-F12, Print... -->
+            <div class="row" style="display:flex; justify-content:space-between; width:100%;">
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="Escape" style="width:50px;">Esc</button>
+                    <div style="width:20px;"></div>
+                    <button class="key" data-code="F1" style="width:50px;">F1</button>
+                    <button class="key" data-code="F2" style="width:50px;">F2</button>
+                    <button class="key" data-code="F3" style="width:50px;">F3</button>
+                    <button class="key" data-code="F4" style="width:50px;">F4</button>
+                    <div style="width:20px;"></div>
+                    <button class="key" data-code="F5" style="width:50px;">F5</button>
+                    <button class="key" data-code="F6" style="width:50px;">F6</button>
+                    <button class="key" data-code="F7" style="width:50px;">F7</button>
+                    <button class="key" data-code="F8" style="width:50px;">F8</button>
+                    <div style="width:20px;"></div>
+                    <button class="key" data-code="F9" style="width:50px;">F9</button>
+                    <button class="key" data-code="F10" style="width:50px;">F10</button>
+                    <button class="key" data-code="F11" style="width:50px;">F11</button>
+                    <button class="key" data-code="F12" style="width:50px;">F12</button>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="PrintScreen" style="width:50px; font-size:0.7rem;">PrtSc</button>
+                    <button class="key" data-code="ScrollLock" style="width:50px; font-size:0.7rem;">ScLk</button>
+                    <button class="key" data-code="Pause" style="width:50px; font-size:0.7rem;">Pause</button>
+                </div>
+            </div>
+
+            <!-- Row 2: ~ to Backspace, Ins/Home/PgUp, Num -->
+            <div class="row" style="display:flex; justify-content:space-between; width:100%;">
+                <!-- Main Block -->
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="Backquote" style="width:50px;">`</button>
+                    <button class="key" data-code="Digit1" style="width:50px;">1</button>
+                    <button class="key" data-code="Digit2" style="width:50px;">2</button>
+                    <button class="key" data-code="Digit3" style="width:50px;">3</button>
+                    <button class="key" data-code="Digit4" style="width:50px;">4</button>
+                    <button class="key" data-code="Digit5" style="width:50px;">5</button>
+                    <button class="key" data-code="Digit6" style="width:50px;">6</button>
+                    <button class="key" data-code="Digit7" style="width:50px;">7</button>
+                    <button class="key" data-code="Digit8" style="width:50px;">8</button>
+                    <button class="key" data-code="Digit9" style="width:50px;">9</button>
+                    <button class="key" data-code="Digit0" style="width:50px;">0</button>
+                    <button class="key" data-code="Minus" style="width:50px;">-</button>
+                    <button class="key" data-code="Equal" style="width:50px;">=</button>
+                    <button class="key" data-code="Backspace" style="width:106px;">Backspace</button>
+                </div>
+                <!-- Nav Block -->
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="Insert" style="width:50px; font-size:0.7rem;">Ins</button>
+                    <button class="key" data-code="Home" style="width:50px; font-size:0.7rem;">Home</button>
+                    <button class="key" data-code="PageUp" style="width:50px; font-size:0.7rem;">PgUp</button>
+                </div>
+            </div>
+
+            <!-- Row 3: Tab to \, Del/End/PgDn, 789+ -->
+            <div class="row" style="display:flex; justify-content:space-between; width:100%;">
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="Tab" style="width:78px;">Tab</button>
+                    <button class="key" data-code="KeyQ" style="width:50px;">Q</button>
+                    <button class="key" data-code="KeyW" style="width:50px;">W</button>
+                    <button class="key" data-code="KeyE" style="width:50px;">E</button>
+                    <button class="key" data-code="KeyR" style="width:50px;">R</button>
+                    <button class="key" data-code="KeyT" style="width:50px;">T</button>
+                    <button class="key" data-code="KeyY" style="width:50px;">Y</button>
+                    <button class="key" data-code="KeyU" style="width:50px;">U</button>
+                    <button class="key" data-code="KeyI" style="width:50px;">I</button>
+                    <button class="key" data-code="KeyO" style="width:50px;">O</button>
+                    <button class="key" data-code="KeyP" style="width:50px;">P</button>
+                    <button class="key" data-code="BracketLeft" style="width:50px;">[</button>
+                    <button class="key" data-code="BracketRight" style="width:50px;">]</button>
+                    <button class="key" data-code="Backslash" style="width:78px;">\</button>
+                </div>
+                <!-- Nav -->
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="Delete" style="width:50px; font-size:0.7rem;">Del</button>
+                    <button class="key" data-code="End" style="width:50px; font-size:0.7rem;">End</button>
+                    <button class="key" data-code="PageDown" style="width:50px; font-size:0.7rem;">PgDn</button>
+                </div>
+
+            </div>
+
+            <!-- Row 4: Caps to Enter, 456 -->
+            <div class="row" style="display:flex; justify-content:space-between; width:100%;">
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="CapsLock" style="width:92px;">Caps</button>
+                    <button class="key" data-code="KeyA" style="width:50px;">A</button>
+                    <button class="key" data-code="KeyS" style="width:50px;">S</button>
+                    <button class="key" data-code="KeyD" style="width:50px;">D</button>
+                    <button class="key" data-code="KeyF" style="width:50px;">F</button>
+                    <button class="key" data-code="KeyG" style="width:50px;">G</button>
+                    <button class="key" data-code="KeyH" style="width:50px;">H</button>
+                    <button class="key" data-code="KeyJ" style="width:50px;">J</button>
+                    <button class="key" data-code="KeyK" style="width:50px;">K</button>
+                    <button class="key" data-code="KeyL" style="width:50px;">L</button>
+                    <button class="key" data-code="Semicolon" style="width:50px;">;</button>
+                    <button class="key" data-code="Quote" style="width:50px;">'</button>
+                    <button class="key" data-code="Enter" style="width:120px;">Enter</button>
+                </div>
+                <div style="width:162px;"></div> <!-- Nav Gap -->
+
+            </div>
+
+            <!-- Row 5: Shift to Shift, Arrow Up, 123 Ent -->
+            <div class="row" style="display:flex; justify-content:space-between; width:100%;">
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="ShiftLeft" style="width:120px;">Shift</button>
+                    <button class="key" data-code="KeyZ" style="width:50px;">Z</button>
+                    <button class="key" data-code="KeyX" style="width:50px;">X</button>
+                    <button class="key" data-code="KeyC" style="width:50px;">C</button>
+                    <button class="key" data-code="KeyV" style="width:50px;">V</button>
+                    <button class="key" data-code="KeyB" style="width:50px;">B</button>
+                    <button class="key" data-code="KeyN" style="width:50px;">N</button>
+                    <button class="key" data-code="KeyM" style="width:50px;">M</button>
+                    <button class="key" data-code="Comma" style="width:50px;">,</button>
+                    <button class="key" data-code="Period" style="width:50px;">.</button>
+                    <button class="key" data-code="Slash" style="width:50px;">/</button>
+                    <button class="key" data-code="ShiftRight" style="width:148px;">Shift</button>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <div style="width:50px;"></div>
+                    <button class="key" data-code="ArrowUp" style="width:50px;">▲</button>
+                    <div style="width:50px;"></div>
+                </div>
+
+            </div>
+
+            <div class="row" style="display:flex; justify-content:space-between; width:100%;">
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="ControlLeft" style="width:64px;">Ctrl</button>
+                    <button class="key" data-code="MetaLeft" style="width:64px;">Win</button>
+                    <button class="key" data-code="AltLeft" style="width:64px;">Alt</button>
+                    <button class="key" data-code="Space" style="width:344px;">Space</button>
+                    <button class="key" data-code="AltRight" style="width:64px;">Alt</button>
+                    <button class="key" data-code="MetaRight" style="width:64px;">Win</button>
+                    <button class="key" data-code="ContextMenu" style="width:64px;">Menu</button>
+                    <button class="key" data-code="ControlRight" style="width:64px;">Ctrl</button>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <button class="key" data-code="ArrowLeft" style="width:50px;">◀</button>
+                    <button class="key" data-code="ArrowDown" style="width:50px;">▼</button>
+                    <button class="key" data-code="ArrowRight" style="width:50px;">▶</button>
+                </div>
+
+            </div>
+        </div>
+
+        <article class="seo-section">
+            <h2>무한 동시입력(N-Key Rollover)이란 무엇인가요?</h2>
+            <p>
+                보통의 저렴한 멤브레인 키보드는 설계 구조상 3~6개 이상의 키를 동시에 누르면 인식이 안 되는 현상이 발생하는데, 이를 <strong>'고스팅(Ghosting)'</strong>이라고
+                합니다. 반면, 기계식 키보드나 고성능 게이밍 키보드는 다이오드 처리를 통해 모든 키를 동시에 눌러도 각각의 신호를 독립적으로 인식할 수 있습니다. 이를 NKRO(N-Key
+                Rollover), 즉 '무한 동시입력'이라고 부릅니다.
+            </p>
+            <h3>게이밍 키보드에서 왜 중요한가요?</h3>
+            <p>
+                리듬 게임(DJMAX, EZ2ON)이나 격투 게임(철권)을 할 때, 혹은 FPS 게임(발로란트)에서 대각선 이동(W+D) 중 점프(Space)와 장전(R), 앉기(Ctrl) 등을 동시에
+                눌러야 하는 상황이 빈번합니다. 이때 키보드가 특정 키를 인식하지 못하면 치명적인 실수로 이어질 수 있습니다. 본 테스트 도구를 사용하여 내 키보드가 몇 개의 동시 입력을 지원하는지,
+                특정 키 조합(예: Shift + W + R)이 씹히지 않는지 확인해보세요.
+            </p>
+
+            <h2>기계식 키보드 축 종류: 청축 vs 적축 vs 갈축</h2>
+            <ul>
+                <li><strong>청축 (Clicky):</strong> 짤깍거리는 경쾌한 소리와 타건감이 특징입니다. PC방에서 주로 볼 수 있으며 타자 칠 때 즐겁지만, 소음이 커서 사무용으로는
+                    부적합할 수 있습니다.</li>
+                <li><strong>적축 (Linear):</strong> 걸리는 느낌 없이 쑥 눌리는 부드러운 키감입니다. 소음이 적고 반응이 빨라 게이머들에게 가장 인기가 높습니다.</li>
+                <li><strong>갈축 (Tactile):</strong> 청축의 구분감(걸리는 느낌)은 유지하되 소음을 줄인 하이브리드 축입니다. 입문용으로 가장 무난합니다.</li>
+            </ul>
+        </article>
+    </div>
+
+    <script>
+        const keyMap = {};
+        const activeKeys = new Set();
+        let maxKeys = 0;
+
+        // Init: Map data-code to element
+        document.querySelectorAll('.key').forEach(el => {
+            keyMap[el.getAttribute('data-code')] = el;
+        });
+
+        // Event Listeners
+        window.addEventListener('keydown', (e) => {
+            // Prevent Default Option
+            if (document.getElementById('preventDef').checked) {
+                // Allow Refresh (F5), Inspect (F12) unless critical?
+                // Actually user said F5 or Alt+Tab might disturb.
+                // Complete prevention can be annoying, let's block common annoyance
+                // e.preventDefault(); 
+
+                // Let's block everything EXCEPT reload/tools if needed, but normally preventDefault blocks F5 too.
+                // Safe approach: block all to verify test accurately.
+                e.preventDefault();
+            }
+
+            const code = e.code;
+            activeKeys.add(code);
+            updateUI();
+
+            if (keyMap[code]) {
+                const el = keyMap[code];
+                el.classList.add('active');
+                el.classList.add('pressed-history');
+            } else {
+                console.log('Unknown Key:', code);
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (document.getElementById('preventDef').checked) {
+                e.preventDefault();
+            }
+            const code = e.code;
+            activeKeys.delete(code);
+            updateUI();
+
+            if (keyMap[code]) {
+                keyMap[code].classList.remove('active');
+            }
+        });
+
+        // Window blur safeguard
+        window.addEventListener('blur', () => {
+            activeKeys.clear();
+            updateUI();
+            document.querySelectorAll('.key.active').forEach(el => el.classList.remove('active'));
+        });
+
+        function updateUI() {
+            const count = activeKeys.size;
+            document.getElementById('currentCount').textContent = count;
+
+            if (count > maxKeys) {
+                maxKeys = count;
+                document.getElementById('maxCount').textContent = maxKeys;
+            }
+        }
+
+        function resetHistory() {
+            document.querySelectorAll('.pressed-history').forEach(el => el.classList.remove('pressed-history'));
+            maxKeys = 0;
+            document.getElementById('maxCount').textContent = 0;
+        }
+    </script>
+</body>
+
+</html>
