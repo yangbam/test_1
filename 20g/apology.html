@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>만능 반성문 생성기 - 상황별 사과문/시말서 자동 작성</title>
+    <meta name="description"
+        content="교수님, 직장 상사, 연인에게 보낼 사과문을 1초 만에 완성하세요. 상황과 어조를 선택하면 2000자 분량의 진정성 있는 반성문을 자동으로 써드립니다.">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-18HBM95WEK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-18HBM95WEK');
+    </script>
+
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --bg: #F0F2F5;
+            --text: #2d3436;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            /* Wider for better reading */
+            background: var(--white);
+            min-height: 100vh;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-home {
+            position: absolute;
+            top: 25px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+            font-weight: 300;
+        }
+
+        main {
+            padding: 30px 25px;
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            /* Increased spacing significantly */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 30px;
+            /* Further increased to 40px */
+            font-weight: 700;
+            color: #444;
+            font-size: 1rem;
+        }
+
+        select,
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #e1e1e1;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #fdfdfd;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .radio-label {
+            flex: 1;
+            padding: 12px 10px;
+            border: 1px solid #e1e1e1;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #666;
+            transition: all 0.2s;
+            background-color: #fafafa;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        input[type="radio"]:checked+.radio-label {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        button.generate-btn {
+            width: 100%;
+            padding: 18px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 40px;
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.3);
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        button.generate-btn:hover {
+            background-color: #5f50cc;
+        }
+
+        button.generate-btn:active {
+            transform: scale(0.98);
+        }
+
+        .result-area {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px dashed #eee;
+            display: none;
+        }
+
+        .result-area.active {
+            display: block;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.7;
+            resize: vertical;
+            background-color: #fff;
+            color: #333;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-copy {
+            background-color: #2d3436;
+            color: white;
+        }
+
+        .btn-kakao {
+            background-color: #FEE500;
+            color: #3c1e1e;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .gift-link {
+            display: block;
+            margin-top: 25px;
+            padding: 18px;
+            background: linear-gradient(45deg, #ff7675, #fab1a0);
+            color: white;
+            text-align: center;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.05rem;
+            box-shadow: 0 6px 15px rgba(255, 118, 117, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* SEO Section */
+        .seo-section {
+            padding: 40px 30px;
+            background: #fff;
+            border-top: 10px solid #f1f2f6;
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .seo-section h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .seo-section h3 {
+            color: #2d3436;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+            padding-left: 12px;
+        }
+
+        .seo-section p {
+            margin-bottom: 15px;
+            word-break: keep-all;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: #f1f2f6;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <a href="index.html" class="nav-home">←</a>
+            <h1>만능 반성문 생성기 🙇‍♂️</h1>
+            <p class="subtitle">어떤 잘못이라도 용서받는 마법의 문장 (대용량)</p>
+        </header>
+
+        <main>
+            <div class="form-group">
+                <label>누구에게 보내나요 (Target)</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="target" value="professor" checked>
+                        <span class="radio-label">교수님</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="target" value="boss">
+                        <span class="radio-label">직장 상사</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="target" value="lover">
+                        <span class="radio-label">연인</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="target" value="parents">
+                        <span class="radio-label">부모님</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>무슨 잘못을 했나요 (Reason)</label>
+                <select id="reason">
+                    <option value="late">지각 / 결석 / 결근</option>
+                    <option value="mistake">업무/과제 실수</option>
+                    <option value="forgot">중요한 기념일/일정 망각</option>
+                    <option value="contact">연락 두절 (잠수)</option>
+                    <option value="lie">거짓말하다 걸림</option>
+                    <option value="accident">물건 파손/사고</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>감성 설정 (Tone Mode)</label>
+                <div class="radio-group" style="gap:10px;">
+                    <label style="flex:1;">
+                        <input type="radio" name="tone" value="desperate" checked>
+                        <span class="radio-label">😭 절박/비굴</span>
+                    </label>
+                    <label style="flex:1;">
+                        <input type="radio" name="tone" value="formal">
+                        <span class="radio-label">👔 논리/정중</span>
+                    </label>
+                    <label style="flex:1;">
+                        <input type="radio" name="tone" value="emotional">
+                        <span class="radio-label">🥺 감성/호소</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="generate-btn" onclick="generateLongApology()">✍️ 2000자 반성문 생성하기</button>
+
+            <div id="resultArea" class="result-area">
+                <label>생성된 사과문 <span style="font-weight:normal; font-size:0.8rem; color:var(--primary);">(내용을 수정해서
+                        사용하세요)</span></label>
+                <textarea id="resultText" readonly></textarea>
+                <div class="char-count" id="charCount">0자</div>
+
+                <div class="action-buttons">
+                    <button class="action-btn btn-copy" onclick="copyText()">📋 복사하기</button>
+                    <button class="action-btn btn-kakao" onclick="shareKakao()">💬 카톡 공유</button>
+                </div>
+
+                <a href="https://gift.kakao.com/home" target="_blank" class="gift-link">
+                    🎁 말로 하기 힘들 땐? <br>진심이 담긴 작은 선물 함께 보내기
+                </a>
+            </div>
+        </main>
+
+        <article class="seo-section">
+            <h2>차원이 다른 사과문, 왜 길어야 할까요?</h2>
+            <p>
+                짧은 사과문은 "성의가 없다"는 인상을 주기 쉽습니다. 반면, 장문의 사과문은 읽는 사람으로 하여금 "이 사람이 이 문제에 대해 이렇게 깊이 고민했구나"라는 인식을 심어줍니다.
+                특히 교수님이나 직장 상사와 같은 공적인 관계에서는 <strong>논리적인 인과관계 분석</strong>과 <strong>구체적인 재발 방지 대책</strong>이 포함된 긴 글이
+                필수적입니다.
+                연인 관계에서도 마찬가지입니다. 단순히 "미안해"라는 말 대신, 우리가 함께했던 추억과 당신의 소중함을 길게 풀어서 이야기할 때 닫혔던 마음의 문이 열립니다.
+            </p>
+
+            <h3>제재 조치 감경을 위한 팁</h3>
+            <p>
+                시말서나 경위서를 작성할 때 가장 중요한 것은 '변명하지 않는 것'처럼 보이면서 '불가피한 상황'을 은근히 어필하는 고도의 전략입니다.
+                본 생성기는 이러한 심리학적 기법을 적용하여, 자신의 잘못을 100% 인정하는 듯한 문장 속에 "평소의 성실함"과 "이번 실수의 우발성"을 녹여냅니다.
+                이는 징계 수위를 낮추거나 상대방의 화를 누그러뜨리는 데 매우 효과적입니다.
+            </p>
+        </article>
+
+        <footer>
+            &copy; 2026 20g Lab. Educational Purpose Only.
+        </footer>
+    </div>
+
+    <script>
+        // --- Data Source for Long Text Generation ---
+        // Instead of single lines, we use arrays of long paragraphs.
+
+        const strategies = {
+            formal: {
+                openers: [
+                    "존경하는 %NAME%께,\n\n안녕하십니까. 본인은 금번 발생한 불미스러운 사안과 관련하여, 깊은 사죄의 말씀을 올리고자 무거운 마음으로 펜을 들었습니다. 평소 %NAME%께서 저에게 보여주신 신뢰와 기대가 얼마나 컸는지 잘 알고 있기에, 저의 부주의하고 미숙한 행동이 초래한 결과가 더욱 뼈아프게 느껴집니다.",
+                    "%NAME%께,\n\n우선 본인의 부족함으로 인해 심려를 끼쳐드린 점, 머리 숙여 깊이 사죄드립니다. 그동안 %NAME%의 지도 편달 아래 성실히 임하고자 노력해 왔으나, 저의 안일한 판단과 부족한 책임감으로 인해 결코 있어서는 안 될 과오를 범하고 말았습니다."
+                ],
+                recognitions: [
+                    "저는 %REASON%라는 중대한 실수를 저질렀습니다. 이는 단순히 일회성의 실수로 치부할 수 없는, 저의 기본적인 태도와 마음가짐에서 비롯된 문제임을 통감하고 있습니다. 조직(또는 공동체)의 규율과 약속은 무엇보다 우선되어야 하는 가치임에도 불구하고, 이를 망각하고 편의주의적인 사고방식으로 행동했던 저 자신이 너무나 부끄럽습니다.",
+                    "금번 %REASON% 건은 변명의 여지가 없는 저의 명백한 귀책사유입니다. 당시 상황을 돌이켜볼 때, 제가 조금만 더 주의를 기울이고 규정을 준수했다면 충분히 예방할 수 있었던 문제였기에 자책감이 더욱 큽니다. 저의 행동이 %NAME%뿐만 아니라 주변 동료들과 전체 분위기에 미칠 부정적인 영향까지 미처 헤아리지 못했습니다."
+                ],
+                reflections: [ // This is the 'Filler' logic to increase length
+                    "사건 발생 직후부터 현재까지, 저는 제가 저지른 행동의 원인과 배경에 대해 밤을 지새우며 깊이 반성해보았습니다. 겉으로 드러난 현상보다 더 근본적인 문제는 제 내면에 자리 잡고 있던 나태함과 안일함이었습니다. '이 정도면 괜찮겠지'라는 안일한 생각이 모여 결국 큰 화를 불렀다는 사실을 뼈저리게 느끼고 있습니다.\n\n또한, 저의 행동이 단순히 저 개인의 문제로 끝나지 않고, %NAME%께서 그동안 쌓아오신 명예와 원칙에도 누를 끼칠 수 있다는 사실을 뒤늦게 깨닫고 공포감마저 느꼈습니다. 신뢰를 쌓는 데는 수년이 걸리지만, 그것을 무너뜨리는 건 한순간이라는 옛말이 하나도 틀리지 않음을 몸소 체험하고 있습니다.",
+                    "이번 일을 통해 저는 제 자신이 얼마나 부족한 사람인지 절실히 깨달았습니다. 그동안 %NAME%의 배려 속에서 제가 잠시 자만했던 것은 아닌지, 초심을 잃고 타성에 젖어 있었던 것은 아닌지 스스로를 매섭게 질책하였습니다. 거울 속에 비친 제 모습이 너무나 초라하고 부끄러워 고개를 들 수가 없습니다. 하지만 이미 엎질러진 물이기에, 후회만 하고 있기보다는 냉철하게 저의 과오를 분석하고 다시는 같은 실수를 반복하지 않는 것이 %NAME%에 대한 최소한의 도리라고 생각했습니다."
+                ],
+                resolutions: [
+                    "이에 저는 다음과 같은 재발 방지 대책을 수립하고, 이를 생명처럼 지킬 것을 약속드립니다.\n\n첫째, 기본으로 돌아가겠습니다. 초심자의 마음가짐으로 모든 업무(또는 학업) 프로세스를 재점검하고, 사소한 규정 하나라도 소홀히 하지 않겠습니다.\n둘째, 자기 관리 시스템을 강화하겠습니다. 다시는 같은 원인으로 문제가 발생하지 않도록 체크리스트를 생활화하고, 주변의 조언을 경청하는 열린 자세를 갖겠습니다.\n셋째, 신뢰 회복을 위해 배전의 노력을 기울이겠습니다. 말뿐인 사과가 아니라, 행동으로 변화된 모습을 보여드려 언젠가는 %NAME%께서 '다시 믿어볼 만한 사람'이라고 생각하실 수 있도록 모든 열정을 쏟겠습니다.",
+                    "이번 사태를 수습하기 위해 제가 할 수 있는 모든 조치를 취하겠습니다. 우선 발생한 피해를 최소화하는 데 전력을 다할 것이며, 이후 어떤 처분이나 질책도 달게 받겠습니다. 이번 시련을 제 인생의 반면교사로 삼아, 뼛속 깊이 새기고 또 새기겠습니다. 단순히 위기를 모면하기 위한 임시방편의 태도가 아님을, 앞으로의 시간들을 통해 증명해 보이겠습니다."
+                ],
+                closings: [
+                    "다시 한번 %NAME%께 큰 실망을 안겨드린 점 사죄드립니다. 부디 너그러운 마음으로 저의 부족함을 질책해 주시되, 한 번만 더 기회를 주신다면 분골쇄신의 각오로 기대에 보답하겠습니다.\n\n죄송합니다. 그리고 감사합니다.\n\n2026년 O월 O일\nOOO 올림",
+                    "입이 열 개라도 할 말이 없지만, 염치 불구하고 용서를 구합니다. 이 반성문 한 장에 저의 모든 뉘우침을 담을 수는 없겠지만, 적어도 제 마음의 진정성만큼은 전해지기를 간절히 소망합니다.\n\n평안하신 날들에 심려를 끼쳐드려 거듭 죄송합니다.\n\nOOO 배상"
+                ]
+            },
+            emotional: {
+                openers: [
+                    "사랑하는 %NAME%에게,\n\n펜을 들기까지 참 많은 시간이 걸렸어. 너의 이름을 부르는 것조차 지금의 나에게는 사치스럽고 미안해서, 몇 번을 쓰고 지우기를 반복했는지 몰라. 지금 네가 느끼고 있을 실망감과 상처를 생각하면 내 가슴이 찢어지는 것 같아.",
+                    "%NAME%아,\n\n어디서부터 이야기를 시작해야 할까. 너의 차가운 눈빛과 돌아선 뒷모습이 내 머릿속을 떠나지 않아서 숨을 쉬는 것조차 힘이 들어. 내가 너에게 얼마나 큰 잘못을 했는지, 네가 얼마나 아팠을지 생각하면 나 자신이 너무 밉고 원망스러워."
+                ],
+                recognitions: [
+                    "내가 저지른 %REASON% 행동은 그 어떤 변명으로도 정당화될 수 없다는 걸 잘 알아. 너는 항상 나를 믿어주고 기다려줬는데, 나는 너의 그 믿음을 너무나 쉽게 배신했어. 너에게 내가 유일한 안식처가 되어주지는 못할망정, 오히려 가장 큰 아픔을 주는 존재가 되어버렸다는 사실이 나를 미치게 만들어.",
+                    "%REASON%라니... 내가 생각해도 정말 어이없고 화가 나는데, 당사자인 너는 오죽할까. 너의 입장에서 1분만 생각했어도 절대 하지 않았을 행동이었어. 나의 이기심과 배려 없음이 너의 맑은 눈에 눈물이 고이게 만들었구나."
+                ],
+                reflections: [
+                    "우리가 함께했던 시간들을 하나하나 떠올려봤어. 처음 만났을 때의 설렘, 함께 웃었던 수많은 날들, 그리고 서로에게 힘이 되어주기로 약속했던 순간들... 내가 그 소중한 추억들을 내 손으로 더럽힌 것 같아서 견딜 수가 없어. 네가 내 옆에 있는 게 당연하다고 생각했던 걸까? 익숙함에 속아 소중함을 잃는 바보 같은 짓을 내가 하고 말았어.\n\n네가 없는 나의 하루는 상상조차 할 수 없어. 아침에 눈을 뜨고 잠들 때까지 모든 순간에 네가 있었는데, 이제 내 잘못으로 그 자리가 비어버릴까 봐 너무 두려워. 네가 받았을 상처를 내가 대신 다 가져갈 수만 있다면, 악마에게 영혼이라도 팔고 싶은 심정이야.",
+                    "너는 나에게 단순한 연인 이상이야. 나의 가장 친한 친구이자, 멘토이자, 나의 세상 그 자체였어. 그런 너에게 상처를 입힌 건 내 세상 전체를 무너뜨린 것과 같아. 내가 뱉은 말들, 내가 한 행동들이 비수가 되어 네 가슴에 꽂혔을 걸 생각하면, 차라리 내가 그 비수를 맞고 쓰러지는 게 낫겠다는 생각이 들어. 정말 미안해. 내가 너무 못나서, 너의 사랑을 받을 자격이 부족해서 미안해."
+                ],
+                resolutions: [
+                    "뻔한 말로 들릴지 모르겠지만, 정말 달라질게. 아니, 달라져야만 해. 너를 잃는다는 건 나에게 죽음과도 같으니까.\n앞으로는 내 감정보다 너의 감정을 먼저 살피고, 말하기 전에 세 번 생각하고 행동할게. 네가 싫어하는 건 절대 하지 않고, 네가 웃을 수 있는 일만 찾아서 할게. 나의 모든 시간과 노력을 너의 상처를 치유하는 데 쓸게.",
+                    "다시는 네 눈에서 눈물 나게 하지 않겠다고 맹세할게. 내 남은 인생을 너에게 속죄하는 마음으로 살게 해줘. 예전처럼 우리가 다시 웃을 수만 있다면, 나는 뭐든지 할 수 있어. 밤하늘의 별이라도 따다 주고 싶은 내 마음은 변치 않았어. 다만 그 마음을 표현하는 방식이 너무 서툴고 어리석었을 뿐이야."
+                ],
+                closings: [
+                    "부디 이 편지가 너에게 조금이라도 닿기를 기도해. 당장 용서해 달라고 떼쓰지 않을게. 네가 화가 풀릴 때까지, 마음이 열릴 때까지 언제까지나 기다릴게. \n\n여전히 너를 세상에서 가장 사랑하는 못난 나 올림.",
+                    "제발 나를 버리지 말아 줘. 너 없이는 나도 없어. 다시 한번만 나를 믿어준다면, 세상에서 가장 행복한 사람으로 만들어 줄게. \n\n사랑해, 미안해, 그리고 고마워."
+                ]
+            }
+        };
+
+        // Generic fillers to maximize length (Common for all types)
+        const longFillers = [
+            "\n\n이 글을 쓰고 있는 지금 이 순간에도 제 손은 떨리고 마음은 진정되지 않습니다. 하지만 회피하는 것은 비겁한 짓이기에, 용기를 내어 저의 부끄러운 민낯을 마주하고 있습니다. 사람은 실수를 통해 성장한다고 하지만, 저의 이번 실수는 성장의 밑거름으로 삼기에는 대가가 너무나 큽니다. 그럼에도 불구하고 염치없이 희망을 이야기하는 것은, %NAME%와의 관계가 저에게 그만큼 절실하고 소중하기 때문입니다.\n\n",
+            "\n\n세상에 완벽한 사람은 없지만, 노력하는 사람은 있습니다. 저는 완벽하지는 못했습니다. 하지만 이번 일을 계기로 누구보다 치열하게 반성하고 노력하는 사람이 되겠습니다. 저의 뼈를 깎는 반성과 노력이 %NAME%의 마음에 닿아, 얼어붙은 신뢰가 조금이라도 녹을 수 있다면 저는 더 바랄 것이 없습니다.\n\n"
+        ];
+
+        function generateLongApology() {
+            const target = document.querySelector('input[name="target"]:checked').value;
+            const reasonKey = document.getElementById('reason').value;
+            const toneKey = document.querySelector('input[name="tone"]:checked').value;
+
+            // Map UI values to Data keys
+            // If tone is 'desperate', we can use 'formal' or 'emotional' logic but append more pleading words.
+            // For simplicity in this logic update, I'll map: 
+            //   Prof/Boss/Parents -> mostly Formal structure
+            //   Lover -> Emotional structure
+
+            let style = 'formal';
+            if (target === 'lover') style = 'emotional';
+            if (target === 'parents' && toneKey === 'emotional') style = 'emotional'; // Emotional letter to parents
+
+            // Data picking
+            let dataset = strategies[style];
+            // Fallback if mixed (e.g., emotional tone for boss - unlikely but handleable)
+            if (!dataset) dataset = strategies['formal'];
+
+            // Variable Substitution
+            let nameMap = {
+                professor: "교수님",
+                boss: "팀장님",
+                lover: "자기야",
+                parents: "어머니, 아버지"
+            };
+
+            let reasonMap = {
+                late: "시간 약속 불이행",
+                mistake: "업무상 과실",
+                forgot: "기념일 망각",
+                contact: "연락 두절",
+                lie: "거짓말",
+                accident: "파손 사고"
+            };
+
+            const targetName = nameMap[target];
+            const reasonText = reasonMap[reasonKey];
+
+            // Random Selector
+            const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+            // Construct Text
+            let fullText = "";
+
+            // 1. Opener
+            fullText += pick(dataset.openers);
+
+            // 2. Recognition
+            fullText += "\n\n" + pick(dataset.recognitions);
+
+            // 3. Filler 1 (Generic)
+            fullText += longFillers[0];
+
+            // 4. Reflection
+            fullText += pick(dataset.reflections);
+
+            // 5. Filler 2 (Generic)
+            fullText += longFillers[1];
+
+            // 6. Resolution
+            fullText += pick(dataset.resolutions);
+
+            // 7. Closing
+            fullText += "\n\n" + pick(dataset.closings);
+
+            // Replace Placeholders
+            // Simple regex replaceAll
+            fullText = fullText.split("%NAME%").join(targetName);
+            fullText = fullText.split("%REASON%").join(reasonText);
+
+            // Display
+            const resultEl = document.getElementById('resultText');
+            resultEl.value = fullText;
+            document.getElementById('charCount').innerText = fullText.length + "자 (공백 포함)";
+
+            // Animation
+            const resultArea = document.getElementById('resultArea');
+            resultArea.style.display = 'block';
+            resultArea.classList.remove('active');
+            void resultArea.offsetWidth;
+            resultArea.classList.add('active');
+            resultArea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyText() {
+            const copyText = document.getElementById("resultText");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("복사되었습니다! 진심을 담아 전달하세요.");
+            });
+        }
+
+        function shareKakao() {
+            alert("카카오톡 실행 (시뮬레이션)");
+        }
+    </script>
+
+</body>
+
+</html>

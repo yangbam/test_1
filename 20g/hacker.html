@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starbucks Hacker Typer - 개발자 시뮬레이터</title>
+    <meta name="description" content="아무 키나 눌러도 천재 해커처럼 코드가 작성되는 시뮬레이터. 카페나 도서관에서 개발자 코스프레를 즐겨보세요.">
+    <meta name="keywords" content="해커 시뮬레이터, 코딩하는 척, hacker tycoon, 가짜 해킹 사이트, 매트릭스 화면">
+    <meta property="og:title" content="Hacker Typer 💻">
+    <meta property="og:description" content="타자를 칠 때마다 복잡한 코드가 쏟아져 나옵니다. 지금 바로 해커가 되어보세요.">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-18HBM95WEK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-18HBM95WEK');
+    </script>
+
+    <style>
+        /* Cyberpunk / Hacker Theme */
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #000000;
+            --text-color: #00FF00;
+            /* Classic Terminal Green */
+            --cursor-color: #00FF00;
+            --alert-bg: rgba(255, 0, 0, 0.8);
+            --breach-bg: rgba(0, 255, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier Prime', 'Consolas', 'Courier New', monospace;
+            overflow: hidden;
+            /* Fullscreen immersion */
+            height: 100vh;
+            width: 100vw;
+            font-size: 16px;
+            line-height: 1.5;
+            cursor: text;
+        }
+
+        #codeContainer {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            overflow-y: auto;
+            /* Allow scroll if needed, but we do auto-scroll */
+            white-space: pre-wrap;
+            /* Preserve code formatting */
+            word-break: break-all;
+            /* Hide scrollbar for aesthetics */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        #codeContainer::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cursor {
+            background-color: var(--cursor-color);
+            color: black;
+            display: inline-block;
+            width: 10px;
+            height: 1em;
+            vertical-align: text-bottom;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* Popups */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 10px currentColor;
+            border: 3px solid currentColor;
+            padding: 20px 40px;
+            box-shadow: 0 0 30px currentColor;
+            backdrop-filter: blur(5px);
+        }
+
+        .access-denied {
+            color: red;
+            background-color: rgba(0, 0, 0, 0.9);
+            font-size: 3rem;
+            animation: shake 0.3s ease-in-out infinite;
+        }
+
+        .system-breach {
+            color: #00FF00;
+            background-color: rgba(0, 20, 0, 0.95);
+            font-size: 2rem;
+            width: 500px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #003300;
+            margin-top: 15px;
+            border: 1px solid #00FF00;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00FF00;
+            width: 0%;
+            transition: width 0.2s linear;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(-52%, -52%) rotate(-2deg);
+            }
+
+            50% {
+                transform: translate(-48%, -48%) rotate(2deg);
+            }
+
+            75% {
+                transform: translate(-52%, -48%) rotate(-2deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+        }
+
+        /* Scanlines Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* SEO Footer - Hidden until scrolled or explicitly viewed */
+        .seo-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.3;
+            color: white;
+            cursor: pointer;
+            z-index: 200;
+        }
+
+        .seo-content {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            color: #ccc;
+            padding: 40px;
+            overflow-y: auto;
+            z-index: 210;
+            font-family: sans-serif;
+        }
+
+        .seo-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="scanlines"></div>
+    <div id="codeContainer"></div>
+
+    <!-- Access Denied Popup -->
+    <div id="deniedPopup" class="popup access-denied">
+        ⚠️ ACCESS DENIED
+    </div>
+
+    <!-- System Breach Popup -->
+    <div id="breachPopup" class="popup system-breach">
+        SYSTEM BREACH IN PROGRESS...
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+    </div>
+
+    <div class="seo-trigger" onclick="toggleSeo()">[INFO]</div>
+    <div id="seoContent" class="seo-content" onclick="toggleSeo()">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <h1>영화 속 해킹 장면은 진짜일까?</h1>
+            <p>
+                영화 '매트릭스'의 초록색 비가 내리는 화면이나, '미션 임파서블'에서 주인공이 미친 듯이 타자를 쳐서 방화벽을 뚫는 장면을 보신 적이 있나요?
+                실제 해킹은 지루한 로그 분석과 취약점 스캔의 연속이지만, 영화에서는 시각적인 긴박감을 위해 과장된 연출을 사용합니다.
+            </p>
+            <h2>이 시뮬레이터의 비밀</h2>
+            <ul>
+                <li><strong>C++ 커널 코드:</strong> 여러분이 보고 계신 코드는 실제 리눅스(Linux) 커널의 일부이거나 암호화 라이브러리의 소스코드입니다. 있어 보이기 위해
+                    선택되었습니다.</li>
+                <li><strong>자동 완성:</strong> 키보드를 막 눌러도 오타가 나지 않는 이유는, 미리 준비된 코드를 순서대로 출력하기 때문입니다. 이를 'Typer
+                    Animation'이라고 합니다.</li>
+            </ul>
+            <h2>개발자처럼 보이는 법</h2>
+            <ol>
+                <li>스타벅스 창가 자리에 앉는다.</li>
+                <li>검은 화면에 초록 글씨가 나오는 터미널을 켠다. (또는 이 사이트를 켠다)</li>
+                <li>심각한 표정으로 기계식 키보드를 두드린다. (청축 추천)</li>
+                <li>가끔 안경을 치켜올리며 "...뚫렸군" 이라고 중얼거린다.</li>
+            </ol>
+            <p style="margin-top:20px; color: #aaa;">(클릭하면 닫힙니다)</p>
+        </div>
+    </div>
+
+    <script>
+        // The "Source Code" to be typed out
+        const sourceCode = `/* 
+ * KERNEL BOOT SEQUENCE - v5.14.2
+ * AUTHOR: N30_H4CK3R
+ * ENCRYPTION: AES-256-GCM
+ */
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <crypto/aead.h>
+
+struct sdesc {
+    struct shash_desc shash;
+    char ctx[];
+};
+
+static struct crypto_aead *tfm;
+static struct aead_request *req;
+static struct scatterlist sg[2];
+static char *idata = "CONFIDENTIAL_DATA_PACKET_X99";
+
+// INITIALIZING NEURAL NETWORK BRIDGE...
+void init_neural_link(void) {
+    printk(KERN_INFO "Establishing secure handshake...\\n");
+    // Allocating memory blocks
+    char *iv = kmalloc(16, GFP_KERNEL);
+    if (!iv) {
+        printk(KERN_ERR "Memory Allocation Failed. Retrying...\\n");
+        return;
+    }
+    memset(iv, 0, 16);
+    
+    // Bypass Firewall Level 5
+    for(int i=0; i<1024; i++) {
+        bypass_socket(i);
+        inject_payload(0x909090); // NOP Sled
+    }
+}
+
+// DECRYPTING MAIN FRAME...
+int decrypt_master_key(const char *hash) {
+    unsigned long flags;
+    spin_lock_irqsave(&current->lock, flags);
+    
+    if (strcmp(hash, "ROOT_ACCESS") == 0) {
+        grant_permission(ADMIN);
+        disable_logging();
+        return 1;
+    }
+    
+    spin_unlock_irqrestore(&current->lock, flags);
+    return 0;
+}
+
+/*
+ * MAIN LOOP
+ * Monitoring system calls and intercepting packets
+ */
+void main_loop(void) {
+    while(true) {
+        scan_ports();
+        if (detect_intrusion()) {
+            deploy_countermeasures();
+        }
+        
+        // Quantum processing simulation
+        double entropy = calculate_entropy();
+        if (entropy > 9.0) {
+            trigger_system_meltdown();
+        }
+    }
+}
+
+// INITIATE OVERRIDE PROTOCOL
+// ...Loading dependencies
+// ...Mounting file system
+// ...Root access granted.
+`;
+
+        const container = document.getElementById('codeContainer');
+        let index = 0;
+        let autoTyping = false;
+        let enterCount = 0;
+
+        // Initialize with cursor
+        container.innerHTML = '<span class="cursor">_</span>';
+
+        function typeCode(chars = 3) {
+            if (index >= sourceCode.length) index = 0; // Loop code
+
+            // Get chunk
+            let chunk = sourceCode.substring(index, index + chars);
+            index += chars;
+
+            // Insert before cursor
+            const textNode = document.createTextNode(chunk);
+            container.insertBefore(textNode, container.lastChild);
+
+            // Auto Scroll
+            window.scrollTo(0, document.body.scrollHeight);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Keydown Event
+        window.addEventListener('keydown', (e) => {
+            // Special Keys
+
+            // ESC -> Access Denied
+            if (e.key === 'Escape') {
+                showAccessDenied();
+                return;
+            }
+
+            // Enter -> Breach Progress
+            if (e.key === 'Enter') {
+                enterCount++;
+                typeCode(5); // Type a bit on enter too
+                if (enterCount >= 5) {
+                    showSystemBreach();
+                    enterCount = 0;
+                }
+                return;
+            }
+
+            // Alt -> Toggle Auto Mode
+            if (e.key === 'Alt') {
+                e.preventDefault();
+                autoTyping = !autoTyping;
+                if (autoTyping) autoLoop();
+                return;
+            }
+
+            // Ignore modifiers mostly, but just type on any other key
+            if (!e.ctrlKey && !e.metaKey) {
+                // Random char count for realism (1~4 chars per key)
+                const count = Math.floor(Math.random() * 4) + 1;
+                typeCode(count);
+            }
+        });
+
+        // Auto Typing Loop
+        function autoLoop() {
+            if (!autoTyping) return;
+            const count = Math.floor(Math.random() * 4) + 1;
+            typeCode(count);
+            setTimeout(autoLoop, 30 + Math.random() * 100); // Fast typing speed
+        }
+
+        // Popups Logic
+        function showAccessDenied() {
+            const popup = document.getElementById('deniedPopup');
+            popup.style.display = 'flex';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 1000);
+        }
+
+        function showSystemBreach() {
+            const popup = document.getElementById('breachPopup');
+            const fill = document.getElementById('progressFill');
+            popup.style.display = 'flex';
+
+            let width = 0;
+            const interval = setInterval(() => {
+                width += 2;
+                fill.style.width = width + '%';
+                if (width >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        popup.style.display = 'none';
+                        width = 0;
+                        fill.style.width = '0%';
+                    }, 500);
+                }
+            }, 20); // 1 sec to fill
+        }
+
+        function toggleSeo() {
+            const el = document.getElementById('seoContent');
+            el.classList.toggle('active');
+        }
+
+        // Initial Tip
+        setTimeout(() => {
+            const tip = document.createTextNode("// Press any key to start hacking... [ESC] for Denied, [ALT] for Auto Mode\n\n");
+            container.insertBefore(tip, container.lastChild);
+        }, 500);
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파일 파손기 (File Corrupter) - 과제 제출 오류 생성기</title>
+    <meta name="description" content="멀쩡한 파일을 열리지 않는 손상된 파일로 변환해주는 도구입니다. 과제 제출 기한 연장이 필요할 때, 파일 오류를 시뮬레이션해보세요.">
+    <meta name="keywords" content="파일깨짐만들기, 과제제출오류, 파일손상시키기, 워드파일안열림, 엑셀파일복구, corrupt file online, 파일해시변경">
+    <meta property="og:title" content="File Corrupter (파일 파손기) 📂">
+    <meta property="og:description" content="완벽한 파일을 '손상된 파일'로 만들어드립니다. 1초 만에 변환.">
+    <meta property="og:type" content="website">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-18HBM95WEK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-18HBM95WEK');
+    </script>
+
+    <style>
+        :root {
+            --primary: #ff5252;
+            --secondary: #ff1744;
+            --bg: #1e1e2e;
+            --card: #2d2d44;
+            --text: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .tool-card {
+            background-color: var(--card);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 1px solid #3e3e5e;
+            transition: transform 0.2s;
+        }
+
+        .drop-zone {
+            border: 2px dashed #555;
+            border-radius: 12px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            background-color: #232336;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background-color: #2a2a40;
+        }
+
+        .drop-zone h3 {
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .drop-zone p {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .icon-file {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .controls {
+            margin: 20px 0;
+            background: #252538;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .radio-group label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            min-height: 24px;
+            font-size: 0.9rem;
+        }
+
+        .success {
+            color: #00e676;
+        }
+
+        .error {
+            color: #ff1744;
+        }
+
+        .disclaimer-box {
+            background-color: rgba(255, 82, 82, 0.1);
+            border: 1px solid var(--primary);
+            color: #ff8a80;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: left;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* SEO Section */
+        .seo-section {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 60px;
+            padding: 30px;
+            background-color: #232336;
+            border-radius: 12px;
+            color: #ccc;
+            line-height: 1.7;
+        }
+
+        .seo-section h2 {
+            color: var(--primary);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .seo-section h3 {
+            color: #fff;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .seo-section p {
+            margin-bottom: 15px;
+        }
+
+        .seo-section li {
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .tool-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>File Corrupter</h1>
+            <p class="subtitle">모든 파일을 '열리지 않는 파일'로 만들어드립니다.</p>
+        </header>
+
+        <main class="tool-card">
+            <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <div class="icon-file">📂</div>
+                <h3 id="fileName">파일을 여기에 드롭하거나 클릭하세요</h3>
+                <p>Word, Excel, PPT, PDF, Zip 등 모든 형식 지원</p>
+                <input type="file" id="fileInput">
+            </div>
+
+            <div class="controls">
+                <div style="margin-bottom:10px; color:#aaa; font-size:0.9rem;">파손 강도 (Damage Level)</div>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="intensity" value="low" checked>
+                        살짝 파손 (Light)
+                    </label>
+                    <label>
+                        <input type="radio" name="intensity" value="high">
+                        완전 파괴 (Heavy)
+                    </label>
+                </div>
+            </div>
+
+            <button id="corruptBtn" class="btn" disabled onclick="corruptFile()">파일 파손시키기 🔨</button>
+            <div id="status" class="status-msg"></div>
+
+            <div class="disclaimer-box">
+                <strong>⚠️ 주의사항:</strong><br>
+                이 도구는 교육 및 테스트 목적으로 제작되었습니다.<br>
+                반드시 <strong>중요한 원본 파일은 백업</strong>해두고, 복사본으로 테스트하세요.<br>
+                생성된 파일은 복구가 불가능할 수 있습니다. 본 도구 사용으로 인한 불이익은 사용자 본인에게 있습니다.
+            </div>
+        </main>
+
+        <article class="seo-section">
+            <h2>파일이 손상되는 원리와 복구 불가능성</h2>
+            <p>
+                컴퓨터의 모든 파일(docx, pptx, xlsx, zip 등)은 0과 1로 이루어진 바이너리 데이터입니다. 파일의 맨 앞부분에는 '헤더(Header)'라는 정보가 있어 이 파일이 어떤
+                형식인지 컴퓨터에게 알려줍니다.
+                본 도구(File Corrupter)는 파일의 <strong>헤더 이후의 데이터나 핵심 구조(Body)</strong>의 비트값을 무작위로 뒤섞거나 0으로 덮어씁니다.
+                이렇게 되면 뷰어 프로그램(Word, Excel 등)은 파일 형식을 인식하더라도 내부 구조가 깨져있어 "파일을 열 수 없습니다" 또는 "손상된 파일입니다"라는 오류 메시지를 출력하게
+                됩니다.
+            </p>
+
+            <h3>과제 제출 실수 예방과 백업의 중요성</h3>
+            <p>
+                많은 대학생들이 과제 제출 마감 직전에 컴퓨터 오류나 파일 손상으로 곤란을 겪습니다.
+                이 도구를 통해 "파일이 깨졌을 때 어떤 메시지가 뜨는지" 미리 확인해보고, 교수님이나 조교님께 보내는 멘일이 어떻게 보일지 시뮬레이션 해볼 수 있습니다.
+                하지만 가장 중요한 것은 주기적인 <strong>백업(Backup)</strong>입니다. 클라우드(Google Drive, OneDrive)를 활용하여 실시간 저장을 생활화하세요.
+            </p>
+
+            <h2>파일 손상 핑계? 교수님들은 다 안다?</h2>
+            <p>
+                과제 제출이 늦었을 때 빈 파일이나 손상된 파일을 보내 시간을 벌어보려는 시도는 고전적인 방법입니다.
+                하지만 최신 LMS(학습관리시스템)는 파일의 해시값이나 업로드 시간을 정밀하게 기록합니다.
+                또한, 단순히 확장자만 바꾼 파일(예: jpg를 hwp로 변경)은 메모장으로 열어보면 바로 들통납니다.
+                이 도구는 실제 바이너리 레벨에서 데이터를 변조하므로 겉보기에는 완벽한 파일처럼 보이지만, 내용은 완전히 파괴됩니다.
+                <strong>물론, 정직하게 마감 기한을 지키는 것이 최고의 학점 비결입니다.</strong>
+            </p>
+
+            <h3>손상된 파일 체크리스트</h3>
+            <ul>
+                <li>✅ 파일 크기(Byte)가 원본과 동일한가? (너무 작거나 0바이트면 의심받음)</li>
+                <li>✅ 확장자가 올바른가? (.docx, .pdf 등)</li>
+                <li>✅ 실제로 열었을 때 적절한 에러 메시지가 뜨는가?</li>
+            </ul>
+        </article>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const corruptBtn = document.getElementById('corruptBtn');
+        const statusDiv = document.getElementById('status');
+
+        let targetFile = null;
+
+        // Drag & Drop Handling
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFileSelect(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFileSelect(e.target.files[0]);
+        });
+
+        function handleFileSelect(file) {
+            if (!file) return;
+            targetFile = file;
+            fileNameDisplay.textContent = `📄 ${file.name} (${formatBytes(file.size)})`;
+            fileNameDisplay.style.color = '#fff';
+            corruptBtn.disabled = false;
+            statusDiv.textContent = '';
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function corruptFile() {
+            if (!targetFile) return;
+
+            statusDiv.textContent = '파일 처리 중...';
+            statusDiv.className = 'status-msg';
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const arrayBuffer = e.target.result;
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const intensity = document.querySelector('input[name="intensity"]:checked').value;
+
+                // Corruption Logic
+                // We want to keep file size EXACTLY the same.
+                // Strategy: Modify bytes in the middle of the file.
+                // Low intensity: Change random 5% of bytes in a middle chunk.
+                // High intensity: Zero out large chunks or randomize 30% of bytes.
+
+                const fileSize = uint8Array.length;
+                const startOffset = Math.floor(fileSize * 0.1); // Keep first 10% (headers) intact? Or maybe corrupt headers too for "Fatal Error"?
+                // The prompt says: "상위 10% 지점부터 중간 지점 사이" -> Start at 10%, go to 50%?
+
+                const endOffset = Math.floor(fileSize * 0.9); // Keep footer intact?
+
+                // Let's corrupt a segment.
+                // Low: Random 0.5% bytes between 10% and 90%
+                // High: Random 5% bytes between 5% and 95%
+
+                const ratio = intensity === 'high' ? 0.05 : 0.005;
+                const corruptionCount = Math.max(1, Math.floor(fileSize * ratio));
+
+                for (let i = 0; i < corruptionCount; i++) {
+                    // Random position between start and end
+                    const pos = Math.floor(Math.random() * (endOffset - startOffset + 1)) + startOffset;
+                    // Random byte
+                    uint8Array[pos] = Math.floor(Math.random() * 256);
+                }
+
+                // Create Blob
+                const corruptedBlob = new Blob([uint8Array], { type: targetFile.type });
+
+                // Trigger Download
+                const url = URL.createObjectURL(corruptedBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'corrupted_' + targetFile.name;
+                document.body.appendChild(a);
+                a.click();
+
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                statusDiv.textContent = '✅ 파일 파손 완료! 다운로드가 시작됩니다.';
+                statusDiv.className = 'status-msg success';
+            };
+
+            reader.onerror = function () {
+                statusDiv.textContent = '❌ 파일 읽기 실패.';
+                statusDiv.className = 'status-msg error';
+            };
+
+            reader.readAsArrayBuffer(targetFile);
+        }
+    </script>
+</body>
+
+</html>
