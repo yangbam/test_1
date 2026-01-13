@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>달팽이 레이싱 게임 - 점심 메뉴/내기 결정</title>
+    <meta name="description" content="사다리 타기보다 짜릿한 달팽이 경주! 점심 메뉴, 벌칙 당첨자, 내기 결과를 스릴 넘치게 정해보세요. 귀여운 달팽이들의 예측불허 레이스.">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-18HBM95WEK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-18HBM95WEK');
+    </script>
+
+    <style>
+        :root {
+            --primary: #FF9F43;
+            --secondary: #ff6b6b;
+            --text: #2d3436;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #f7f1e3;
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            /* Increased from 600px */
+            background: #fff;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        p.subtitle {
+            margin: 5px 0 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .ad-banner {
+            width: 100%;
+            height: 60px;
+            background: #eee;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Setup Screen */
+        #setupScreen {
+            padding: 30px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto 20px auto;
+        }
+
+        #participantInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        #addBtn {
+            padding: 15px 25px;
+            background-color: #576574;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .participants-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+            justify-content: center;
+            min-height: 100px;
+            /* layout stability */
+        }
+
+        .chip {
+            background-color: #ffeaa7;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .chip button {
+            background: none;
+            border: none;
+            color: #d63031;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .start-btn {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #cc8e35;
+            transition: all 0.1s;
+        }
+
+        .start-btn:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        /* Racing Screen */
+        #racingScreen {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            /* Fill container */
+            flex: 1;
+            overflow: hidden;
+            background-color: #34495e;
+            /* Road color */
+        }
+
+        .track-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            position: relative;
+        }
+
+        .lane {
+            flex: 1;
+            /* Distribute height equally */
+            display: flex;
+            align-items: center;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .lane:last-child {
+            border-bottom: none;
+        }
+
+        .lane-name-area {
+            width: 100px;
+            /* Fixed width for names */
+            padding-right: 15px;
+            text-align: right;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 5;
+            flex-shrink: 0;
+            border-right: 4px solid #fff;
+            /* Start line */
+        }
+
+        .lane-track-area {
+            flex: 1;
+            position: relative;
+            height: 100%;
+        }
+
+        .finish-line {
+            position: absolute;
+            right: 30px;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background-image:
+                linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
+                linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000);
+            background-color: #fff;
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            z-index: 1;
+        }
+
+        .snail {
+            font-size: 2.5rem;
+            /* Bigger Snail */
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) scaleX(-1);
+            /* Flip to face right if needed, assumes standard emoji faces right usually, wait snail faces left? 🐌 faces left. So scaleX(-1) makes it face right. */
+            left: 0;
+            transition: left 0.5s linear;
+            z-index: 10;
+            line-height: 1;
+        }
+
+        .leader-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(-1);
+            /* Unflip text */
+            background: #ff0000;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: none;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .snail.leader .leader-badge {
+            display: block;
+        }
+
+        .snail.leader {
+            z-index: 20;
+            filter: drop-shadow(0 0 10px yellow);
+        }
+
+        /* Result Popup */
+        #resultPopup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            color: white;
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #f1c40f;
+        }
+
+        .result-winner {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            color: #fff;
+            text-shadow: 0 0 20px var(--primary);
+        }
+
+        .restart-btn {
+            padding: 15px 40px;
+            background: white;
+            color: #333;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #f2d74e;
+            animation: confetti-fall 3s linear infinite;
+            z-index: 90;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* SEO / Instructions */
+        .instructions {
+            margin-top: 40px;
+            text-align: left;
+            background: #fafafa;
+            padding: 30px;
+            border-radius: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .seo-section {
+            padding: 40px;
+            background: #fff;
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            border-top: 10px solid #f1f1f1;
+        }
+
+        footer {
+            padding: 30px;
+            color: #999;
+            font-size: 0.85rem;
+            background: #fff;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <header>
+                <a href="index.html" class="nav-home">←</a>
+                <h1>🐌 달팽이 레이싱</h1>
+                <p class="subtitle">도파민 터지는 내기/결정 게임</p>
+            </header>
+
+            <div class="ad-banner">
+                (광고) 결정하기 힘들 땐? 달팽이에게 맡겨보세요!
+            </div>
+
+            <!-- Setup Screen -->
+            <div id="setupScreen">
+                <h2 style="margin-bottom:20px; color:#555;">참가자 설정</h2>
+                <div class="input-group">
+                    <input type="text" id="participantInput" placeholder="이름을 입력하세요 (예: 탕수육)"
+                        onkeypress="handleKeyPress(event)">
+                    <button id="addBtn" onclick="addParticipant()">추가</button>
+                </div>
+
+                <div id="list" class="participants-list">
+                    <!-- Chips go here -->
+                </div>
+
+                <button class="start-btn" onclick="startRace()">🏁 경기 시작 🏁</button>
+
+                <div class="instructions">
+                    <h3>🎮 게임 방법</h3>
+                    <ol>
+                        <li>후보(메뉴, 벌칙자 등)를 입력하고 '추가'하세요.</li>
+                        <li>'경기 시작'을 누르면 달팽이들이 경주를 시작합니다.</li>
+                        <li>약 10초~15초 간의 숨 막히는 레이스를 지켜보세요.</li>
+                        <li>1등에게는 화려한 축하가 쏟아집니다!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Racing Screen -->
+            <div id="racingScreen">
+                <div class="track-container" id="trackContainer">
+                    <!-- Tracks Generated Here -->
+                </div>
+            </div>
+
+            <article class="seo-section">
+                <h2>공정한 랜덤 게임을 찾고 계신가요?</h2>
+                <p>
+                    '달팽이 레이싱'은 단순한 제비뽑기가 아닙니다. 각 달팽이는 매 0.5초마다 랜덤한 속도(멈춤/걷기/전력질주)를 부여받습니다.
+                    따라서 출발이 늦더라도 막판 대역전극이 일어날 수 있죠.
+                    직장 동료들과의 점심 내기, 친구들과의 술자리 벌칙 정하기 등 긴장감이 필요한 순간에 이 게임을 실행해보세요.
+                    모두가 화면을 뚫어져라 쳐다보며 자신의 달팽이를 응원하게 될 것입니다.
+                </p>
+            </article>
+
+            <footer>
+                &copy; 2026 20g Lab. Educational Purpose Only.
+            </footer>
+    </div>
+
+    <!-- Result Overlay -->
+    <div id="resultPopup">
+        <div class="result-title">Today's Winner!</div>
+        <div id="winnerName" class="result-winner"></div>
+        <button class="restart-btn" onclick="resetGame()">한 번 더 하기</button>
+    </div>
+
+    <script>
+        let participants = [];
+        let snails = [];
+        let raceInterval = null;
+        let finished = false;
+
+        // DOM Elements
+        const listEl = document.getElementById('list');
+        const inputEl = document.getElementById('participantInput');
+        const setupScreen = document.getElementById('setupScreen');
+        const racingScreen = document.getElementById('racingScreen');
+        const trackContainer = document.getElementById('trackContainer');
+
+        // Init
+        renderList();
+
+        function renderList() {
+            listEl.innerHTML = '';
+            participants.forEach((name, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.innerHTML = `${name} <button onclick="removeParticipant(${idx})">&times;</button>`;
+                listEl.appendChild(chip);
+            });
+        }
+
+        function addParticipant() {
+            const val = inputEl.value.trim();
+            if (!val) return;
+            if (participants.length >= 8) {
+                alert("최대 8명까지만 가능합니다! (화면이 꽉 차요 😅)");
+                return;
+            }
+            participants.push(val);
+            inputEl.value = '';
+            renderList();
+        }
+
+        function removeParticipant(idx) {
+            participants.splice(idx, 1);
+            renderList();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') addParticipant();
+        }
+
+        function startRace() {
+            if (participants.length < 2) {
+                alert("혼자서는 경주할 수 없어요. 최소 2명 이상 추가해주세요!");
+                return;
+            }
+
+            setupScreen.style.display = 'none';
+            racingScreen.style.display = 'flex';
+            // Hide SEO during game for immersion
+            document.querySelector('.seo-section').style.display = 'none';
+
+            // Build Track
+            trackContainer.innerHTML = '<div class="finish-line"></div>';
+            snails = [];
+
+            participants.forEach((name, i) => {
+                // Lane Container
+                const lane = document.createElement('div');
+                lane.className = 'lane';
+
+                // 1. Name Area (Left, Fixed Width)
+                const nameArea = document.createElement('div');
+                nameArea.className = 'lane-name-area';
+                nameArea.innerText = name;
+                lane.appendChild(nameArea);
+
+                // 2. Track Area (Right, Flex 1)
+                const trackArea = document.createElement('div');
+                trackArea.className = 'lane-track-area';
+
+                // Snail
+                const snail = document.createElement('div');
+                snail.className = 'snail';
+                snail.textContent = '🐌';
+
+                // Leader Badge inside Snail
+                const badge = document.createElement('div');
+                badge.className = 'leader-badge';
+                badge.textContent = '1st';
+                snail.appendChild(badge);
+
+                trackArea.appendChild(snail);
+                lane.appendChild(trackArea);
+
+                trackContainer.appendChild(lane);
+
+                snails.push({
+                    el: snail,
+                    name: name,
+                    pos: 0,   // Percentage 0-100
+                    speed: 0
+                });
+            });
+
+            finished = false;
+
+            // Countdown or just Start
+            // Let's just start for speed
+
+            let tick = 0;
+            raceInterval = setInterval(() => {
+                updateRace();
+            }, 500); // Game tick
+        }
+
+        function updateRace() {
+            if (finished) return;
+
+            let maxPos = -1;
+            let leaderIdx = -1;
+
+            // Target: reach approx 92% to cross finish line visually
+            // Total ticks desired: ~20-30 (10-15s)
+            // Avg speed needed: ~3-4% per tick
+
+            snails.forEach((s, i) => {
+                const random = Math.random();
+                let boost = 0;
+
+                if (random < 0.15) boost = 0; // Stumble/Stop
+                else if (random < 0.75) boost = Math.random() * 3 + 1; // Walk (1~4%)
+                else boost = Math.random() * 6 + 3; // Sprint (3~9%)
+
+                s.pos += boost;
+
+                // Check cross line
+                if (s.pos >= 92) {
+                    finishGame(s);
+                }
+
+                // Update Visual
+                // Limit to 92% if finished so they don't run off screen immediately
+                let visualPos = s.pos > 93 ? 93 : s.pos;
+                s.el.style.left = visualPos + '%';
+
+                // Find leader
+                if (s.pos > maxPos) {
+                    maxPos = s.pos;
+                    leaderIdx = i;
+                }
+
+                s.el.classList.remove('leader');
+            });
+
+            if (!finished && leaderIdx !== -1) {
+                snails[leaderIdx].el.classList.add('leader');
+            }
+        }
+
+        function finishGame(winner) {
+            if (finished) return;
+            finished = true;
+            clearInterval(raceInterval);
+
+            // Ensure winner is visually at/past line
+            winner.el.style.left = '93%';
+            winner.el.classList.add('leader');
+
+            createConfetti();
+
+            setTimeout(() => {
+                document.getElementById('winnerName').textContent = winner.name;
+                document.getElementById('resultPopup').style.display = 'flex';
+            }, 1200);
+        }
+
+        function createConfetti() {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
+            for (let i = 0; i < 60; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                document.body.appendChild(conf);
+
+                setTimeout(() => conf.remove(), 5000);
+            }
+        }
+
+        function resetGame() {
+            document.getElementById('resultPopup').style.display = 'none';
+            setupScreen.style.display = 'block';
+            racingScreen.style.display = 'none';
+            document.querySelector('.seo-section').style.display = 'block';
+        }
+
+    </script>
+
+</body>
+
+</html>
