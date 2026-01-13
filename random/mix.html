@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>편의점 믹솔로지 - Random Mix Box</title>
+    <meta name="description" content="매일 먹던 조합이 지겹다면? 편의점 꿀조합 랜덤 박스를 열어보세요! 불닭, 짜파게티, 쿨피스, 민트초코... 상상 초월의 레시피가 튀어납니다.">
+    <meta name="keywords" content="편의점꿀조합, 편의점레시피, 마크정식, 불닭조합, 편의점랜덤박스, 괴식월드컵, 점심메뉴추천">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://Yangbam-lab.com/random/mix.html">
+    <meta property="og:title" content="편의점 믹솔로지 랜덤 박스 🍱">
+    <meta property="og:description" content="환상의 꿀조합일까, 지옥의 괴식일까? 당신의 운을 시험해보세요.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_mix.png">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Do+Hyeon&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --cv-blue: #007CFF;
+            --cv-orange: #FF7B00;
+            --cv-bg: #F0F8FF;
+            --box-color: #ffd700;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jua', sans-serif;
+            background-color: var(--cv-bg);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        nav {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-back {
+            position: absolute;
+            left: 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .logo {
+            font-family: 'Do Hyeon', sans-serif;
+            font-size: 1.5rem;
+            color: var(--cv-blue);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        /* Title Area */
+        .title-area {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .title-area h1 {
+            font-size: 2.2rem;
+            color: var(--cv-orange);
+            margin: 0;
+            text-shadow: 2px 2px 0 #fff;
+        }
+
+        .title-area p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* Box Stage */
+        .box-stage {
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+
+        .mystery-box {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: 4px solid #333;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            z-index: 5;
+        }
+
+        .mystery-box::before {
+            content: '?';
+            color: white;
+            text-shadow: 2px 2px 0 #333;
+        }
+
+        .mystery-box:active {
+            transform: scale(0.95);
+        }
+
+        .mystery-box.shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-2px, 0, 0) rotate(-2deg);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(4px, 0, 0) rotate(2deg);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-6px, 0, 0) rotate(-4deg);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(6px, 0, 0) rotate(4deg);
+            }
+        }
+
+        .mystery-box.open {
+            display: none;
+        }
+
+        /* Results */
+        .result-grid {
+            display: none;
+            /* Flex when active */
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .item-card {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            border-left: 10px solid #ddd;
+        }
+
+        .item-card.ramen {
+            border-color: #FF5252;
+        }
+
+        .item-card.drink {
+            border-color: #448AFF;
+        }
+
+        .item-card.side {
+            border-color: #69F0AE;
+        }
+
+        .item-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-category {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 2px;
+        }
+
+        .item-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        /* Judgment */
+        .judgment-area {
+            margin-top: 30px;
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            /* Visible in result */
+        }
+
+        .verdict-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .verdict-desc {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .btn-retry {
+            background: var(--cv-blue);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 0 #0056b3;
+            transition: all 0.1s;
+            font-family: 'Jua', sans-serif;
+        }
+
+        .btn-retry:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* SEO Content */
+        .content-section {
+            margin-top: 60px;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            line-height: 1.8;
+            color: #444;
+            border: 2px dashed #ddd;
+        }
+
+        .content-section h2 {
+            border-bottom: 3px solid var(--cv-orange);
+            display: inline-block;
+            margin-top: 30px;
+            color: #333;
+        }
+
+        .content-section h3 {
+            color: var(--cv-blue);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html" class="nav-back">← 돌아가기</a>
+        <div class="logo">CU GS7-Eleven</div>
+    </nav>
+
+    <div class="container">
+        <div class="title-area">
+            <h1>편의점 믹솔로지</h1>
+            <p>오늘의 랜덤 레시피를 뽑아보세요!</p>
+        </div>
+
+        <!-- Stage -->
+        <div class="box-stage">
+            <div class="mystery-box" id="mysteryBox" onclick="openBox()"></div>
+        </div>
+
+        <!-- Result View -->
+        <div class="result-grid" id="resultGrid">
+            <div class="item-card ramen">
+                <div class="item-icon" id="iconR">🍜</div>
+                <div class="item-info">
+                    <div class="item-category">MAIN Noodle</div>
+                    <div class="item-name" id="nameR">불닭볶음면</div>
+                </div>
+            </div>
+            <div class="item-card drink">
+                <div class="item-icon" id="iconD">🧃</div>
+                <div class="item-info">
+                    <div class="item-category">DRINK Beverage</div>
+                    <div class="item-name" id="nameD">쿨피스</div>
+                </div>
+            </div>
+            <div class="item-card side">
+                <div class="item-icon" id="iconS">🧀</div>
+                <div class="item-info">
+                    <div class="item-category">SIDE Topping</div>
+                    <div class="item-name" id="nameS">스트링치즈</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="judgment-area" id="judgmentArea">
+            <div class="verdict-title" id="vTitle">🎉 환상의 꿀조합!</div>
+            <div class="verdict-desc" id="vDesc">맵단짠의 정석입니다. 이건 맛이 없을 수가 없네요.</div>
+            <button class="btn-retry" onclick="reset()">다시 뽑기</button>
+        </div>
+
+        <!-- SEO Content -->
+        <article class="content-section">
+            <h2>편의점 꿀조합의 역사</h2>
+            <p>
+                편의점 음식 조합의 역사는 2016년 '마크정식'의 등장 이전과 이후로 나뉩니다. 갓세븐 마크의 팬이 "마크가 이걸 먹고 행복했으면 좋겠다"는 마음으로 개발한 이 레시피(스파게티 컵라면
+                + 떡볶이 + 소시지 + 치즈)는 SNS를 강타하며 편의점 모디슈머(Modisumer) 열풍을 불러일으켰습니다. 이후 '밴쯔정식', '강호동정식' 등 다양한 인플루언서와 예능 프로그램이
+                가세하며 편의점은 단순한 매점을 넘어 창의적인 요리 연구소로 변모했습니다.
+            </p>
+
+            <h3>실패 없는 3대 공식</h3>
+            <p>
+                1. <strong>맵느(매운맛+느끼한맛):</strong> 불닭볶음면이나 마라탕면에 치즈, 크림빵, 옥수수 등을 곁들이는 조합입니다. 매운맛을 중화시키면서 감칠맛을 폭발시킵니다.<br>
+                2. <strong>단짠(단맛+짠맛):</strong> 짭짤한 컵라면이나 핫바를 먹고 달콤한 초코우유나 마카롱으로 마무리하는 코스입니다.<br>
+                3. <strong>탄탄(탄수화물+탄수화물):</strong> 라면 국물에 삼각김밥, 볶음면 소스에 스트링치즈와 밥을 비벼 먹는 '리조또' 스타일입니다.
+            </p>
+
+            <h3>주의해야 할 괴식 조합</h3>
+            <p>
+                모든 시도가 성공하는 것은 아닙니다. 예를 들어 '민트초코 우유에 라면 말아먹기', '솔의눈에 에스프레소 샷 추가' 등은 호기심에 시도했다가 혀를 마비시킬 수 있습니다. 특히 향이 강한
+                음료(솔의눈, 실론티)와 기름진 국물 라면의 조합은 최악의 밸런스를 자랑하니 주의가 필요합니다. 하지만 벌칙 게임으로는 훌륭한 선택이 될 수 있겠죠.
+            </p>
+
+            <h2>랜덤 박스 즐기는 법</h2>
+            <p>
+                오늘 점심이나 야식이 고민된다면, 이 랜덤 박스가 정해주는 대로 편의점에 달려가보세요. 혹시 '괴식'이 나왔나요? 친구와 내기를 하거나, 새로운 미각의 세계를 개척해볼 기회입니다.
+                편의점의 매력은 저렴한 가격으로 무한한 가능성을 실험해볼 수 있다는 점이니까요.
+            </p>
+        </article>
+    </div>
+
+    <script>
+        // Data
+        const ramens = [
+            { name: "불닭볶음면", icon: "🔥", tag: "spicy" },
+            { name: "신라면", icon: "🍜", tag: "spicy" },
+            { name: "짜파게티", icon: "🍛", tag: "salty" },
+            { name: "컵누들 투움바", icon: "🍝", tag: "creamy" },
+            { name: "참깨라면", icon: "🍲", tag: "savory" },
+            { name: "왕뚜껑", icon: "🍜", tag: "plain" },
+            { name: "마라탕면", icon: "🥘", tag: "spicy" }
+        ];
+
+        const drinks = [
+            { name: "쿨피스", icon: "🍑", tag: "sweet" },
+            { name: "솔의눈", icon: "🌲", tag: "pine" },
+            { name: "맥콜", icon: "🍺", tag: "barley" },
+            { name: "초코우유", icon: "🍫", tag: "sweet" },
+            { name: "아메리카노", icon: "☕", tag: "bitter" },
+            { name: "바나나우유", icon: "🍌", tag: "sweet" },
+            { name: "제로콜라", icon: "🥤", tag: "fizz" }
+        ];
+
+        const sides = [
+            { name: "스트링치즈", icon: "🧀", tag: "cheese" },
+            { name: "전주비빔 삼각김밥", icon: "🍙", tag: "rice" },
+            { name: "핫바 (매운맛)", icon: "🌭", tag: "meat" },
+            { name: "감동란", icon: "🥚", tag: "egg" },
+            { name: "민트초코", icon: "🌿", tag: "mint" },
+            { name: "볶음김치", icon: "🥗", tag: "kimchi" },
+            { name: "비엔나 소시지", icon: "🍖", tag: "meat" }
+        ];
+
+        // Core Interaction
+        const box = document.getElementById('mysteryBox');
+        const resultGrid = document.getElementById('resultGrid');
+        const judgmentArea = document.getElementById('judgmentArea');
+
+        let isOpened = false;
+
+        function openBox() {
+            if (isOpened) return;
+            isOpened = true;
+
+            // 1. Shake Animation
+            box.classList.add('shake');
+
+            // 2. Open Logic
+            setTimeout(() => {
+                box.style.display = 'none'; // Hide box
+                resultGrid.style.display = 'flex'; // Show Results
+
+                // Pick Items
+                const r = pick(ramens);
+                const d = pick(drinks);
+                const s = pick(sides);
+
+                // Render Content
+                document.getElementById('nameR').textContent = r.name;
+                document.getElementById('iconR').textContent = r.icon;
+
+                document.getElementById('nameD').textContent = d.name;
+                document.getElementById('iconD').textContent = d.icon;
+
+                document.getElementById('nameS').textContent = s.name;
+                document.getElementById('iconS').textContent = s.icon;
+
+                // Evaluate
+                evaluate(r, d, s);
+
+            }, 600);
+        }
+
+        function pick(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function evaluate(r, d, s) {
+            let title = "🤔 평범한 한 끼";
+            let desc = "나쁘지 않은 조합입니다. 무난하게 배를 채울 수 있겠어요.";
+            let color = "#333";
+
+            // Logic Rules
+
+            // 1. Honey Combo (Spicy + Sweet/Cheese)
+            const isBuldak = r.name.includes("불닭") || r.name.includes("마라");
+            const isSoothing = d.tag === "sweet" || s.tag === "cheese" || s.tag === "egg";
+
+            if (isBuldak && isSoothing) {
+                title = "🎉 환상의 맵단짠!";
+                desc = "매운맛을 달콤함과 부드러움이 감싸주는 갓벽한 조합입니다.";
+                color = "var(--cv-orange)";
+            }
+
+            // 2. Jjapagetti Combo (Jjapa + Egg/Cheese/Meat)
+            if (r.name.includes("짜파게티") && (s.tag === "egg" || s.tag === "cheese" || s.tag === "meat")) {
+                title = "👨‍🍳 내가 바로 요리사";
+                desc = "일요일엔 역시 짜파게티! 토핑까지 완벽하네요.";
+                color = "#333";
+            }
+
+            // 3. Diet Combo (CupNoodle + Egg/Tea)
+            if (r.name.includes("컵누들") && s.tag === "egg" && d.tag === "bitter") {
+                title = "💪 식단관리 꿀조합";
+                desc = "칼로리는 낮추고 단백질은 챙기고! 다이어터에게 추천합니다.";
+                color = "var(--cv-blue)";
+            }
+
+            // 4. GROSS Combo (Mint/Pine + Spicy/Salty)
+            const isWeirdDrink = d.name === "솔의눈" || d.name === "맥콜" || d.name === "아메리카노";
+            const isMint = s.tag === "mint";
+
+            if (isMint) {
+                title = "🤮 민초단이 세상을 지배한다";
+                desc = "라면 먹고 후식으로 민트초코... 진심이세요? 호불호가 강력하게 갈립니다.";
+                color = "#2ecc71";
+            }
+
+            if (r.tag === "spicy" && d.name === "솔의눈") {
+                title = "🌲 숲속의 화재 진압";
+                desc = "매운 입안을 솔의눈으로 씻어내는 짜릿함... 머리가 맑아지다 못해 하얘질지도 모릅니다.";
+                color = "#00695c";
+            }
+
+            if (r.name === "신라면" && s.name === "민트초코") {
+                title = "☠️ 지옥에서 온 괴식";
+                desc = "이 조합을 먹고 살아남은 사람은 드뭅니다. 챌린지 용도로만 추천합니다.";
+                color = "#c0392b";
+            }
+
+            // Render Judgment
+            const tEl = document.getElementById('vTitle');
+            const dEl = document.getElementById('vDesc');
+
+            tEl.textContent = title;
+            tEl.style.color = color;
+            dEl.textContent = desc;
+
+            setTimeout(() => {
+                judgmentArea.style.display = 'block';
+                judgmentArea.scrollIntoView({ behavior: 'smooth' });
+            }, 500); // Delay for visual pacing
+        }
+
+        function reset() {
+            box.classList.remove('shake');
+            box.style.display = 'flex';
+            resultGrid.style.display = 'none';
+            judgmentArea.style.display = 'none';
+            isOpened = false;
+        }
+
+    </script>
+</body>
+
+</html>

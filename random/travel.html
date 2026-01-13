@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random World Tour - 세계 여행 다트 게임</title>
+    <meta name="description" content="어디로 떠날지 고민되시나요? 지구본을 돌리고 다트를 던져보세요! 당신의 운명이 이끄는 다음 여행지를 랜덤으로 추천해드립니다.">
+    <meta name="keywords" content="랜덤여행지, 여행지추천, 세계여행, 다트게임, 해외여행추천, 휴가지고르기, 직장인휴가, 스카이스캐너">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://Yangbam-lab.com/random/travel.html">
+    <meta property="og:title" content="Random World Tour - 여행 다트 게임 ✈️">
+    <meta property="og:description" content="지구본을 돌려라! 다트가 꽂히는 곳이 당신의 다음 목적지입니다.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_travel.png">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Noto+Sans+KR:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --sky-blue: #87CEEB;
+            --ocean-blue: #0077BE;
+            --vintage-paper: #FDFBF7;
+            --text-color: #2C3E50;
+            --accent-red: #E74C3C;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--sky-blue);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Nav */
+        nav {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-back {
+            position: absolute;
+            left: 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .logo {
+            font-family: 'Abril Fatface', cursive;
+            font-size: 1.5rem;
+            color: var(--ocean-blue);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            /* Slightly wider for map */
+            padding: 80px 20px 20px;
+            /* Top padding for nav */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        /* Viewport */
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: var(--ocean-blue);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 5px solid white;
+            margin-bottom: 30px;
+        }
+
+        .map-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            /* Double width for looping */
+            height: 100%;
+            background-color: #2196F3;
+            /* Ocean */
+
+            /* Simplified World Map SVG */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 180' fill='%238BC34A'%3E%3Cpath d='M50,20 L90,15 L110,40 L100,50 L70,55 L40,40 Z' opacity='0.9'/%3E%3Cpath d='M75,60 L105,60 L120,90 L90,130 L70,80 Z' opacity='0.9'/%3E%3Cpath d='M160,20 L200,20 L190,40 L220,50 L200,60 L160,50 L150,30 Z' opacity='0.9'/%3E%3Cpath d='M200,20 L300,20 L320,60 L280,80 L240,60 L220,40 Z' opacity='0.9'/%3E%3Cpath d='M150,60 L200,60 L220,90 L180,120 L150,90 Z' opacity='0.9'/%3E%3Cpath d='M260,100 L310,100 L300,140 L260,130 Z' opacity='0.9'/%3E%3Cpath d='M30,150 L120,165 L330,165 L30,165 Z' fill='white' opacity='0.6'/%3E%3C/svg%3E");
+
+            background-size: 50% 100%;
+            /* Fit one map in half the layer (viewport width) */
+            background-repeat: repeat-x;
+            animation: scrollMap 10s linear infinite;
+        }
+
+        /* More realistic map pattern using SVG data uri could be better, but simple shapes work for 'abstract' spinning */
+
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 2px dashed rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .crosshair::before {
+            top: 50%;
+            left: -10px;
+            width: 60px;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .crosshair::after {
+            left: 50%;
+            top: -10px;
+            width: 2px;
+            height: 60px;
+            transform: translateX(-50%);
+        }
+
+        .dart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 20px;
+            background: linear-gradient(90deg, transparent, #E74C3C, #C0392B);
+            transform: translate(200px, -50%) rotate(180deg);
+            /* Start off-screen right */
+            transform-origin: center right;
+            z-index: 20;
+            opacity: 0;
+            /* Tail */
+        }
+
+        .dart::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 30px;
+            background: #333;
+            clip-path: polygon(100% 0, 0 50%, 100% 100%);
+        }
+
+        /* Animations */
+        @keyframes scrollMap {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .game-area.spin-fast .map-layer {
+            animation-duration: 0.5s;
+        }
+
+        .game-area.stop .map-layer {
+            animation-play-state: paused;
+        }
+
+        .game-area.shake {
+            animation: shakeCamera 0.3s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shakeCamera {
+
+            10%,
+            90% {
+                transform: translate3d(-2px, 2px, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(4px, -2px, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-6px, 4px, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(6px, -4px, 0);
+            }
+        }
+
+        .dart.throw {
+            animation: throwDart 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes throwDart {
+            0% {
+                opacity: 1;
+                transform: translate(200px, -250%) rotate(135deg) scale(1.5);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) rotate(135deg) scale(1);
+            }
+        }
+
+        /* Controls */
+        .control-area {
+            text-align: center;
+        }
+
+        .btn-throw {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #c0392b;
+            transition: all 0.1s;
+        }
+
+        .btn-throw:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
+        .btn-throw:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--vintage-paper);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 30px;
+            width: 100%;
+            display: none;
+            animation: slideUp 0.5s ease-out;
+            position: relative;
+        }
+
+        /* Stamp Effect */
+        .result-card::before {
+            content: 'ARRIVED';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-family: 'Abril Fatface', cursive;
+            font-size: 2rem;
+            color: rgba(231, 76, 60, 0.3);
+            border: 3px solid rgba(231, 76, 60, 0.3);
+            padding: 5px 10px;
+            transform: rotate(-15deg);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .city-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--ocean-blue);
+            margin-bottom: 10px;
+        }
+
+        .country-name {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .city-desc {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .btn-link {
+            display: inline-block;
+            background: #00a699;
+            /* Agoda/Skyscanner ish teal */
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-link:hover {
+            background: #008c81;
+        }
+
+        /* SEO Content */
+        .seo-content {
+            margin-top: 60px;
+            background: white;
+            padding: 30px;
+            width: 100%;
+            border-radius: 20px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .seo-content h2 {
+            font-family: 'Abril Fatface', cursive;
+            color: var(--ocean-blue);
+            border-bottom: 2px solid var(--sky-blue);
+            padding-bottom: 10px;
+        }
+
+        .seo-content h3 {
+            color: var(--accent-red);
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html" class="nav-back">← 돌아가기</a>
+        <div class="logo">Random World Tour</div>
+    </nav>
+
+    <div class="container">
+        <!-- Game Stage -->
+        <div class="game-area" id="gameArea">
+            <div class="map-layer" id="mapLayer"></div>
+            <div class="crosshair"></div>
+            <div class="dart" id="dartElement"></div>
+        </div>
+
+        <div class="control-area">
+            <button class="btn-throw" id="throwBtn" onclick="throwDart()">DART THROW! 🎯</button>
+        </div>
+
+        <!-- Result -->
+        <div class="result-card" id="resultCard">
+            <div class="country-name" id="resCountry">FRANCE</div>
+            <div class="city-name" id="resCity">PARIS</div>
+            <div class="city-desc" id="resDesc">
+                낭만과 예술의 도시. 에펠탑 아래에서 즐기는 피크닉과 루브르 박물관의 감동을 느껴보세요.
+            </div>
+        </div>
+
+        <!-- SEO Content -->
+        <article class="seo-content">
+            <h2>당신의 다음 목적지는 어디인가요?</h2>
+            <p>
+                매일 반복되는 일상 속에서 문득 어디론가 떠나고 싶다는 생각이 들 때가 있습니다. 하지만 막상 여행 계획을 세우려 하면 "어디를 가야 할지"부터가 고민이죠.
+                유럽의 고풍스러운 거리? 동남아의 에메랄드빛 바다? 아니면 남미의 열정적인 축제?
+                선택 장애가 올 때, 이 <strong>세계 여행 다트 게임</strong>이 해답을 드립니다. 복잡한 고민은 잠시 접어두고 운명에 맡겨보세요.
+            </p>
+
+            <h3>직장인을 위한 추천 여행지 BEST 3</h3>
+            <p>
+                <strong>1. 힐링이 필요할 때 - 발리, 인도네시아 (Ubud):</strong><br>
+                요가와 명상의 성지 우붓. 푸른 논밭을 바라보며 마시는 모닝 커피 한 잔이면, 쌓였던 업무 스트레스가 눈 녹듯 사라집니다. 저렴한 물가와 프라이빗 풀빌라는 덤이죠.<br><br>
+                <strong>2. 짧고 굵은 먹방 투어 - 오사카, 일본 (Osaka):</strong><br>
+                금요일 오후 반차로 떠날 수 있는 가장 가까운 미식 천국. 도톤보리의 타코야키부터 현지인만 아는 이자카야까지. 먹다 지쳐 잠든다는 '쿠이다오레'를 경험해보세요.<br><br>
+                <strong>3. 이국적인 풍경 - 카파도키아, 튀르키예 (Cappadocia):</strong><br>
+                지구가 아닌 듯한 기암괴석 위로 떠오르는 수백 개의 열기구. 인생 샷을 남기고 싶다면 더 이상 고민할 필요가 없습니다. 동굴 호텔에서의 하룻밤은 평생 잊지 못할 추억이 될 것입니다.
+            </p>
+
+            <h3>여행 준비 꿀팁</h3>
+            <p>
+                항공권은 출발 6주 전, 화요일 오후에 예약하는 것이 통계적으로 가장 저렴하다고 합니다.
+                또한 스카이스캐너의 'Everywhere (어디든지)' 기능을 활용하면 내 예산에 맞는 최적의 여행지를 찾을 수 있습니다.
+                이 게임의 결과가 설레셨다면, 지금 당장 여권을 확인해보세요!
+            </p>
+        </article>
+    </div>
+
+    <script>
+        // Destinations Data (50 Cities)
+        const destinations = [
+            { city: "파리 (Paris)", country: "프랑스", desc: "낭만과 예술의 도시. 에펠탑 야경과 센강 유람선은 필수 코스입니다." },
+            { city: "방콕 (Bangkok)", country: "태국", desc: "화려한 사원과 길거리 음식의 천국. 카오산 로드의 열기를 느껴보세요." },
+            { city: "도쿄 (Tokyo)", country: "일본", desc: "과거와 미래가 공존하는 메가 시티. 스시부터 쇼핑까지 모든 것이 있습니다." },
+            { city: "뉴욕 (New York)", country: "미국", desc: "잠들지 않는 도시, 타임스퀘어의 네온사인을 마주하세요." },
+            { city: "발리 (Bali)", country: "인도네시아", desc: "신들의 섬. 서핑과 요가, 그리고 완벽한 휴식이 기다립니다." },
+            { city: "바르셀로나 (Barcelona)", country: "스페인", desc: "가우디의 숨결이 살아있는 건축의 도시. 타파스와 샹그리아를 즐겨보세요." },
+            { city: "울란바토르 (Ulaanbaatar)", country: "몽골", desc: "끝없이 펼쳐진 초원과 쏟아지는 은하수. 게르에서의 하룻밤." },
+            { city: "이스탄불 (Istanbul)", country: "튀르키예", desc: "동서양의 문명이 만나는 곳. 그랜드 바자르에서 보물찾기." },
+            { city: "호놀룰루 (Honolulu)", country: "하와이", desc: "알로하! 와이키키 해변과 화산 트레킹의 조화." },
+            { city: "런던 (London)", country: "영국", desc: "빨간 이층 버스와 빅벤. 셜록 홈즈와 해리포터의 무대." },
+            { city: "로마 (Rome)", country: "이탈리아", desc: "도시 전체가 박물관. 콜로세움과 트레비 분수에서 소원을 빌어보세요." },
+            { city: "다낭 (Da Nang)", country: "베트남", desc: "한국인이 사랑하는 휴양지. 미케비치와 호이안 등불 축제." },
+            { city: "싱가포르 (Singapore)", country: "싱가포르", desc: "가든스 바이 더 베이의 몽환적인 야경과 칠리크랩." },
+            { city: "두바이 (Dubai)", country: "UAE", desc: "사막 위의 기적. 세계 최고층 빌딩과 럭셔리 쇼핑." },
+            { city: "프라하 (Prague)", country: "체코", desc: "동화 속 마을 같은 붉은 지붕의 물결. 까를교의 야경." },
+            { city: "시드니 (Sydney)", country: "호주", desc: "오페라 하우스와 하버 브리지. 서핑과 브런치의 여유." },
+            { city: "케이프타운 (Cape Town)", country: "남아공", desc: "테이블 마운틴과 펭귄이 있는 해변. 아프리카의 보석." },
+            { city: "마라케시 (Marrakesh)", country: "모로코", desc: "붉은 도시의 미로 같은 골목길과 향신료 시장." },
+            { city: "레이캬비크 (Reykjavik)", country: "아이슬란드", desc: "오로라 헌팅과 블루라군 온천. 자연의 신비를 경험하세요." },
+            { city: "교토 (Kyoto)", country: "일본", desc: "천년의 고도. 붉은 도리이 터널과 고즈넉한 사찰 산책." },
+            { city: "산토리니 (Santorini)", country: "그리스", desc: "파란 지붕과 하얀 벽, 그리고 지중해의 석양." },
+            { city: "타이베이 (Taipei)", country: "대만", desc: "딤섬과 버블티, 야시장의 먹거리 천국." },
+            { city: "칸쿤 (Cancun)", country: "멕시코", desc: "카리브해의 에메랄드빛 바다와 올인클루시브 호캉스." },
+            { city: "암스테르담 (Amsterdam)", country: "네덜란드", desc: "운하를 따라 자전거를 타고 달리는 낭만." },
+            { city: "부다페스트 (Budapest)", country: "헝가리", desc: "국회의사당의 황금빛 야경과 온천 즐기기." },
+            { city: "치앙마이 (Chiang Mai)", country: "태국", desc: "디지털 노마드의 성지. 맛있는 커피와 여유로운 분위기." },
+            { city: "리스본 (Lisbon)", country: "포르투갈", desc: "노란 트램을 타고 언덕을 오르며 즐기는 에그타르트." },
+            { city: "오사카 (Osaka)", country: "일본", desc: "먹다가 망한다는 미식의 도시. 유니버설 스튜디오도 필수." },
+            { city: "라스베이거스 (Las Vegas)", country: "미국", desc: "사막 한가운데 펼쳐진 화려한 쇼와 엔터테인먼트." },
+            { city: "코타키나발루 (Kota Kinabalu)", country: "말레이시아", desc: "세계 3대 석양으로 꼽히는 로맨틱한 일몰." },
+            { city: "인터라켄 (Interlaken)", country: "스위스", desc: "융프라우요흐의 만년설과 알프스의 대자연." },
+            { city: "세부 (Cebu)", country: "필리핀", desc: "고래상어와 함께 수영하는 잊지 못할 경험." },
+            { city: "블라디보스토크 (Vladivostok)", country: "러시아", desc: "가장 가까운 유럽. 킹크랩과 곰새우 파티." },
+            { city: "사이판 (Saipan)", country: "미국령", desc: "투명한 바다와 별빛 투어. 가족 여행의 정석." },
+            { city: "멜버른 (Melbourne)", country: "호주", desc: "커피와 예술의 골목. 그레이트 오션 로드 드라이브." },
+            { city: "밴쿠버 (Vancouver)", country: "캐나다", desc: "도시와 자연이 완벽하게 조화된 살기 좋은 도시." },
+            { city: "홍콩 (Hong Kong)", country: "홍콩", desc: "백만불짜리 야경과 딤섬, 쇼핑의 메카." },
+            { city: "카이로 (Cairo)", country: "이집트", desc: "피라미드와 스핑크스. 고대 문명의 신비를 마주하다." },
+            { city: "자그레브 (Zagreb)", country: "크로아티아", desc: "동유럽의 숨은 보석. 크리스마스 마켓이 아름다운 곳." },
+            { city: "몰디브 (Maldives)", country: "몰디브", desc: "모히또 가서 몰디브 한 잔? 지상 낙원 그 자체." },
+            { city: "베를린 (Berlin)", country: "독일", desc: "자유와 힙스터의 도시. 클럽 문화와 역사적 장벽." },
+            { city: "상하이 (Shanghai)", country: "중국", desc: "와이탄의 야경과 현대적인 스카이라인." },
+            { city: "하노이 (Hanoi)", country: "베트남", desc: "쌀국수와 오토바이 부대. 호안끼엠 호수의 정취." },
+            { city: "비엔나 (Vienna)", country: "오스트리아", desc: "클래식 음악과 커피의 도시. 우아한 궁전 투어." },
+            { city: "리우데자네이루 (Rio)", country: "브라질", desc: "코파카바나 해변과 예수상. 열정적인 삼바 축제." },
+            { city: "헬싱키 (Helsinki)", country: "핀란드", desc: "북유럽 디자인과 사우나. 산타클로스의 고향." },
+            { city: "나트랑 (Nha Trang)", country: "베트남", desc: "동양의 나폴리. 머드 온천과 빈펄 랜드." },
+            { city: "괌 (Guam)", country: "미국령", desc: "쇼핑과 휴양을 동시에. 면세점 털기 좋은 곳." },
+            { city: "삿포로 (Sapporo)", country: "일본", desc: "눈 축제와 징기스칸 양고기, 그리고 맥주." },
+            { city: "푸켓 (Phuket)", country: "태국", desc: "안다만해의 진주. 피피섬 투어와 밤문화." }
+        ];
+
+        // Web Audio Context
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'spin') {
+                // Rising pitch
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(300, audioCtx.currentTime + 1.5);
+
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1.5);
+            } else if (type === 'throw') {
+                // Whoosh noise-ish (using sine sweep for simplicity)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'hit') {
+                // Thud
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.1);
+
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            }
+        }
+
+        let isPlaying = false;
+
+        function throwDart() {
+            if (isPlaying) return;
+            isPlaying = true;
+
+            const btn = document.getElementById('throwBtn');
+            const gameArea = document.getElementById('gameArea');
+            const dart = document.getElementById('dartElement');
+            const resultCard = document.getElementById('resultCard');
+
+            // 0. Reset UI
+            btn.disabled = true;
+            resultCard.style.display = 'none';
+            dart.classList.remove('throw');
+            gameArea.classList.remove('spin-fast', 'stop', 'shake');
+            gameArea.querySelector('.map-layer').style.animationPlayState = 'running';
+
+            // 1. Spin Fast
+            playSound('spin');
+            gameArea.classList.add('spin-fast');
+
+            // 2. Throw Logic (Wait 1.5s)
+            setTimeout(() => {
+                // Throw!
+                playSound('throw');
+                dart.classList.add('throw');
+
+                // 3. Impact (0.2s later)
+                setTimeout(() => {
+                    playSound('hit');
+                    // Stop Map
+                    gameArea.classList.add('stop');
+                    gameArea.classList.add('shake');
+
+                    // 4. Show Result (0.5s later)
+                    setTimeout(() => {
+                        const dest = destinations[Math.floor(Math.random() * destinations.length)];
+
+                        document.getElementById('resCountry').innerText = dest.country;
+                        document.getElementById('resCity').innerText = dest.city;
+                        document.getElementById('resDesc').innerText = dest.desc;
+
+                        resultCard.style.display = 'block';
+                        resultCard.scrollIntoView({ behavior: 'smooth' });
+
+                        // Reset state
+                        btn.disabled = false;
+                        isPlaying = false;
+                    }, 500);
+
+                }, 200);
+
+            }, 1500);
+        }
+
+        function openSearch() {
+            const city = document.getElementById('resCity').innerText.split('(')[0].trim();
+            // Demo alert
+            alert(`'${city}' 최저가 항공권을 검색합니다. (실제 스카이스캐너 연결 예시)`);
+            // window.open(`https://www.skyscanner.co.kr/transport/flights/sela/${city}`, '_blank');
+        }
+
+    </script>
+</body>
+
+</html>

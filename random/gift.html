@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Master - 센스 있는 선물 추천 생성기</title>
+    <meta name="description"
+        content="생일, 기념일, 집들이 선물 고민 끝! 예산과 대상을 선택하면 실패 없는 맞춤형 선물을 추천해드립니다. 20대 여자 생일선물, 3만원대 선물 추천.">
+    <meta name="keywords" content="생일선물추천, 여자친구선물, 남자친구선물, 집들이선물, 3만원대선물, 5만원대선물, 카카오선물하기추천, 센스있는선물, 20대여자생일선물">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://Yangbam-lab.com/random/gift.html">
+    <meta property="og:title" content="Gift Master - 선물 추천 생성기 🎁">
+    <meta property="og:description" content="아직도 선물 고민 중이신가요? 예산과 대상만 알려주세요. 센스 있는 MD가 딱 골라드립니다.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_gift.png">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #FF7E67;
+            /* Warm Coral */
+            --secondary: #FFF3E0;
+            /* Soft Peach */
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --white: #ffffff;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f9f9f9;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Nav */
+        nav {
+            width: 100%;
+            padding: 1.5rem;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-back {
+            position: absolute;
+            left: 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Text */
+        .header-text {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .header-text h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .header-text p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+
+        .filter-group {
+            margin-bottom: 25px;
+        }
+
+        .filter-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-input {
+            display: none;
+        }
+
+        .tag-label {
+            padding: 10px 18px;
+            background: #f0f2f5;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .tag-input:checked+.tag-label {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 126, 103, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 16px;
+            background: var(--text-dark);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 40px 0;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading p {
+            margin-top: 15px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Results */
+        .result-area {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gift-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            background: var(--secondary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background: white;
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .gift-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .gift-desc {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn-link {
+            display: block;
+            text-align: center;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-link:hover {
+            background: #e66e58;
+        }
+
+        .no-result {
+            text-align: center;
+            color: var(--text-light);
+            padding: 30px;
+            font-size: 1rem;
+        }
+
+        /* SEO Section */
+        .content-section {
+            margin-top: 60px;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 20px;
+            color: #555;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .content-section h2 {
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+
+        .content-section h3 {
+            color: var(--primary);
+            margin-top: 30px;
+            font-size: 1.1rem;
+        }
+
+        .content-section p {
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+            animation: floatUp 15s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Decor particles -->
+    <div id="particles"></div>
+
+    <nav>
+        <a href="index.html" class="nav-back">← 돌아가기</a>
+        <div class="logo">Gift Master</div>
+    </nav>
+
+    <div class="container">
+        <div class="header-text">
+            <h1>완벽한 선물 찾기</h1>
+            <p>누구를 위한 선물인가요? 예산은 어느 정도인가요?<br>몇 가지 질문만 답하면, 센스 있는 상품을 추천해드려요.</p>
+        </div>
+
+        <section class="filter-section" id="filterSection">
+            <!-- Target -->
+            <div class="filter-group">
+                <div class="filter-title">🎁 받는 사람은 누구인가요?</div>
+                <div class="tags">
+                    <input type="radio" name="target" id="t_f20" class="tag-input" value="f20" checked>
+                    <label for="t_f20" class="tag-label">20대 여성</label>
+
+                    <input type="radio" name="target" id="t_m20" class="tag-input" value="m20">
+                    <label for="t_m20" class="tag-label">20대 남성</label>
+
+                    <input type="radio" name="target" id="t_w30" class="tag-input" value="w30">
+                    <label for="t_w30" class="tag-label">30대 직장인</label>
+
+                    <input type="radio" name="target" id="t_stu" class="tag-input" value="stu">
+                    <label for="t_stu" class="tag-label">학생</label>
+
+                    <input type="radio" name="target" id="t_couple" class="tag-input" value="couple">
+                    <label for="t_couple" class="tag-label">커플/신혼</label>
+                </div>
+            </div>
+
+            <!-- Budget -->
+            <div class="filter-group">
+                <div class="filter-title">💰 예산은 어느 정도인가요?</div>
+                <div class="tags">
+                    <input type="radio" name="budget" id="b_1" class="tag-input" value="1-3" checked>
+                    <label for="b_1" class="tag-label">1~3만원 (가성비)</label>
+
+                    <input type="radio" name="budget" id="b_4" class="tag-input" value="4-6">
+                    <label for="b_4" class="tag-label">4~6만원 (센스)</label>
+
+                    <input type="radio" name="budget" id="b_7" class="tag-input" value="7-10">
+                    <label for="b_7" class="tag-label">7~10만원 (고급)</label>
+
+                    <input type="radio" name="budget" id="b_flex" class="tag-input" value="flex">
+                    <label for="b_flex" class="tag-label">그 이상 (Flex)</label>
+                </div>
+            </div>
+
+            <button class="btn-search" onclick="findGift()">선물 추천 받기</button>
+        </section>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>MD가 상품 재고를 확인하고 있습니다...</p>
+        </div>
+
+        <!-- Result -->
+        <div class="result-area" id="resultArea">
+            <!-- Dynamic Content -->
+        </div>
+
+        <!-- SEO Content -->
+        <article class="content-section">
+            <h2>실패 없는 선물 고르기 노하우</h2>
+            <p>
+                선물은 주는 사람의 마음과 받는 사람의 필요가 만나는 지점에서 감동을 만들어냅니다. 하지만 매번 "뭘 줘야 좋아할까?"라는 고민에 빠지게 되죠. 20대 여성, 30대 직장인, 사회초년생
+                등 대상별로 실패하지 않는 선물 추천 팁을 정리했습니다.
+            </p>
+
+            <h3>20대 여성을 위한 선물 (스몰 럭셔리)</h3>
+            <p>
+                20대 여성들에게는 '내 돈 주고 사기는 아깝지만 받으면 기분 좋은' 아이템이 인기입니다. 대표적으로 **핸드크림, 립밤, 향수, 헤어미스트** 등이 있습니다. 특히
+                '이솝(Aesop)', '탬버린즈(Tamburins)', '조말론' 같은 브랜드 제품은 3~5만원대의 가격으로 고급스러운 패키지와 감성을 선물할 수 있어 '스몰 럭셔리'의 대명사로
+                불립니다. 포장을 풀었을 때의 인스타그래머블한 비주얼도 중요한 요소입니다.
+            </p>
+
+            <h3>30대 직장인을 위한 선물 (실용성 & 힐링)</h3>
+            <p>
+                직장 생활에 지친 30대에게는 **피로 회복과 데스크테리어(Deskterior)** 관련 아이템이 좋습니다. 고급 비타민(오쏘몰 등), 마사지기, 고급 텀블러, 무선 충전기 트레이 등이
+                실용적입니다. 혹은 퇴근 후 혼자만의 시간을 즐길 수 있는 입욕제, 인센스 스틱, 와인 칠링백 같은 '힐링 아이템'도 센스 있는 선택입니다.
+            </p>
+
+            <h3>사회초년생 & 학생 (응원 & IT)</h3>
+            <p>
+                새로운 시작을 앞둔 이들에게는 응원의 의미가 담긴 선물이 좋습니다. **명함 지갑, 고급 볼펜, 다이어리**는 고전적이지만 의미 있는 선물입니다. 또한 학생들에게는 에어팟 케이스,
+                보조배터리, 노트북 파우치 같은 IT 주변기기가 호불호 없이 환영받습니다. 카카오톡 선물하기 위시리스트를 살짝 확인해보는 것도 팁입니다.
+            </p>
+
+            <h3>집들이 & 신혼부부 (공간 & 감성)</h3>
+            <p>
+                휴지나 세제는 이제 그만. 요즘 집들이 선물 트렌드는 공간의 분위기를 바꿔주는 **인테리어 오브제**나 **고급 식기**입니다. 조명(렉슨 미나 등), 디저트 접시 세트, 핸드워시 세트,
+                룸 스프레이 등이 인기입니다. 신혼부부에게는 커플 잠옷이나 고급 타월 세트처럼 둘이 함께 쓸 수 있는 아이템을 추천합니다.
+            </p>
+
+            <h2>선물 예산 정하는 법</h2>
+            <p>
+                - **가벼운 인사/답례 (1~2만원):** 커피 기프티콘, 쿠키 세트, 핸드크림.<br>
+                - **생일/기념일 (3~6만원):** 브랜드 립스틱, 향수(소용량), 바디워시 세트.<br>
+                - **특별한 날/집들이 (7~10만원):** 소형가전, 고급 주류, 브랜드 잡화.<br>
+                가장 중요한 것은 가격표가 아니라 그 안에 담긴 '고민의 흔적'입니다. "네가 지난번에 이거 필요하다고 했잖아"라는 한마디가 선물보다 더 큰 감동을 줍니다.
+            </p>
+        </article>
+    </div>
+
+    <script>
+        // Data: 50+ Items
+        const giftData = [
+            // 1-3만원 (가성비)
+            { name: "탬버린즈 핸드크림", budget: "1-3", target: ["f20", "w30", "couple"], desc: "감각적인 향과 힙한 패키지, 카카오톡 선물하기 베스트셀러." },
+            { name: "이솝 립밤", budget: "1-3", target: ["f20", "m20", "w30"], desc: "호불호 없는 시크한 디자인과 촉촉함." },
+            { name: "오설록 티 세트", budget: "1-3", target: ["w30", "stu", "couple"], desc: "고급스러운 차 한 잔의 여유를 선물하세요." },
+            { name: "스타벅스 텀블러", budget: "1-3", target: ["stu", "m20", "w30"], desc: "실용성 갑, 환경까지 생각하는 데일리 아이템." },
+            { name: "록시땅 핸드크림 세트", budget: "1-3", target: ["f20", "w30"], desc: "국민 핸드크림, 향기와 보습 모두 잡은 정석 선물." },
+            { name: "양키캔들 워머 세트", budget: "1-3", target: ["f20", "couple"], desc: "방 안 분위기를 아늑하게 만들어주는 향기 테라피." },
+            { name: "고급 수건 세트 (TWB)", budget: "1-3", target: ["m20", "couple"], desc: "호텔 수건의 뽀송함을 집에서." },
+            { name: "라미 만년필", budget: "1-3", target: ["stu", "m20"], desc: "아날로그 감성의 시작, 잉크의 사각거림." },
+            { name: "고디바 초콜릿", budget: "1-3", target: ["f20", "stu"], desc: "달콤한 당 충전이 필요한 순간." },
+            { name: "카카오프렌즈 보조배터리", budget: "1-3", target: ["stu", "f20"], desc: "귀여운데 실용적이기까지 한 필수템." },
+            { name: "교촌치킨 허니콤보", budget: "1-3", target: ["m20", "stu"], desc: "실패 확률 0%의 치느님 기프티콘." },
+            { name: "러쉬 입욕제 (배쓰밤)", budget: "1-3", target: ["f20", "couple"], desc: "화려한 색감과 향기로 즐기는 반신욕 힐링." },
+            { name: "몰스킨 노트", budget: "1-3", target: ["w30", "stu"], desc: "성공하는 사람들의 기록 습관." },
+            { name: "차량용 방향제", budget: "1-3", target: ["m20", "w30"], desc: "새 차 뽑은 친구나 운전하는 직장인 필수템." },
+            { name: "무선 충전기", budget: "1-3", target: ["m20", "w30"], desc: "책상 위 선 정리를 깔끔하게." },
+
+            // 4-6만원 (센스)
+            { name: "샤넬 립스틱 (루쥬 코코)", budget: "4-6", target: ["f20", "w30"], desc: "파우치 속의 작은 사치, 여심 저격 아이템." },
+            { name: "조말론 핸드/바디 워시", budget: "4-6", target: ["f20", "w30", "couple"], desc: "욕실을 호텔 스파처럼 만들어주는 니치 향기." },
+            { name: "오쏘몰 이뮨 멀티비타민", budget: "4-6", target: ["w30", "m20"], desc: "이게 요즘 유행하는 비타민계의 에르메스." },
+            { name: "렉슨 미나 조명 (M)", budget: "4-6", target: ["f20", "couple"], desc: "버섯 모양의 귀여운 무드등, 인테리어 포인트." },
+            { name: "딥티크 룸 스프레이", budget: "4-6", target: ["f20", "w30"], desc: "공간의 품격을 높여주는 고급스러운 향." },
+            { name: "벨킨 3in1 충전기", budget: "4-6", target: ["m20", "w30"], desc: "폰, 시계, 이어폰을 한 번에 충전." },
+            { name: "교보문고 드림카드 5만원", budget: "4-6", target: ["stu", "w30"], desc: "책을 좋아하는 사람에게 최고의 자유." },
+            { name: "요가매트 (룰루레몬)", budget: "4-6", target: ["f20", "w30"], desc: "운동은 장비빨, 홈트의 질이 달라집니다." },
+            { name: "정관장 홍삼정 에브리타임", budget: "4-6", target: ["w30", "m20"], desc: "건강 챙기라는 말보다 강력한 한 포." },
+            { name: "와인 칠링백 & 글라스", budget: "4-6", target: ["couple", "f20"], desc: "한강 피크닉이나 홈파티의 분위기 메이커." },
+            { name: "전기 면도기 (보급형)", budget: "4-6", target: ["m20", "stu"], desc: "매일 아침 시간을 단축시켜주는 실용템." },
+            { name: "블루투스 키보드 (로지텍)", budget: "4-6", target: ["m20", "stu", "w30"], desc: "아이패드 유저라면 필수, 생산성 UP." },
+
+            // 7-10만원 (고급)
+            { name: "산타마리아노벨라 왁스 타블렛", budget: "7-10", target: ["f20", "w30"], desc: "옷장이나 방문에 걸어두는 고체 방향제, 향기가 예술." },
+            { name: "논픽션 향수 (30ml)", budget: "7-10", target: ["f20", "m20"], desc: "중성적이고 세련된 향, 트렌디한 선택." },
+            { name: "일리/네스프레소 커피머신", budget: "7-10", target: ["couple", "w30"], desc: "우리 집을 홈카페로 만들어주는 마법." },
+            { name: "브라운 전기면도기 (중급)", budget: "7-10", target: ["m20", "w30"], desc: "남자의 피부는 소중하니까, 절삭력 굿." },
+            { name: "폴로 랄프로렌 모자/티셔츠", budget: "7-10", target: ["m20", "w30", "stu"], desc: "유행 타지 않는 클래식한 패션 아이템." },
+            { name: "백화점 상품권 10만원", budget: "7-10", target: ["w30", "m20", "f20", "couple"], desc: "가장 실용적이고 실패 없는 현금성 선물." },
+            { name: "아크네 스튜디오 머플러", budget: "7-10", target: ["f20", "w30"], desc: "겨울철 패션 완성, 따뜻함과 스타일 동시에." },
+            { name: "애플 맥세이프 카드지갑", budget: "7-10", target: ["m20", "stu"], desc: "아이폰 유저라면 누구나 갖고 싶은 정품 액세서리." },
+            { name: "소니 블루투스 스피커", budget: "7-10", target: ["couple", "m20"], desc: "캠핑이나 방구석 콘서트에 딱." },
+            { name: "Aesop 룸 스프레이 & 핸드워시", budget: "7-10", target: ["couple", "w30"], desc: "집들이 선물 1순위, 센스 있다는 소리 듣습니다." },
+
+            // Flex (10만원 이상)
+            { name: "애플워치 SE", budget: "flex", target: ["stu", "m20", "f20", "w30"], desc: "건강과 알림을 책임지는 스마트한 손목 파트너." },
+            { name: "다이슨 에어랩/드라이기", budget: "flex", target: ["f20", "w30", "couple"], desc: "삶의 질 수직 상승, 머릿결이 달라집니다." },
+            { name: "호텔 뷔페 2인 식사권", budget: "flex", target: ["couple", "w30"], desc: "특별한 날을 더욱 특별하게 만드는 미식 경험." },
+            { name: "닌텐도 스위치", budget: "flex", target: ["m20", "stu", "couple"], desc: "집돌이 집순이 최고의 친구." },
+            { name: "톰포드/크리드 향수", budget: "flex", target: ["m20", "w30"], desc: "성공한 남자의 향기, 니치 향수의 끝판왕." },
+            { name: "구찌/프라다 카드지갑", budget: "flex", target: ["f20", "w30"], desc: "가방 속에서 꺼낼 때마다 기분 좋은 명품." },
+            { name: "발뮤다 토스터기", budget: "flex", target: ["couple", "w30"], desc: "죽은 빵도 살려낸다는 전설의 토스터." },
+            { name: "에어팟 프로", budget: "flex", target: ["stu", "m20", "f20"], desc: "노이즈 캔슬링으로 세상과 단절되는 몰입감." },
+            { name: "갤럭시 워치", budget: "flex", target: ["m20", "w30"], desc: "갤럭시 유저에게 최고의 선물." },
+            { name: "르크루제 냄비 세트", budget: "flex", target: ["couple"], desc: "신혼 주방의 로망, 평생 쓰는 무쇠 주물." }
+        ];
+
+        // Background Particles
+        const particleContainer = document.getElementById('particles');
+        const colors = ['#FF7E67', '#FFD700', '#A8E6CF', '#FF8B94'];
+
+        for (let i = 0; i < 15; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            p.style.animationDelay = (Math.random() * 5) + 's';
+
+            // Random SVGs or Shapes? Just font icons for simplicity
+            const shapes = ['🎁', '💝', '🎀', '🎈', '✨'];
+            p.innerText = shapes[Math.floor(Math.random() * shapes.length)];
+            p.style.fontSize = (Math.random() * 20 + 20) + 'px';
+
+            particleContainer.appendChild(p);
+        }
+
+        // --- Logic ---
+        function findGift() {
+            // 1. Get Inputs
+            const target = document.querySelector('input[name="target"]:checked').value;
+            const budget = document.querySelector('input[name="budget"]:checked').value;
+
+            // 2. UI Loading
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('filterSection').style.opacity = '0.5';
+            document.getElementById('filterSection').style.pointerEvents = 'none';
+
+            // 3. Logic Delay (1.5s)
+            setTimeout(() => {
+                // Filter Logic
+                const matchedItems = giftData.filter(item => {
+                    const budgetMatch = item.budget === budget;
+                    const targetMatch = item.target.includes(target);
+                    // Also include items with 'couple' in target if viewing couple? Already set.
+                    return budgetMatch && targetMatch;
+                });
+
+                // Pick Random 3 (or less if not enough)
+                const results = shuffleArray(matchedItems).slice(0, 3);
+
+                // Render
+                showResult(results);
+
+            }, 1000);
+        }
+
+        function showResult(items) {
+            const container = document.getElementById('resultArea');
+            container.innerHTML = '';
+
+            if (items.length === 0) {
+                container.innerHTML = '<div class="no-result">조건에 맞는 상품을 찾지 못했어요 😢<br>다른 예산이나 대상을 선택해보세요.</div>';
+            } else {
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'gift-card';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <span style="font-size:1.5rem;">🎁</span>
+                            <span class="badge">추천</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="gift-name">${item.name}</div>
+                            <div class="gift-desc">${item.desc}</div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // UI Reset
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('filterSection').style.opacity = '1';
+            document.getElementById('filterSection').style.pointerEvents = 'auto';
+            container.style.display = 'flex';
+
+            // Scroll to result
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function openLink(productName) {
+            // In a real scenario, this would loop through an affiliate mapping.
+            // For now, open a Coupang search
+            const query = encodeURIComponent(productName);
+            // window.open(`https://www.coupang.com/np/search?q=${query}`, '_blank');
+            alert("수익화 링크로 연결됩니다. (데모)");
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Breaker - 대화 주제 자판기</title>
+    <meta name="description" content="어색한 분위기를 깨는 스몰토크 주제 자판기입니다. 소개팅, 회식, 모임에서 캡슐을 돌려보세요 재미있는 질문이 쏟아집니다.">
+    <meta name="keywords" content="아이스브레이킹, 스몰토크주제, 소개팅대화, 대화주제추천, 밸런스게임, 어색할때, 질문카드">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://Yangbam-lab.com/random/capsule.html">
+    <meta property="og:title" content="Ice Breaker - 대화 캡슐 자판기 💊">
+    <meta property="og:description" content="무슨 말을 해야 할지 막막할 때, 레버를 돌려보세요!">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_capsule.png">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Gaegu:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --pop-pink: #FF6B81;
+            --pop-blue: #70A1FF;
+            --pop-yellow: #F39C12;
+            --pop-mint: #2ED573;
+            --bg-color: #FFEDF0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gaegu', cursive;
+            background-color: var(--bg-color);
+            color: #2F3542;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Nav */
+        nav {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(255, 107, 129, 0.1);
+        }
+
+        .nav-back {
+            position: absolute;
+            left: 20px;
+            text-decoration: none;
+            color: var(--pop-pink);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.8rem;
+            color: var(--pop-blue);
+            text-shadow: 3px 3px 0 #FFF;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        /* Machine Visuals */
+        .machine-container {
+            position: relative;
+            width: 320px;
+            height: 480px;
+            margin-top: 20px;
+            perspective: 800px;
+        }
+
+        /* Dome (Glass) */
+        .dome {
+            width: 280px;
+            height: 280px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 8px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 20px;
+            z-index: 10;
+            overflow: hidden;
+            box-shadow:
+                inset -20px -20px 40px rgba(255, 255, 255, 0.5),
+                inset 10px 10px 20px rgba(255, 255, 255, 0.9),
+                0 10px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px);
+        }
+
+        .dome::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            width: 60px;
+            height: 30px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.6;
+            transform: rotate(-45deg);
+        }
+
+        /* Capsules inside */
+        .capsule-pool {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .ball {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            /* Pseudo-3D shading */
+            box-shadow: inset -5px -5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .ball.half {
+            background: linear-gradient(to bottom, var(--c1) 50%, white 50%);
+        }
+
+        /* Base */
+        .base {
+            width: 320px;
+            height: 220px;
+            background: var(--pop-pink);
+            border-radius: 40px 40px 20px 20px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 5;
+            box-shadow:
+                inset -10px -10px 0 rgba(0, 0, 0, 0.1),
+                0 20px 40px rgba(255, 107, 129, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 30px;
+        }
+
+        /* Controls Area */
+        .controls {
+            width: 200px;
+            height: 100px;
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Lever */
+        .knob-back {
+            width: 70px;
+            height: 70px;
+            background: #dfe6e9;
+            border-radius: 50%;
+            border: 4px solid #b2bec3;
+            position: relative;
+        }
+
+        .knob-handle {
+            width: 20px;
+            height: 90px;
+            background: var(--pop-blue);
+            border-radius: 10px;
+            position: absolute;
+            top: -10px;
+            left: 25px;
+            transform-origin: center center;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s;
+        }
+
+        .knob-handle::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 30px;
+            height: 100px;
+            /* larger hit area */
+        }
+
+        /* Chute */
+        .chute-hole {
+            width: 80px;
+            height: 80px;
+            background: #2d3436;
+            border-radius: 50% 50% 10px 10px;
+            position: absolute;
+            bottom: 20px;
+            left: calc(50% - 40px);
+            z-index: 20;
+            overflow: hidden;
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .chute-door {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            position: absolute;
+            top: 0;
+            transform-origin: top;
+            transition: transform 0.2s;
+        }
+
+        /* Active States */
+        .machine-container.shake .dome {
+            animation: shake 0.5s linear infinite;
+        }
+
+        .machine-container.shake .ball {
+            animation: mix 0.5s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
+        }
+
+        @keyframes mix {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            25% {
+                transform: translate(10px, -20px);
+            }
+
+            50% {
+                transform: translate(-10px, 10px);
+            }
+
+            75% {
+                transform: translate(5px, -5px);
+            }
+        }
+
+        /* Result Popup */
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            backdrop-filter: blur(5px);
+        }
+
+        .result-card {
+            width: 90%;
+            max-width: 350px;
+            background: white;
+            border-radius: 30px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 5px solid var(--pop-yellow);
+            position: relative;
+        }
+
+        .result-card.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .topic-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            word-break: keep-all;
+        }
+
+        .btn-close {
+            background: var(--pop-pink);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-family: 'Gaegu', cursive;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #D63031;
+        }
+
+        .btn-close:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Dropped Capsule Animation */
+        .dropped-capsule {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            z-index: 50;
+            top: 400px;
+            /* Chute start */
+            left: 130px;
+            display: none;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to bottom, var(--c1) 50%, white 50%);
+        }
+
+        .dropped-capsule.fall {
+            display: block;
+            animation: fallBounce 1s ease-out forwards;
+        }
+
+        @keyframes fallBounce {
+            0% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(150px) scale(1.1, 0.9);
+            }
+
+            60% {
+                transform: translateY(120px) scale(0.9, 1.1);
+            }
+
+            80% {
+                transform: translateY(150px) scale(1.05, 0.95);
+            }
+
+            100% {
+                transform: translateY(150px) scale(1);
+            }
+        }
+
+        /* SEO Content */
+        .content-section {
+            margin-top: 60px;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            line-height: 1.8;
+            color: #555;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            font-size: 1.1rem;
+        }
+
+        .content-section h2 {
+            border-bottom: 3px solid var(--pop-pink);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .content-section h3 {
+            color: var(--pop-blue);
+            margin-top: 30px;
+        }
+
+        .helper-text {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--pop-blue);
+            font-weight: bold;
+            animation: fadePop 2s infinite;
+        }
+
+        @keyframes fadePop {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html" class="nav-back">←</a>
+        <div class="logo">Ice Breaker</div>
+        <div style="width: 20px;"></div> <!-- Spacer -->
+    </nav>
+
+    <div class="container">
+        <!-- Visual Machine -->
+        <div class="machine-container" id="machine">
+            <div class="dome">
+                <div class="capsule-pool" id="capsulePool">
+                    <!-- Balls injected by JS -->
+                </div>
+            </div>
+
+            <div class="base">
+                <div class="controls">
+                    <div class="knob-back">
+                        <div class="knob-handle" id="handle" onclick="spin()"></div>
+                    </div>
+                </div>
+                <!-- Chute -->
+                <div class="chute-hole"></div>
+            </div>
+
+            <!-- Dropped Item Placeholder -->
+            <div class="dropped-capsule" id="droppedItem"></div>
+        </div>
+
+        <div class="helper-text">▲ 레버를 돌려보세요!</div>
+
+        <!-- SEO Content -->
+        <article class="content-section">
+            <h2>어색한 침묵을 깨는 마법</h2>
+            <p>
+                소개팅, 첫 만남, 혹은 오랜만에 만난 친구들과의 자리에서 무슨 말을 해야 할지 막막했던 적 있으신가요?
+                'Ice Breaker'는 굳어있는 분위기를 부드럽게 녹여줄 대화 주제를 랜덤으로 제공합니다.
+                너무 가볍지도, 너무 무겁지도 않은 스몰토크 주제를 통해 상대방의 새로운 면을 발견해보세요.
+            </p>
+
+            <h3>상황별 대화 꿀팁</h3>
+            <p>
+                <strong>1. 소개팅:</strong> "만약 ~라면?" 같은 밸런스 게임 질문은 상대방의 가치관을 자연스럽게 알 수 있는 좋은 방법입니다.<br>
+                <strong>2. 아이스브레이킹:</strong> TMI(Too Much Information) 질문은 서로의 소소한 취향을 공유하며 친밀감을 높여줍니다.<br>
+                <strong>3. 회식/모임:</strong> 긍정적인 기억을 떠올리게 하는 질문(최근에 웃은 일, 여행지 추천 등)은 분위기를 밝게 만듭니다.
+            </p>
+
+            <h3>사용 방법</h3>
+            <p>
+                가운데 있는 파란색 레버를 클릭하여 돌려주세요. 자판기 속 알록달록한 캡슐이 섞이고, 당신을 위한 단 하나의 질문이 배달됩니다.
+                나온 질문에 대해 먼저 대답하고 상대방에게 되물어보는 것이 대화의 정석!
+            </p>
+        </article>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="result-overlay" id="resultOverlay" onclick="closeModal()">
+        <div class="result-card" id="resultCard" onclick="event.stopPropagation()">
+            <div class="result-icon">💊</div>
+            <div class="topic-text" id="topicArea">질문이 여기에 나옵니다.</div>
+            <button class="btn-close" onclick="closeModal()">OK!</button>
+        </div>
+    </div>
+
+    <script>
+        // Data: 50 Questions
+        const topics = [
+            "만약 내일 좀비 사태가 터진다면 가장 먼저 챙길 3가지는?",
+            "학창 시절 가장 좋아했던 급식 메뉴는?",
+            "최근에 가장 크게 웃었던 일은 무엇인가요?",
+            "만약 10억이 생긴다면 가장 먼저 하고 싶은 것은?",
+            "자신만의 스트레스 해소법이 있다면?",
+            "다시 태어난다면 갖고 싶은 재능은?",
+            "가장 좋아하는 계절과 그 이유는?",
+            "최근에 본 영화나 드라마 중 추천하고 싶은 것은?",
+            "죽기 전에 꼭 가보고 싶은 여행지는?",
+            "나만의 소울 푸드(Soul Food)는 무엇인가요?",
+            "평생 한 가지 음식만 먹어야 한다면?",
+            "어릴 때 장래희망은 무엇이었나요?",
+            "요즘 가장 관심 있는 분야나 취미는?",
+            "가장 기억에 남는 생일 선물은?",
+            "노래방 애창곡 18번은?",
+            "주말에는 주로 무엇을 하며 시간을 보내나요?",
+            "만약 초능력을 하나 가질 수 있다면?",
+            "가장 무서워하는 것은 무엇인가요? (벌레, 귀신 등)",
+            "자신을 동물에 비유한다면?",
+            "가장 좋아하는 아이스크림 맛은?",
+            "하루 중 가장 좋아하는 시간대는?",
+            "내 인생의 영화를 하나 꼽자면?",
+            "만약 과거로 돌아갈 수 있다면 언제로 가고 싶나요?",
+            "가장 좋아하는 야식 메뉴는?",
+            "최근에 산 물건 중 가장 만족하는 것은?",
+            "탕수육은 부먹 vs 찍먹?",
+            "붕어빵은 팥 vs 슈크림?",
+            "민트초코 호 vs 불호?",
+            "여름에 패딩 입기 vs 겨울에 반팔 입기?",
+            "평생 라면 안 먹기 vs 평생 탄산 안 먹기?",
+            "가장 좋아하는 냄새(향기)는?",
+            "자기 전에 마지막으로 하는 일은?",
+            "아침에 일어나서 가장 먼저 하는 일은?",
+            "가장 존경하는 인물은 누구인가요?",
+            "학창 시절 별명이 있었나요?",
+            "가장 자신 있는 요리는?",
+            "만약 로또 1등에 당첨된다면 가족에게 알린다 vs 비밀로 한다?",
+            "가장 좋아하는 카페 음료는?",
+            "스마트폰 배경화면은 무엇인가요?",
+            "가장 최근에 찍은 사진은 무엇인가요?",
+            "지금 당장 먹고 싶은 음식은?",
+            "나만의 소확행(소소하지만 확실한 행복)은?",
+            "가장 좋아하는 색깔과 그 이유는?",
+            "비 오는 날을 좋아하시나요?",
+            "만약 유튜버가 된다면 어떤 콘텐츠를 하고 싶나요?",
+            "가장 좋아하는 과일은?",
+            "잠이 안 올 때 하는 행동은?",
+            "가장 듣기 좋은 칭찬은 무엇인가요?",
+            "올해 꼭 이루고 싶은 목표가 있다면?",
+            "지금 가장 보고 싶은 사람은 누구인가요?"
+        ];
+
+        // Colors
+        const colors = ['#FF6B81', '#70A1FF', '#F39C12', '#2ED573', '#A3CB38', '#ea8685'];
+
+        // Init Capsules
+        const pool = document.getElementById('capsulePool');
+        for (let i = 0; i < 15; i++) {
+            const ball = document.createElement('div');
+            ball.className = 'ball half';
+            ball.style.left = Math.random() * 200 + 20 + 'px';
+            ball.style.top = Math.random() * 100 + 100 + 'px';
+            ball.style.transform = `rotate(${Math.random() * 360}deg)`;
+            ball.style.setProperty('--c1', colors[Math.floor(Math.random() * colors.length)]);
+            pool.appendChild(ball);
+        }
+
+        // Web Audio Context
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'crank') {
+                // Ratchet sound simulation
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'drop') {
+                // Clunk sound
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.3);
+
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'pop') {
+                // Pop sound
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            }
+        }
+
+        // Logic
+        let isSpinning = false;
+
+        function spin() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const handle = document.getElementById('handle');
+            const machine = document.getElementById('machine');
+            const dropItem = document.getElementById('droppedItem');
+
+            // 0. Reset
+            dropItem.classList.remove('fall');
+            dropItem.style.display = 'none';
+
+            // 1. Rotate Handle
+            handle.style.transform = 'rotate(360deg)';
+
+            // 2. Shake Machine (Mixing)
+            machine.classList.add('shake');
+
+            // Sound loop for crank
+            let clickCount = 0;
+            const crankInterval = setInterval(() => {
+                playSound('crank');
+                clickCount++;
+                if (clickCount > 5) clearInterval(crankInterval);
+            }, 100);
+
+            // 3. Drop Capsule
+            setTimeout(() => {
+                machine.classList.remove('shake');
+                handle.style.transform = 'rotate(0deg)'; // Reset handle visually
+
+                // Color setup for dropped item
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                dropItem.style.setProperty('--c1', randomColor);
+
+                dropItem.style.display = 'block';
+                dropItem.classList.add('fall');
+                playSound('drop');
+
+                // 4. Open Modal
+                setTimeout(() => {
+                    playSound('pop');
+                    showResult(randomColor);
+                    isSpinning = false; // unlock
+                }, 1000);
+
+            }, 1000);
+        }
+
+        function showResult(color) {
+            const overlay = document.getElementById('resultOverlay');
+            const card = document.getElementById('resultCard');
+            const text = document.getElementById('topicArea');
+            const icon = document.querySelector('.result-icon');
+
+            // Pick random topic
+            const question = topics[Math.floor(Math.random() * topics.length)];
+            text.innerText = question;
+
+            // Style match
+            card.style.borderColor = color;
+            icon.style.color = color;
+            document.querySelector('.btn-close').style.backgroundColor = color;
+
+            overlay.style.display = 'flex';
+            // Force reflow for transition
+            requestAnimationFrame(() => {
+                card.classList.add('show');
+            });
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('resultOverlay');
+            const card = document.getElementById('resultCard');
+
+            card.classList.remove('show');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+
+                // Reset dropped item
+                const dropItem = document.getElementById('droppedItem');
+                dropItem.classList.remove('fall');
+                dropItem.style.display = 'none';
+            }, 300);
+        }
+
+    </script>
+</body>
+
+</html>

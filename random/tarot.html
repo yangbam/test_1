@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 타로 - Daily One-Card Tarot | 무료 운세</title>
+    <meta name="description"
+        content="오늘 당신에게 필요한 조언은? 신비로운 타로 카드를 한 장 뽑아 오늘의 운세, 연애운, 금전운, 직장운을 확인하세요. 22장의 메이저 아르카나가 전하는 지혜. 무료/설치없음.">
+    <meta name="keywords" content="오늘의타로, 무료타로, 타로점, 원카드타로, 오늘의운세, 타로카드해석, 메이저아르카나, 타로심리테스트, 연애운, 금전운, 직장운">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://Yangbam-lab.com/random/tarot.html">
+    <meta property="og:title" content="오늘의 타로 - Daily One-Card Tarot 🔮">
+    <meta property="og:description" content="마음이 이끄는 카드를 한 장 뽑아보세요. 당신의 하루를 위한 신비로운 메시지가 기다리고 있습니다.">
+    <meta property="og:image" content="https://Yangbam-lab.com/assets/og_tarot.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Nanum+Myeongjo:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #1a0b2e;
+            --bg-light: #2d1b4e;
+            --accent-gold: #ffd700;
+            --accent-glow: #b388ff;
+            --text-color: #e0e0e0;
+            --card-width: 120px;
+            --card-height: 200px;
+            --tab-active: #9c27b0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nanum Myeongjo', serif;
+            background-color: var(--bg-dark);
+            background: radial-gradient(circle at center, #2d1b4e 0%, #1a0b2e 100%);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Star Animation Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            50% {
+                opacity: var(--opacity);
+                transform: scale(1);
+                box-shadow: 0 0 10px white;
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+
+        /* Navigation */
+        nav {
+            width: 100%;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-back {
+            position: absolute;
+            left: 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .nav-back:hover {
+            opacity: 1;
+            color: var(--accent-gold);
+        }
+
+        .nav-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Main Stage */
+        #app {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        /* Header Text */
+        .intro-text {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 50px;
+            transition: opacity 0.5s;
+        }
+
+        .intro-text h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            margin: 0 0 10px 0;
+            color: #fff;
+            text-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .intro-text p {
+            font-size: 1rem;
+            color: #aaa;
+            margin: 0;
+        }
+
+        /* Card Stage */
+        .card-stage {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            /* Space for spread */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .tarot-card {
+            width: var(--card-width);
+            height: var(--card-height);
+            position: absolute;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s;
+            border-radius: 10px;
+        }
+
+        /* Mobile adjustment */
+        @media (max-width: 400px) {
+            :root {
+                --card-width: 90px;
+                --card-height: 150px;
+            }
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Card Faces */
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #332144;
+        }
+
+        .card-back {
+            background-color: #222;
+            background-image:
+                radial-gradient(circle at 50% 50%, #4a2c6d 0%, #1a0b2e 100%),
+                repeating-linear-gradient(45deg, rgba(255, 215, 0, 0.05) 0px, rgba(255, 215, 0, 0.05) 2px, transparent 2px, transparent 8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-back::after {
+            content: '✧';
+            font-size: 2rem;
+            color: rgba(255, 215, 0, 0.2);
+        }
+
+        .card-front {
+            transform: rotateY(180deg);
+            background-color: white;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .tarot-card.flipped .card-inner {
+            transform: rotateY(180deg);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        /* Button */
+        .btn-action {
+            background: transparent;
+            border: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 15px 40px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
+            margin-top: -50px;
+            /* Pull up into stage */
+            z-index: 5;
+        }
+
+        .btn-action:hover {
+            background: var(--accent-gold);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Result Section */
+        .result-section {
+            display: none;
+            /* Initially hidden, toggled by JS to flex */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s;
+            text-align: center;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            /* Overlay stage */
+            top: 0;
+            left: 0;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            /* Stronger Glass */
+            background: rgba(26, 11, 46, 0.8);
+            min-height: 100%;
+            z-index: 10;
+        }
+
+        .result-section.active {
+            display: flex;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .result-card-view {
+            width: 180px;
+            height: 300px;
+            border-radius: 12px;
+            border: 3px solid var(--accent-gold);
+            box-shadow: 0 0 50px rgba(179, 136, 255, 0.4);
+            margin-bottom: 20px;
+            background-size: cover;
+            background-position: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .result-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-keyword {
+            font-size: 1rem;
+            color: var(--accent-glow);
+            margin-bottom: 20px;
+            font-weight: bold;
+            border: 1px solid var(--accent-glow);
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #aaa;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-family: 'Nanum Myeongjo', serif;
+        }
+
+        .tab-btn.active {
+            background: var(--tab-active);
+            color: white;
+            border-color: var(--tab-active);
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--tab-active);
+        }
+
+        .result-desc-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 150px;
+            /* Prevent jump */
+        }
+
+        .result-desc {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #eee;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-desc.active {
+            display: block;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-retry,
+        .btn-share {
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-retry {
+            background: #444;
+            color: #fff;
+        }
+
+        .btn-share {
+            background: var(--accent-gold);
+            color: #333;
+        }
+
+        .btn-share:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        /* SEO & Ads */
+        .content-section {
+            width: 100%;
+            max-width: 600px;
+            padding: 60px 20px;
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            background: rgba(0, 0, 0, 0.2);
+            margin-top: 40px;
+        }
+
+        .content-section h2 {
+            font-family: 'Nanum Myeongjo', serif;
+            color: var(--text-color);
+            border-bottom: 1px solid #444;
+            padding-bottom: 15px;
+            margin-top: 50px;
+            font-size: 1.4rem;
+        }
+
+        .content-section h3 {
+            color: var(--accent-gold);
+            margin-top: 30px;
+            font-size: 1.1rem;
+        }
+
+        .content-section p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        /* Capture Highlight */
+        #captureArea {
+            background: radial-gradient(circle at center, #2d1b4e 0%, #1a0b2e 100%);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stars" id="starContainer"></div>
+
+    <nav>
+        <a href="index.html" class="nav-back">← Random Lab</a>
+        <span class="nav-title">Daily Tarot</span>
+    </nav>
+
+    <div id="app">
+        <!-- Intro -->
+        <div class="intro-text" id="introView">
+            <h1>오늘의 신탁</h1>
+            <p>마음을 비우고, 카드가 하는 이야기에 귀 기울여보세요.</p>
+        </div>
+
+        <!-- Stage for Interaction -->
+        <div class="card-stage" id="cardStage">
+            <!-- Cards Injected JS -->
+        </div>
+
+        <button class="btn-action" id="btnStart" onclick="startApp()">운세 보기</button>
+
+        <!-- Result View -->
+        <div class="result-section" id="resultView">
+            <!-- Capture Area Start -->
+            <div id="captureArea">
+                <div style="font-family:'Cinzel'; color:#888; font-size:0.8rem; margin-bottom:10px;">Daily One-Card
+                    Tarot</div>
+                <div class="result-card-view" id="resCardImg"></div>
+                <div class="result-name" id="resName">The Fool</div>
+                <div class="result-keyword" id="resKey">새로운 시작</div>
+            </div>
+            <!-- Capture Area End -->
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('total')">종합운</button>
+                <button class="tab-btn" onclick="switchTab('love')">연애운</button>
+                <button class="tab-btn" onclick="switchTab('money')">금전운</button>
+                <button class="tab-btn" onclick="switchTab('work')">직장운</button>
+            </div>
+
+            <!-- Description Content -->
+            <div class="result-desc-container">
+                <div class="result-desc active" id="desc-total">종합 해석...</div>
+                <div class="result-desc" id="desc-love">연애운 해석...</div>
+                <div class="result-desc" id="desc-money">금전운 해석...</div>
+                <div class="result-desc" id="desc-work">직장운 해석...</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-retry" onclick="resetApp()">↻ 다시 뽑기</button>
+                <button class="btn-share" onclick="captureResult()">📷 캡처/공유</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO Content (Expanded) -->
+    <article class="content-section">
+        <h2 style="margin-top:0;">타로의 기원과 역사</h2>
+        <p>
+            타로 카드의 역사는 14세기 유럽으로 거슬러 올라갑니다. 처음에는 귀족들의 유희를 위한 카드 게임인 '타로키(Tarocchi)'로 시작되었으나, 점차 신비주의와 결합하며 점술 도구로
+            발전했습니다. 특히 18세기 프랑스의 신비주의자들에 의해 카드의 상징적 의미가 체계화되었고, 현재 가장 널리 쓰이는 '라이더-웨이트(Rider-Waite)' 덱은 1909년 아서 에드워드
+            웨이트와 파멜라 콜먼 스미스에 의해 탄생했습니다. 이 덱은 직관적인 이미지로 누구나 쉽게 타로의 세계에 입문할 수 있게 만들었습니다.
+        </p>
+
+        <h2>메이저 아르카나: 바보의 여정</h2>
+        <p>
+            타로 덱은 22장의 메이저 아르카나와 56장의 마이너 아르카나로 구성됩니다. 본 서비스에서 제공하는 '오늘의 타로'는 인생의 큰 흐름과 원형적 상징을 담고 있는 **메이저 아르카나**를
+            사용합니다. 0번 '바보(The Fool)'가 세상에 태어나 다양한 경험을 하고 깨달음을 얻어 21번 '세계(The World)'에 도달하는 과정을 '바보의 여정( The Fool's
+            Journey)'이라고 부릅니다. 우리가 뽑는 한 장의 카드는 바보가 여정 중에 만난 현재의 순간을 의미하며, 우리에게 필요한 지혜를 전달해줍니다.
+        </p>
+
+        <h2>오늘의 운세를 보는 올바른 태도</h2>
+        <p>
+            많은 사람들이 미래를 '점친다'고 생각하지만, 타로의 진정한 목적은 <strong>'현재의 통찰'</strong>에 있습니다. 카드는 무의식 속에 숨겨진 당신의 욕망, 두려움, 가능성을 거울처럼
+            비춰줍니다.
+        </p>
+        <h3>1. 질문은 구체적으로</h3>
+        <p>
+            "제 운명은 어떻게 되나요?"라는 막연한 질문보다는, "오늘 중요한 미팅에서 어떤 태도를 취해야 할까요?"와 같이 구체적인 질문을 마음속으로 되뇌어 보세요. 더 명확한 답을 얻을 수 있습니다.
+        </p>
+        <h3>2. 결과는 조언으로 받아들이기</h3>
+        <p>
+            부정적인 카드(예: 죽음, 탑, 악마)가 나왔다고 해서 두려워할 필요는 없습니다. 타로에서 '죽음'은 종말이 아닌 '새로운 시작을 위한 정리'를, '탑'은 '거짓된 기반의 붕괴'를 의미합니다.
+            나쁜 운명이 정해진 것이 아니라, 주의해야 할 점을 미리 알려주는 고마운 신호등으로 생각하세요.
+        </p>
+        <h3>3. 직관을 믿으세요</h3>
+        <p>
+            해설 텍스트도 중요하지만, 카드의 그림을 보고 처음 든 느낌이 가장 정확할 수 있습니다. 이미지가 주는 분위기, 색감, 인물의 표정에서 당신만의 메시지를 찾아보세요.
+        </p>
+
+        <h2>자주 묻는 질문 (FAQ)</h2>
+        <h3>Q. 같은 질문을 계속 해도 되나요?</h3>
+        <p>
+            원하는 카드가 나올 때까지 계속 뽑는 것은 좋지 않습니다. 이는 자신의 불안을 잠재우기 위한 행동일 뿐, 진정한 조언을 구하는 태도가 아닙니다. 하루에 한 번, 혹은 상황이 바뀌었을 때 다시
+            뽑는 것을 권장합니다.
+        </p>
+        <h3>Q. 타로로 남의 마음도 알 수 있나요?</h3>
+        <p>
+            타로는 기본적으로 '자신'을 향한 도구입니다. 타인의 마음을 엿보려 하기보다는, 그 사람과의 관계에서 내가 어떻게 행동해야 할지를 묻는 것이 훨씬 건설적이고 정확합니다.
+        </p>
+    </article>
+
+    <script>
+        // Data: 22 Major Arcana with Detailed Interpretations
+        const tarotData = [
+            {
+                name: "0. The Fool",
+                keyword: "시작, 자유, 순수, 모험",
+                img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg",
+                desc_total: "계획 없는 여행을 떠나는 여행자처럼, 오늘은 마음이 이끄는 대로 행동해보세요. 무모해 보일지라도 그 속에 새로운 가능성이 숨어 있습니다. 두려움을 내려놓고 첫발을 내딛는 것이 중요합니다.",
+                desc_love: "꾸미지 않은 순수한 모습이 매력으로 다가옵니다. 썸을 타고 있다면 계산하지 말고 솔직하게 감정을 표현하세요. 새로운 만남을 기대해도 좋습니다.",
+                desc_money: "충동적인 지출을 조심해야 하지만, 새로운 투자나 부업을 시작하기에는 좋은 날입니다. 다만 큰돈이 오가는 계약은 신중하게 검토하세요.",
+                desc_work: "기존의 틀을 깨는 아이디어가 빛을 발합니다. 실패를 두려워하지 말고 새로운 프로젝트에 도전해보세요. 자유로운 사고방식이 동료들에게 신선한 자극을 줄 것입니다."
+            },
+            {
+                name: "I. The Magician",
+                keyword: "창조, 능력, 시작, 다재다능",
+                img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg",
+                desc_total: "당신에게는 이미 목표를 이룰 도구가 모두 준비되어 있습니다. 망설이지 말고 당신의 능력을 세상에 보여주세요. 시작이 반이 아니라, 오늘은 시작이 곧 완성입니다.",
+                desc_love: "당신의 언변과 재치가 이성의 마음을 사로잡습니다. 주도권을 쥐고 데이트를 리드해보세요. 고백하기에도 아주 좋은 타이밍입니다.",
+                desc_money: "당신의 능력으로 수익을 창출할 수 있는 기회가 옵니다. 아이디어가 곧 돈이 되는 시기이니, 머릿속 구상을 실행으로 옮겨보세요.",
+                desc_work: "업무 능력이 최상조에 달합니다. 멀티태스킹도 문제없고, 발표나 협상 자리에서 주인공이 될 수 있습니다. 자신감을 가지세요."
+            },
+            {
+                name: "II. The High Priestess",
+                keyword: "지혜, 직관, 신비, 비밀",
+                img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg",
+                desc_total: "눈에 보이는 것이 전부가 아닙니다. 표면적인 상황보다 그 이면에 숨겨진 진실을 파악해야 합니다. 오늘은 행동하기보다 조용히 관망하며 내면의 목소리에 귀 기울이세요.",
+                desc_love: "짝사랑이나 비밀스러운 연애를 하고 있을 수 있겠네요. 지금은 감정을 드러내기보다 신비로운 매력을 유지하는 것이 좋습니다. 상대방의 속마음을 직감적으로 알게 될 것입니다.",
+                desc_money: "정보가 중요합니다. 남들이 모르는 고급 정보를 얻을 수 있으니 귀를 열어두세요. 당장의 수익보다는 미래의 가치를 보고 투자하는 것이 좋습니다.",
+                desc_work: "서류나 문서를 꼼꼼히 검토하세요. 직장 내의 미묘한 기류를 잘 파악하고, 중립을 지키는 것이 현명합니다. 지식이나 노하우를 쌓기에 좋은 날입니다."
+            },
+            {
+                name: "III. The Empress",
+                keyword: "풍요, 모성, 편안함, 성취",
+                img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg",
+                desc_total: "물질적으로나 정신적으로나 풍요로운 하루입니다. 노력한 것에 대한 결실을 맺을 수 있습니다. 주변 사람들에게 베푸는 여유가 더 큰 행운을 불러올 것입니다.",
+                desc_love: "사랑받고 사랑주는 기쁨을 느낄 수 있습니다. 연인과는 편안하고 따뜻한 데이트를 즐기세요. 솔로라면 매력이 넘쳐나는 날이니 자신을 꾸며보세요.",
+                desc_money: "재물운이 매우 좋습니다. 예상치 못한 수입이 있거나, 쇼핑에서 좋은 물건을 득템할 수도 있습니다. 나를 위한 투자를 아끼지 마세요.",
+                desc_work: "성과가 눈에 보이는 시기입니다. 당신의 프로젝트가 순조롭게 성장하고 있습니다. 부드러운 리더십으로 팀 분위기를 화목하게 만드는 것이 성과의 열쇠입니다."
+            },
+            {
+                name: "IV. The Emperor",
+                keyword: "권위, 책임, 안정, 리더십",
+                img: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg",
+                desc_total: "감정보다는 이성이 필요한 날입니다. 체계와 질서를 잡고, 확고한 의지로 목표를 향해 나아가야 합니다. 당신의 결정이 주변에 큰 영향을 미칠 수 있으니 책임감을 가지세요.",
+                desc_love: "관계에서 주도권을 잡고 싶어 할 수 있습니다. 믿음직스러운 모습을 보여주는 것은 좋지만, 지나친 고집이나 통제는 다툼을 유발하니 주의하세요.",
+                desc_money: "안정적인 수익이 예상됩니다. 위험한 모험보다는 확실한 계획에 따른 투자가 좋습니다. 자산을 지키고 관리하는 데 집중하세요.",
+                desc_work: "승진운이나 리더십을 발휘할 기회가 있습니다. 상사에게 인정받거나, 프로젝트의 책임자가 될 수 있습니다. 원칙을 지키는 태도가 신뢰를 얻습니다."
+            },
+            {
+                name: "V. The Hierophant",
+                keyword: "조언, 전통, 규율, 학습",
+                img: "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg",
+                desc_total: "혼자 고민하기보다 멘토나 전문가의 조언을 구하는 것이 현명합니다. 독창적인 방식보다는 검증된 전통적인 방식을 따르는 것이 안전하고 확실한 성공의 길입니다.",
+                desc_love: "진지한 만남을 추구하게 됩니다. 소개팅이나 중매처럼 누군가의 소개로 좋은 인연을 만날 수 있습니다. 연인과는 신뢰가 깊어질 것입니다.",
+                desc_money: "은행 적금이나 보험처럼 안전하고 보수적인 자산 관리가 필요합니다. 전문가와 상담하거나, 합법적이고 정석적인 방법으로 금전 문제를 해결하세요.",
+                desc_work: "상사나 선배와의 관계가 중요합니다. 그들의 노하우를 배우려는 자세를 가지세요. 팀워크와 조직의 규율을 중시하면 좋은 평가를 받습니다."
+            },
+            {
+                name: "VI. The Lovers",
+                keyword: "사랑, 선택, 조화, 협력",
+                img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/RWS_Tarot_06_Lovers.jpg",
+                desc_total: "매력적인 제안이나 유혹이 찾아올 수 있습니다. 중요한 선택의 기로에서 머리보다는 가슴이 시키는 결정을 하세요. 사람과의 관계에서 큰 기쁨을 얻을 수 있는 날입니다.",
+                desc_love: "사랑에 빠지기 가장 좋은 날입니다! 썸은 연인으로 발전하고, 연인은 더욱 뜨거워집니다. 마음을 솔직하게 표현하면 통할 것입니다.",
+                desc_money: "혼자하기보다는 동업이나 파트너십이 유리합니다. 마음에 드는 물건을 사느라 지출이 생길 수 있지만, 그만큼의 만족감은 클 것입니다.",
+                desc_work: "동료와의 협업이 빛을 발합니다. 계약이 성사되거나 좋은 파트너를 만날 수 있습니다. 즐거운 마음으로 일하면 성과도 자연스럽게 따라옵니다."
+            },
+            {
+                name: "VII. The Chariot",
+                keyword: "전진, 승리, 속도, 도전",
+                img: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg",
+                desc_total: "망설이지 말고 돌진하세요. 장애물이 있어도 당신의 기세로 충분히 돌파할 수 있습니다. 오늘은 행동하는 자가 승리합니다.",
+                desc_love: "자신감 있게 대시하세요. 미지근한 태도보다는 적극적인 애정 공세가 상대의 마음을 엽니다. 경쟁자가 있어도 당신이 이길 수 있습니다.",
+                desc_money: "공격적인 투자가 성과를 낼 수 있습니다. 목표한 수익을 위해 빠르게 움직이세요. 출장이나 여행 등 이동 중에 금전적 기회가 생길 수도 있습니다.",
+                desc_work: "업무 추진력이 대단한 날입니다. 경쟁 PT나 프로젝트에서 승기를 잡을 수 있습니다. 다만, 너무 앞만 보고 달리다 주변을 놓치지 않도록 주의하세요."
+            },
+            {
+                name: "VIII. Strength",
+                keyword: "인내, 외유내강, 용기, 포용",
+                img: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg",
+                desc_total: "진정한 강함은 부드러움에서 나옵니다. 어려운 상황이라도 감정적으로 폭발하지 말고, 차분한 인내심으로 상황을 통제하세요. 당신은 생각보다 훨씬 강한 사람입니다.",
+                desc_love: "연인의 투정이나 갈등을 넓은 마음으로 받아주세요. 당신의 따뜻한 포용력이 상대를 감동시킵니다. 짝사랑 중이라면 서두르지 말고 천천히 스며드세요.",
+                desc_money: "장기적인 안목이 필요합니다. 당장의 등락에 일희일비하지 말고 뚝심 있게 버티면 승산이 있습니다. 충동구매를 참아내는 인내심이 필요합니다.",
+                desc_work: "힘든 업무나 까다로운 상사가 있어도 웃으며 넘길 수 있는 여유가 생깁니다. 당신의 성실함과 끈기가 결국 인정받게 될 것입니다."
+            },
+            {
+                name: "IX. The Hermit",
+                keyword: "성찰, 고독, 탐구, 신중함",
+                img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg",
+                desc_total: "외부 활동보다는 내면을 들여다보는 시간이 필요합니다. 잠시 멈춰서 내가 가고 있는 길이 맞는지 점검해보세요. 해답은 타인이 아닌 당신 안에 있습니다.",
+                desc_love: "혼자만의 시간이 편안하게 느껴질 수 있습니다. 억지로 만남을 갖기보다 자신을 재충전하세요. 헤어진 연인을 그리워하거나 과거를 회상할 수도 있습니다.",
+                desc_money: "돈을 쓰기보다 지출 내역을 분석하고 계획을 세워야 할 때입니다. 전문적인 지식을 공부하거나 자격증을 준비하는 등 내실을 다지는 투자가 좋습니다.",
+                desc_work: "묵묵히 자신의 맡은 바를 수행하는 날입니다. 동료들과 어울리기보다 혼자 집중해서 처리해야 할 업무가 많을 수 있습니다. 깊이 있는 연구나 기획에 적합합니다."
+            },
+            {
+                name: "X. Wheel of Fortune",
+                keyword: "운명, 변화, 전환점, 행운",
+                img: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg",
+                desc_total: "운명의 수레바퀴가 돌기 시작했습니다. 당신의 의지와 상관없이 상황이 변할 수 있지만, 이는 더 좋은 방향으로 나아가기 위한 흐름입니다. 변화를 즐기세요.",
+                desc_love: "운명적인 만남이 기다리고 있습니다. 우연히 마주친 사람과 사랑에 빠질 수도, 재회의 기운이 들어올 수도 있습니다. 흐름에 몸을 맡기세요.",
+                desc_money: "돈의 흐름이 바뀝니다. 뜻밖의 이익을 얻거나 투자의 타이밍이 찾아옵니다. 기회가 왔을 때 잡아야 합니다.",
+                desc_work: "부서 이동, 이직, 새로운 프로젝트 등 환경의 변화가 생길 수 있습니다. 지금은 변화에 저항하기보다 유연하게 적응하는 것이 성공의 열쇠입니다."
+            },
+            {
+                name: "XI. Justice",
+                keyword: "정의, 균형, 판단, 정직",
+                img: "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg",
+                desc_total: "감정에 치우치지 않는 냉철한 판단이 요구됩니다. 모든 일에는 원인과 결과가 따르는 법입니다. 정직하고 공정하게 행동했다면 정당한 보상을 받을 것입니다.",
+                desc_love: "이성적으로 관계를 따져보게 됩니다. 주고받는 것의 균형이 맞는지 고민할 수 있습니다. 솔로라면 조건이 잘 맞는 사람을 찾게 됩니다.",
+                desc_money: "금전 거래나 계약서를 꼼꼼히 확인해야 합니다. 더치페이나 정산 등 돈 계산을 확실히 하는 것이 좋습니다. 법적인 문제에 휘말리지 않도록 주의하세요.",
+                desc_work: "공과 사를 명확히 구분해야 합니다. 업무 평가나 보상에 있어 공정함을 원하게 됩니다. 실수를 인정하고, 원칙대로 처리하면 문제가 해결됩니다."
+            },
+            {
+                name: "XII. The Hanged Man",
+                keyword: "희생, 정체, 다른 시각, 깨달음",
+                img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg",
+                desc_total: "억지로 하려 해도 상황이 잘 풀리지 않을 수 있습니다. 차라리 힘을 빼고 흐름을 관망하거나, 완전히 다른 각도에서 문제를 바라보세요. 멈춤은 후퇴가 아니라 도약을 위한 준비입니다.",
+                desc_love: "관계가 정체기에 빠질 수 있습니다. 무리하게 진전을 시도하기보다 상대의 입장에서 생각해보는 희생과 배려가 필요합니다.",
+                desc_money: "자금이 묶이거나 회수가 늦어질 수 있습니다. 답답하더라도 인내심을 갖고 기다려야 합니다. 지금은 돈을 쫓을 때가 아닙니다.",
+                desc_work: "열심히 해도 성과가 바로 나타나지 않을 수 있습니다. 하지만 이 시기의 고뇌와 연구는 훗날 창의적인 아이디어로 보상받을 것입니다."
+            },
+            {
+                name: "XIII. Death",
+                keyword: "종결, 새로운 시작, 변화, 이별",
+                img: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg",
+                desc_total: "두려워하지 마세요. 끝은 곧 새로운 시작입니다. 낡은 습관, 관계, 상황을 과감하게 정리해야 더 좋은 것이 들어올 자리가 생깁니다. 변화를 받아들이세요.",
+                desc_love: "헤어짐이 있거나, 썸이나 짝사랑이 끝날 수 있습니다. 하지만 이는 악연이 정리되고 진정한 인연을 만나기 위한 과정입니다. 미련을 버리세요.",
+                desc_money: "손실이 난 종목을 정리하거나, 소비 패턴을 완전히 뜯어고쳐야 할 때입니다. 과거의 실패를 교훈 삼아 새롭게 출발하세요.",
+                desc_work: "프로젝트가 중단되거나 직장을 옮길 수도 있습니다. 지금의 변화는 불가피하며, 장기적으로는 당신에게 더 유리한 환경을 만들어줄 것입니다."
+            },
+            {
+                name: "XIV. Temperance",
+                keyword: "절제, 조화, 중용, 소통",
+                img: "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg",
+                desc_total: "어느 한쪽으로 치우치지 않는 균형 감각이 중요합니다. 서로 다른 의견을 조율하고 섞어서 새로운 가치를 만들어낼 수 있습니다. 서두르지 말고 순리대로 진행하세요.",
+                desc_love: "상대방과의 대화가 잘 통하고 마음이 맞습니다. 밀당보다는 진심을 주고받으며 서로에게 스며드는 편안한 연애가 좋습니다.",
+                desc_money: "수입과 지출의 밸런스를 맞춰야 합니다. 큰돈을 벌기보다 현상을 유지하며 자산을 안정적으로 굴리는 것이 유리합니다.",
+                desc_work: "동료나 거래처와의 소통이 원활합니다. 중재자 역할을 하거나, 여러 업무를 조화롭게 병행하며 처리하는 능력이 발휘됩니다."
+            },
+            {
+                name: "XV. The Devil",
+                keyword: "유혹, 집착, 욕망, 구속",
+                img: "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg",
+                desc_total: "치명적인 유혹이 다가옵니다. 당장은 달콤하고 즐거워 보이지만, 결과적으로 당신을 구속하고 힘들게 할 수 있습니다. 나쁜 습관이나 끊어내지 못한 관계가 있다면 단호해져야 합니다.",
+                desc_love: "육체적인 매력이나 위험한 사랑에 빠질 수 있습니다. 집착하거나 집착당하는 관계가 될 수 있으니 주의하세요. 이성이 마비되는 시기입니다.",
+                desc_money: "도박, 투기, 과소비의 유혹을 조심하세요. 쉽게 돈을 벌 수 있다는 말은 함정일 가능성이 큽니다. 빚을 지지 않도록 경계해야 합니다.",
+                desc_work: "부정한 청탁이나 편법의 유혹이 있을 수 있습니다. 지금의 편안함을 위해 양심을 속이면 나중에 큰 대가를 치르게 됩니다."
+            },
+            {
+                name: "XVI. The Tower",
+                keyword: "붕괴, 충격, 각성, 급변",
+                img: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg",
+                desc_total: "견고해 보이던 탑이 무너집니다. 갑작스러운 변화나 충격적인 사건이 발생할 수 있습니다. 하지만 이는 잘못된 기반을 무너뜨리고 진실을 마주하게 하는 하늘의 뜻입니다.",
+                desc_love: "다툼, 별리, 혹은 충격적인 사실을 알게 될 수 있습니다. 관계의 민낯이 드러나는 시기입니다. 곪은 상처는 터져야 새살이 돋습니다.",
+                desc_money: "예상치 못한 지출이나 손실이 발생할 수 있습니다. 부동산이나 투자에서 악재가 있을 수 있으니 보수적으로 대응하고 마음을 비우는 것이 좋습니다.",
+                desc_work: "갑작스러운 인사 발령이나 프로젝트 취소 등 불안정한 상황이 올 수 있습니다. 멘탈을 잡고 위기 속에서 기회를 찾아야 합니다."
+            },
+            {
+                name: "XVII. The Star",
+                keyword: "희망, 치유, 영감, 낙관",
+                img: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg",
+                desc_total: "어두운 밤하늘에 빛나는 별처럼, 힘들었던 시간이 가고 희망이 찾아옵니다. 당신의 꿈과 목표가 이루어질 것이라는 믿음을 가지세요. 힐링이 되는 하루입니다.",
+                desc_love: "이상형을 만나거나 꿈꾸던 로맨스가 시작될 수 있습니다. 연인과는 미래를 약속하며 깊은 신뢰를 쌓게 됩니다. 사랑이 샘솟는 날입니다.",
+                desc_money: "미래를 위한 투자가 좋습니다. 당장의 수익보다는 장기적인 비전을 보고 투자하세요. 예술이나 창작 활동으로 수익을 낼 수도 있습니다.",
+                desc_work: "창의적인 아이디어가 넘쳐납니다. 예술, 디자인, 기획 분야에서 두각을 나타낼 수 있습니다. 밝은 에너지로 주변 사람들에게 영감을 줍니다."
+            },
+            {
+                name: "XVIII. The Moon",
+                keyword: "불안, 모호함, 직감, 환상",
+                img: "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg",
+                desc_total: "안개 속을 걷는 듯 앞이 명확하지 않습니다. 막연한 불안감이나 오해에 휩싸일 수 있습니다. 눈에 보이는 것만 믿지 말고, 당신의 예리한 직감을 믿으세요.",
+                desc_love: "상대방의 마음을 알 수 없어 답답할 수 있습니다. 혹은 오해로 인해 사이가 멀어질 수도 있습니다. 감정적으로 대응하지 말고 차분히 지켜보세요.",
+                desc_money: "사기나 잘못된 투자 정보에 주의해야 합니다. 불확실한 곳에는 돈을 쓰지 마세요. 계약서에 숨겨진 독소 조항은 없는지 꼼꼼히 살피세요.",
+                desc_work: "업무 방향이 모호하거나 숨겨진 적이 있을 수 있습니다. 뒷담화나 구설수에 휘말리지 않도록 언행을 조심하고, 상황이 명확해질 때까지 기다리세요."
+            },
+            {
+                name: "XIX. The Sun",
+                keyword: "성공, 활력, 행복, 축복",
+                img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg",
+                desc_total: "구름 한 점 없는 맑은 태양처럼 모든 것이 밝게 빛납니다. 근심 걱정이 사라지고, 하는 일마다 행운이 따를 것입니다. 에너지가 넘치고 즐거운 하루가 됩니다.",
+                desc_love: "밝고 긍정적인 에너지로 사랑이 넘칩니다. 고백하면 100% 성공! 연인과는 아이처럼 즐겁고 행복한 시간을 보낼 수 있습니다. 임신이나 출산 등 좋은 소식도 있습니다.",
+                desc_money: "금전운이 최상입니다. 노력한 것 이상의 보상을 받을 수 있습니다. 사업이 번창하고 투자가 성공하여 지갑이 두둑해집니다.",
+                desc_work: "당신의 능력을 인정받고 스포트라이트를 받습니다. 승진, 합격, 계약 성사 등 축하받을 일이 생깁니다. 자신감을 가지고 추진하세요."
+            },
+            {
+                name: "XX. Judgement",
+                keyword: "부활, 보상, 결단, 소식",
+                img: "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg",
+                desc_total: "기다리던 소식이 오거나, 과거에 뿌린 씨앗을 거둘 때입니다. 중요한 결정을 내려야 할 시기이며, 그 결정은 당신의 삶을 한 단계 업그레이드할 것입니다.",
+                desc_love: "재회운이 강하게 들어옵니다. 헤어진 연인에게 연락이 오거나, 오해가 풀려 다시 가까워질 수 있습니다. 관계의 확실한 결말(결혼 또는 이별)이 납니다.",
+                desc_money: "과거에 투자했던 것이 수익으로 돌아오거나, 빌려준 돈을 받을 수 있습니다. 막혀있던 금전 흐름이 뚫리게 됩니다.",
+                desc_work: "그동안의 노력을 보상받습니다. 승진이나 포상 소식이 있을 수 있습니다. 혹은 중요한 프로젝트의 결과를 듣게 됩니다. 새로운 기회를 잡으세요."
+            },
+            {
+                name: "XXI. The World",
+                keyword: "완성, 성공, 통합, 해피엔딩",
+                img: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg",
+                desc_total: "긴 여정이 성공적으로 마무리되었습니다. 목표를 달성하고 완벽한 조화를 이루는 최고의 날입니다. 이제 이 성취를 마음껏 누리셔도 좋습니다.",
+                desc_love: "더할 나위 없이 완벽한 사랑입니다. 결혼을 약속하거나, 두 사람의 관계가 완성 단계에 접어듭니다. 서로가 서로에게 운명임을 확인합니다.",
+                desc_money: "경제적 자유를 느낄 만큼 풍요롭습니다. 목표했던 금액을 달성할 수 있습니다. 해외와 관련된 투자나 사업에서 특히 좋은 성과가 있습니다.",
+                desc_work: "프로젝트가 대성공을 거두고 명예를 얻습니다. 승진, 해외 발령, 유학 등 더 넓은 세상으로 나아갈 기회가 생깁니다. 유종의 미를 거두세요."
+            }
+        ];
+
+        // Star Background Gen
+        const starContainer = document.getElementById('starContainer');
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+
+            const size = Math.random() * 3 + 1;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.setProperty('--opacity', Math.random() * 0.7 + 0.3);
+            starContainer.appendChild(star);
+        }
+
+        // --- App Logic ---
+        const stage = document.getElementById('cardStage');
+        const btnStart = document.getElementById('btnStart');
+        const introView = document.getElementById('introView');
+        const resultView = document.getElementById('resultView');
+
+        let isShuffled = false;
+        let cardElements = [];
+        let currentResultData = null;
+
+        function initCards() {
+            stage.innerHTML = '';
+            cardElements = [];
+            // Create 22 dummy cards for deck
+            for (let i = 0; i < 22; i++) {
+                const card = document.createElement('div');
+                card.className = 'tarot-card';
+
+                // Stacked initially
+                card.style.left = 'calc(50% - 60px)'; // half of width
+                card.style.top = '100px';
+                card.style.transform = `translateZ(-${i}px)`; // Stack depth
+
+                const inner = document.createElement('div');
+                inner.className = 'card-inner';
+
+                const front = document.createElement('div');
+                front.className = 'card-front';
+                // front image set later on reveal
+
+                const back = document.createElement('div');
+                back.className = 'card-back';
+
+                inner.appendChild(front);
+                inner.appendChild(back);
+                card.appendChild(inner);
+
+                // Store Index
+                card.dataset.index = i;
+
+                // Click Event
+                card.addEventListener('click', () => onCardClick(i));
+
+                stage.appendChild(card);
+                cardElements.push(card);
+            }
+        }
+
+        function startApp() {
+            btnStart.style.display = 'none';
+            introView.style.opacity = '0'; // fade out text
+            setTimeout(() => { introView.style.display = 'none'; }, 500);
+
+            // 1. Shuffle Animation
+            shuffleCards();
+        }
+
+        function shuffleCards() {
+            // Simple visual shuffle
+            let shuffleCount = 0;
+            const maxShuffle = 20;
+            const interval = setInterval(() => {
+                cardElements.forEach(card => {
+                    const randX = (Math.random() - 0.5) * 20;
+                    const randY = 100 + (Math.random() - 0.5) * 20;
+                    const randRot = (Math.random() - 0.5) * 30;
+                    card.style.transform = `translate(${randX}px, ${randY}px) rotate(${randRot}deg)`;
+                });
+                shuffleCount++;
+                if (shuffleCount > maxShuffle) {
+                    clearInterval(interval);
+                    spreadCards();
+                }
+            }, 100);
+        }
+
+        function spreadCards() {
+            // Fan Spread
+            const count = cardElements.length;
+            const arcAngle = 120; // total arc
+            const startAngle = -60;
+            const radius = 500; // huge circle radius
+
+            cardElements.forEach((card, i) => {
+                const angle = startAngle + (arcAngle / (count - 1)) * i;
+                // Calculate position on arc
+                const radian = angle * (Math.PI / 180);
+                const x = Math.sin(radian) * 250; // spread width
+                const y = Math.cos(radian) * 50 + 50; // arc curve
+                const rot = angle;
+
+                card.style.transition = 'all 0.8s ease-out';
+                // Center origin
+                card.style.left = 'calc(50% - 60px)';
+                card.style.top = '100px';
+                card.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
+
+                // Enable click
+                card.style.cursor = 'pointer';
+            });
+            isShuffled = true;
+        }
+
+        function onCardClick(index) {
+            if (!isShuffled) return;
+
+            const selectedEl = cardElements[index];
+            const data = getRandomCardData(); // Pick random data regardless of which card clicked (simulation)
+            currentResultData = data;
+
+            // 1. Animate Selection (Move to center, Scale up)
+            // Reset all others or fade them?
+            cardElements.forEach((c, i) => {
+                if (i !== index) {
+                    c.style.opacity = '0';
+                    c.style.pointerEvents = 'none';
+                }
+            });
+
+            selectedEl.style.zIndex = 100;
+            selectedEl.style.transition = 'all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            selectedEl.style.transform = `translate(0px, 50px) rotate(0deg) scale(1.5)`;
+
+            // 2. Set Data
+            const frontEl = selectedEl.querySelector('.card-front');
+            frontEl.style.backgroundImage = `url('${data.img}')`;
+
+            // 3. Flip Reveal
+            setTimeout(() => {
+                selectedEl.classList.add('flipped');
+
+                // 4. Show Result Text Overlay
+                setTimeout(() => {
+                    showResult(data);
+                }, 1000);
+            }, 800);
+        }
+
+        function getRandomCardData() {
+            // Pick one from tarotData
+            const r = Math.floor(Math.random() * tarotData.length);
+            return tarotData[r];
+        }
+
+        function showResult(data) {
+            // Populate basic info
+            document.getElementById('resCardImg').style.backgroundImage = `url('${data.img}')`;
+            document.getElementById('resName').textContent = data.name;
+            document.getElementById('resKey').textContent = data.keyword;
+
+            // Populate descriptions
+            document.getElementById('desc-total').innerText = data.desc_total;
+            document.getElementById('desc-love').innerText = data.desc_love;
+            document.getElementById('desc-money').innerText = data.desc_money;
+            document.getElementById('desc-work').innerText = data.desc_work;
+
+            // Reset Tabs
+            switchTab('total');
+
+            // Fade In
+            resultView.classList.add('active');
+        }
+
+        function switchTab(type) {
+            // Update Tab UI
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-btn[onclick="switchTab('${type}')"]`).classList.add('active');
+
+            // Update Content
+            document.querySelectorAll('.result-desc').forEach(desc => desc.classList.remove('active'));
+            document.getElementById(`desc-${type}`).classList.add('active');
+        }
+
+        function captureResult() {
+            const captureArea = document.getElementById('captureArea');
+
+            html2canvas(captureArea, {
+                backgroundColor: null,
+                scale: 2
+            }).then(canvas => {
+                // Create link
+                const link = document.createElement('a');
+                link.download = `today_tarot_${currentResultData.name}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        function resetApp() {
+            location.reload();
+        }
+
+        // Init
+        initCards();
+
+    </script>
+</body>
+
+</html>
