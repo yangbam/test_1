@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 면접 스크립트 메이커 | 합격 시그널 생성기</title>
+    <meta name="description" content="키워드만 선택하면 합격 시그널이 담긴 면접 답변을 자동으로 생성해 드립니다. 자소서와 면접 준비의 필수템!">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --accent-color: #3b82f6;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            /* Fallback */
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            font-size: 1rem;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-panel {
+            flex: 1;
+            min-width: 320px;
+            animation: fadeInLeft 0.8s ease-out;
+        }
+
+        .output-panel {
+            flex: 1;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            animation: fadeInRight 0.8s ease-out;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            color: var(--text-sub);
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .chip-input {
+            display: none;
+        }
+
+        .chip-label {
+            padding: 0.6rem 1.2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .chip-input:checked+.chip-label {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #60a5fa;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .chip-label:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Output Area */
+        .result-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-height: 200px;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            position: relative;
+            flex-grow: 1;
+        }
+
+        /* Highlighting classes */
+        .highlight-bracket {
+            color: #60a5fa;
+            font-weight: 700;
+        }
+
+        .highlight-quote {
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .placeholder-text {
+            color: var(--text-sub);
+            text-align: center;
+            top: 50%;
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .monetization-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .monetization-link:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        /* SEO Section */
+        .seo-section {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 4rem;
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            padding-bottom: 4rem;
+        }
+
+        .seo-section h3 {
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            margin-top: 3rem;
+            font-size: 1.3rem;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 1rem;
+        }
+
+        .seo-section p {
+            margin-bottom: 1.2rem;
+            word-break: keep-all;
+        }
+
+        .seo-section strong {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .seo-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .input-panel,
+            .output-panel {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>AI 면접 스크립트 메이커</h1>
+        <p class="subtitle">키워드만 고르면 합격 시그널 답변이 완성됩니다.</p>
+    </header>
+
+    <div class="container">
+        <!-- Input Panel -->
+        <div class="glass-card input-panel">
+            <div class="form-group">
+                <label>지원 직무</label>
+                <div class="chip-group" id="job-group">
+                    <input type="radio" name="job" id="job-dev" value="dev" class="chip-input" checked>
+                    <label for="job-dev" class="chip-label">개발(IT)</label>
+                    <input type="radio" name="job" id="job-mkt" value="marketing" class="chip-input">
+                    <label for="job-mkt" class="chip-label">마케팅/기획</label>
+                    <input type="radio" name="job" id="job-sales" value="sales" class="chip-input">
+                    <label for="job-sales" class="chip-label">영업/서비스</label>
+                    <input type="radio" name="job" id="job-design" value="design" class="chip-input">
+                    <label for="job-design" class="chip-label">디자인</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>질문 유형</label>
+                <div class="chip-group" id="question-group">
+                    <input type="radio" name="question" id="q-strength" value="strength" class="chip-input" checked>
+                    <label for="q-strength" class="chip-label">직무 강점</label>
+                    <input type="radio" name="question" id="q-proscons" value="pros_cons" class="chip-input">
+                    <label for="q-proscons" class="chip-label">성격의 장단점</label>
+                    <input type="radio" name="question" id="q-motive" value="motivation" class="chip-input">
+                    <label for="q-motive" class="chip-label">지원 동기</label>
+                    <input type="radio" name="question" id="q-aspir" value="aspiration" class="chip-input">
+                    <label for="q-aspir" class="chip-label">입사 후 포부</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>나의 키워드 (가장 자신있는)</label>
+                <div class="chip-group" id="keyword-group">
+                    <input type="radio" name="keyword" id="k-careful" value="careful" class="chip-input" checked>
+                    <label for="k-careful" class="chip-label">꼼꼼함/분석적</label>
+                    <input type="radio" name="keyword" id="k-comm" value="communication" class="chip-input">
+                    <label for="k-comm" class="chip-label">소통/협력</label>
+                    <input type="radio" name="keyword" id="k-passion" value="passion" class="chip-input">
+                    <label for="k-passion" class="chip-label">도전/열정</label>
+                    <input type="radio" name="keyword" id="k-responsible" value="responsible" class="chip-input">
+                    <label for="k-responsible" class="chip-label">성실/책임감</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="glass-card output-panel">
+            <div class="result-box" id="result-box">
+                <span class="placeholder-text">왼쪽에서 옵션을 선택하면<br>여기에 답변이 생성됩니다.</span>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyToClipboard()">
+                    <span>📋 복사하기 (전체 본문)</span>
+                </button>
+                <a href="#" class="btn btn-secondary" onclick="alert('준비 중인 기능입니다.')">
+                    <span>📝 이 답변으로 자소서 점검받기</span>
+                </a>
+            </div>
+
+            <a href="https://www.saramin.co.kr" target="_blank" class="monetization-link">
+                합격 자소서 예시 더 보기 (사람인/잡코리아) &rarr;
+            </a>
+        </div>
+    </div>
+
+    <!-- SEO & Info Section expanded -->
+    <div class="seo-section">
+        <h3>💡 합격하는 면접 1분 자기소개 & 자소서 작성 가이드 (필독)</h3>
+        <p>
+            많은 지원자분들이 <strong>"1분 자기소개"</strong>와 <strong>"자기소개서(자소서)"</strong> 작성에 어려움을 겪습니다.
+            하지만 면접관의 의도를 파악하면 합격의 문은 생각보다 가까이 있습니다.
+            이 AI 면접 답변 생성기가 제안하는 구조는 단순한 문장 나열이 아닌, <strong>면접관이 듣고 싶어 하는 '핵심 역량' 중심의 스토리텔링</strong>입니다.
+        </p>
+
+        <div class="seo-box">
+            <strong>✅ BEST 답변 구조 법칙 (O-R-E-O 기법 변형)</strong>
+            <ul>
+                <li><strong>O (Opinion, 두괄식 결론):</strong> "저의 핵심 경쟁력은 OOO입니다."라고 명확히 선언하세요. 면접관은 피곤합니다. 결론부터 말하는 사람이 귀에
+                    들어옵니다.</li>
+                <li><strong>R (Reason, 구체적 근거):</strong> 단순한 주장이 아닌, "과거 OO 프로젝트에서..."처럼 실제 경험(Experience)을 근거로 제시해야
+                    합니다. 이때 수치(숫자, %)를 포함하면 신뢰도가 200% 상승합니다.</li>
+                <li><strong>E (Example, 위기 극복):</strong> 모든 프로젝트가 완벽할 순 없습니다. "어려움이 있었지만 OO 방식으로 해결했다"는 문제 해결 능력을 보여주세요.
+                </li>
+                <li><strong>O (Opinion, 입사 후 기여):</strong> "이러한 역량으로 귀사의 OO 목표 달성에 기여하겠습니다."로 마무리하여 '나를 뽑아야 하는 이유'를
+                    각인시키세요.</li>
+            </ul>
+        </div>
+
+        <h3>📌 자소서 항목별 공략 꿀팁</h3>
+
+        <p>
+            <strong>1. 성격의 장단점: 솔직하되 전략적으로!</strong><br>
+            성격의 장단점은 지원자가 조직에 잘 융화될 수 있는지 파악하는 항목입니다.
+            <strong>장점</strong>은 직무와 직접적으로 연결되는 키워드(개발자라면 꼼꼼함, 영업이라면 사교성 등)를 선택하세요. 너무 뻔한 단어보다는 "저의 장점은 '픽셀 단위의
+            집요함'입니다"처럼 구체적인 수식어를 붙이는 것이 좋습니다.
+            <strong>단점</strong>은 치명적인 단점(예: "게으르다", "약속을 잘 잊는다")은 절대 금물입니다. 업무에 방해가 되지 않는 사소한 단점을 언급하되, 반드시 <strong>"현재
+                어떻게 개선하고 있는지"</strong> 구체적인 노력을 함께 작성해야 합니다. 이는 오히려 자기주도적인 성장의지를 보여주는 기회가 됩니다.
+        </p>
+
+        <p>
+            <strong>2. 지원 동기: 짝사랑은 그만, '우리가 함께할 이유'를 말하라!</strong><br>
+            가장 쓰기 어려운 항목 1위입니다. 단순히 "회사가 좋아서", "배우고 싶어서"라는 수동적인 태도는 매력이 없습니다.
+            회사의 최근 이슈, 비전, 인재상 등을 철저히 분석하고, <strong>"나의 직무 역량이 회사의 어떤 문제를 해결해 줄 수 있는지"</strong> 연결하세요.
+            "귀사의 글로벌 확장 비전에 제 어학 능력과 해외 영업 경험이 기폭제가 될 확신이 있어 지원했습니다"와 같이, 회사와 나의 <strong>'이익 교집합'</strong>을 어필하는 것이 합격의
+            지름길입니다.
+        </p>
+
+        <p>
+            <strong>3. 입사 후 포부: 구체적인 로드맵을 그려라!</strong><br>
+            "열심히 하겠습니다"는 누구나 할 수 있는 말입니다.
+            입사 후 <strong>1년(적응), 3년(실무 마스터), 5년(팀 리딩), 10년(비전 달성)</strong> 단위로 구체적인 계획을 제시하세요.
+            특히 해당 직무에서 필요한 자격증 취득, 구체적인 프로젝트 성과 목표, 후배 양성 계획 등을 언급하면 "이 친구는 우리 회사에서 뼈를 묻겠구나"라는 진정성을 줄 수 있습니다.
+        </p>
+
+        <h3>❓ 자주 묻는 질문 (FAQ)</h3>
+        <p>
+            <strong>Q. 압박 면접에서 답변이 막히면 어떡하죠?</strong><br>
+            A. 당황한 모습보다는 잠시 생각할 시간을 요청하는 침착함이 중요합니다. "잠시 생각 정리할 시간을 주시겠습니까?"라고 정중히 묻고, 3~5초 후 결론부터 차분히 이야기하세요. 모르는 것은
+            솔직히 모른다고 인정하되, "입사 후 반드시 숙지하겠습니다"라는 배우려는 태도를 보이는 것이 엉뚱한 대답보다 오조오억 배 낫습니다.
+        </p>
+        <p>
+            <strong>Q. AI 자소서 생성 결과는 그대로 써도 되나요?</strong><br>
+            A. 본 서비스가 제공하는 스크립트는 <strong>가장 논리적이고 정제된 '뼈대'</strong>입니다. 이 뼈대 위에 지원자님의 고유한 경험(프로젝트명, 구체적 수치, 당시의 감정 등)을
+            '살'로 붙여야 비로소 살아있는 자소서가 됩니다. AI가 제안한 문장을 베이스로 하되, 반드시 <strong>[ ] 괄호로 표시된 부분</strong>이나 경험 예시는 본인의 진짜 이야기로
+            수정하여 제출하시기 바랍니다.
+        </p>
+
+        <p>
+            여러분 취업 성공을 진심으로 응원합니다.
+            이 도구는 단순한 텍스트 생성기가 아닙니다.
+            여러분이 미처 발견하지 못한 <strong>여러분의 숨겨진 가치를 언어화</strong>해드리는 러닝메이트입니다.
+            지금 바로 키워드를 선택하고, 합격의 시그널을 잡아보세요!
+        </p>
+    </div>
+
+    <script>
+        const answers = {
+            dev: {
+                strength: {
+                    careful: `[직무 강점: 분석적 사고와 집요함]\n\n"오류 로그 한 줄에서 시작된 성능 개선, 저의 가장 큰 무기는 '원인을 끝까지 파고드는 분석적 집요함'입니다."\n\n개발자는 코드로 대화하고, 성능으로 증명한다고 생각합니다. 단순히 기능이 작동하는 것에 만족하지 않고, '왜 작동하는지', '더 최적화할 방법은 없는지'를 끊임없이 고민하는 것이 저의 핵심 경쟁력입니다. 이러한 성향은 특히 원인을 알 수 없는 버그를 디버깅하거나, 레거시 시스템을 리팩토링할 때 빛을 발합니다.\n\n학부 시절, [프로젝트명] 프로젝트를 진행하며 원인 불명의 서버 다운 현상을 겪은 적이 있습니다. 모두가 하드웨어 스펙 문제를 의심할 때, 저는 3일 밤낮으로 서버 로그와 힙 메모리 덤프를 분석했습니다. 수만 줄의 로그 속에서 특정 API 호출 시 메모리 누수가 발생한다는 패턴을 발견했고, 비동기 처리 로직의 미세한 구멍을 찾아낼 수 있었습니다. 이를 통해 코드 단 5줄 수정만으로 서버 안정성을 확보하고, 동시 접속자 수를 기존 대비 2배 이상 감당할 수 있도록 개선한 경험이 있습니다.\n\n이러한 경험은 저에게 '답은 항상 데이터와 코드 안에 있다'는 확신을 주었습니다. 귀사의 서비스가 하루 수백만 트래픽을 처리하는 대규모 시스템인 만큼, 작은 비효율도 큰 비용으로 이어질 수 있다고 생각합니다. 저의 현미경 같은 분석력으로 잠재된 리스크를 사전에 발굴하고, 사용자에게 0.1초 더 빠른 경험을 선사하는 '퍼포먼스 엔지니어'가 되겠습니다. 코드 한 줄의 무게를 아는 개발자, 안정성을 최우선으로 생각하는 든든한 팀원이 되어 귀사의 기술적 성장에 기여하겠습니다.`,
+                    communication: `[직무 강점: 소통을 통한 시너지]\n\n"개발 지식만큼 중요한 것은 '통역 능력'이라고 믿는, 소통형 개발자입니다."\n\n최고의 소프트웨어는 뛰어난 천재 한 명이 만드는 것이 아니라, 기획자, 디자인, 개발자가 치열하게 소통하며 만들어낸 결과물이라고 생각합니다. 저는 복잡한 기술 용어를 비개발 직군도 이해할 수 있는 언어로 풀어서 설명하고, 기획 의도를 기술적으로 정확히 구현해내는 '커뮤니케이션 허브' 역할을 자처합니다.\n\n일례로, [프로젝트명] 프로젝트 당시 디자이너와 프론트엔드 개발자 간의 입장 차이로 마찰이 있었습니다. 디자이너는 화려한 인터랙션을 원했고, 개발 팀은 렌더링 성능 저하를 우려해 반대했습니다. 저는 중재자로서 양측의 의견을 수렴하여, CSS 애니메이션 대신 경량화된 Lottie 라이브러리를 도입하는 대안을 제시했습니다. 또한, 스토리보드 단계에서부터 기술 검토 회의를 주도하여 구현 가능 범위를 사전에 명확히 함으로써, 불필요한 수정 작업을 30% 이상 줄일 수 있었습니다. 결과적으로 팀 분위기는 물론 프로젝트의 완성도까지 높여 공모전 수상이라는 결실을 맺을 수 있었습니다.\n\n개발자는 모니터만 보고 일하는 사람이 아닙니다. 끊임없이 옆 사람과 대화하며 최선의 답을 찾아가는 여정이라고 생각합니다. 귀사에서도 열린 마음으로 동료의 코드 리뷰를 환영하고, 타 부서와의 협업을 즐기는 '함께 일하고 싶은 개발자'가 되겠습니다. 기술적인 탁월함은 물론, 팀워크라는 소프트 스킬까지 겸비하여 귀사의 개발 문화에 긍정적인 에너지를 불어넣겠습니다.`,
+                    passion: `[직무 강점: 기술을 향한 끊임없는 도전]\n\n"새로배움을 두려워하지 않는 '테크 얼리어답터', 그것이 저를 설명하는 단어입니다."\n\nIT 트렌드는 매일 아침 눈을 뜨면 바뀐다고 할 정도로 빠르게 변화합니다. 저에게 개발은 단순한 직업이 아니라, 새로운 기술을 탐구하고 적용해보는 즐거운 놀이입니다. 안정적인 기술 스택에 안주하기보다, 프로젝트의 요구사항에 가장 적합한 최신 기술이 무엇인지 고민하고 과감하게 도입해보는 도전 정신을 가지고 있습니다.\n\n최근 진행한 개인 프로젝트에서는 당초 React로 기획되었던 프론트엔드를, 검색 엔진 최적화(SEO)의 중요성을 인지하고 Next.js로 마이그레이션 하는 결단을 내렸습니다. 익숙하지 않은 프레임워크였기에 초기 러닝 커브가 있었지만, 공식 문서를 밤새 탐독하고 개발 커뮤니티에 질문하며 하나씩 문제를 해결해 나갔습니다. 그 결과 초기 로딩 속도(FCP)를 0.8초대로 단축시키고, 구글 검색 노출 순위를 1페이지 상단으로 끌어올리는 성과를 거두었습니다. 이 과정에서 얻은 것은 단순한 기술적 지식이 아니라, '어떤 기술적 난관도 해결할 수 있다'는 자신감이었습니다.\n\n귀사는 업계에서 가장 혁신적인 기술을 선도적으로 도입하는 기업으로 알고 있습니다. 저의 이러한 '학습하는 근육'과 '도전하는 DNA'가 귀사의 기술 혁신 방향과 완벽하게 일치한다고 확신합니다. 입사 후에도 현실에 안주하지 않고, 매주 기술 블로그를 작성하고 사내 스터디를 주도하며 조직 전체의 기술 역량을 상향 평준화시키는 '에반젤리스트'로 성장하겠습니다.`,
+                    responsible: `[직무 강점: 끝까지 완수하는 책임감]\n\n"서버가 멈추면 제 심장도 멈춥니다. 맡은 기능에 대해 무한 책임을 지는 개발자입니다."\n\n저에게 책임감이란 단순히 주어진 일을 하는 것을 넘어, 그 결과물의 퀄리티와 사후 관리까지 보증하는 것입니다. '내가 짠 코드는 내가 책임진다'는 프로 의식이야말로, 안정적인 서비스를 지탱하는 가장 기초적이면서도 중요한 덕목이라고 생각합니다.\n\n대학교 4학년, 산학 협력 프로젝트의 팀장을 맡았을 때의 일입니다. 마감 1주일을 앞두고 핵심 백엔드 개발자가 개인 사정으로 이탈하는 위기 상황이 발생했습니다. 팀원들이 포기를 고민할 때, 저는 "내가 밤을 새워서라도 빈자리를 채우겠다"고 팀원들을 다독였습니다. 낮에는 프론트엔드 작업을 조율하고, 밤에는 익숙하지 않던 백엔드 로직을 분석하며 코드를 작성했습니다. 3일간 하루 2시간씩 쪽잠을 자며 강행군을 펼친 끝에, 기한 내에 모든 기능을 100% 구현하여 성공적으로 시연을 마칠 수 있었습니다. 클라이언트로부터 "가장 완성도 높은 팀"이라는 찬사를 들었을 때의 짜릿함은 아직도 잊을 수가 없습니다.\n\n이 경험을 통해 책임감은 곧 실력이라는 것을 깨달았습니다. 귀사에서도 저에게 맡겨진 태스크는 어떤 난관이 있어도 반드시 해결해내는 든든한 '해결사'가 되겠습니다. 서비스 장애 발생 시 가장 먼저 달려와 문제를 해결하고, 동료들이 믿고 등을 맡길 수 있는 신뢰의 아이콘이 되겠습니다. 저의 우직한 책임감이 귀사의 서비스 안정성에 기여할 것을 약속드립니다.`
+                },
+                pros_cons: {
+                    careful: `[성격의 장단점: 신중함과 실행력 사이]\n\n"저의 장점은 '돌다리도 두드려 보고 건너는' 치밀한 신중함입니다."\n\n평소 물건을 하나 살 때도 스펙을 비교 분석하고 리뷰를 10페이지 넘게 읽어보는 꼼꼼한 성격입니다. 이러한 성격은 개발 업무에서 큰 장점이 됩니다. 코드 한 줄을 작성할 때도 이 코드가 미칠 사이드 이펙트를 고려하고, 예외 처리를 꼼꼼하게 하여 버그 없는 코드를 작성하려고 노력합니다. 팀 내 코드 리뷰 시간에도 동료들이 놓친 사소한 오타나 로직 오류를 가장 많이 잡아내는 '인간 컴파일러'로 통하기도 합니다.\n\n하지만 이러한 신중함이 때로는 '속도'를 늦추는 단점이 되기도 합니다. 완벽한 아키텍처를 고민하느라 초기 개발 착수가 늦어지거나, 너무 많은 엣지 케이스를 고려하느라 일정에 쫓길 때가 있었습니다. 이를 인지한 후로는 '애자일(Agile)'한 마인드셋을 갖추려 노력하고 있습니다.\n\n우선 핵심 기능 위주로 빠르게 프로토타입을 개발하고, 이후 반복적인 리팩토링을 통해 완성도를 높이는 방식으로 작업 스타일을 개선했습니다. 또한, 업무 시작 전 '체크리스트'를 만들어 필수적인 검토 사항과 선택적인 검토 사항을 구분하여 시간 배분을 효율적으로 하고 있습니다.\n\n이제는 신중함이라는 장점은 살리되, 속도라는 날개까지 달았습니다. 귀사에서도 꼼꼼한 코드 품질 관리와 빠른 기능 구현 사이의 균형을 맞추어, 안정적이면서도 속도감 있는 개발을 주도하는 개발자가 되겠습니다.`,
+                    communication: `[성격의 장단점: 경청과 거절의 미학]\n\n"저의 장점은 타인의 의견을 편견 없이 받아들이는 '스펀지 같은 수용력'입니다."\n\n대화할 때 제 의견을 주장하기보다 상대방의 말을 끝까지 듣고 이해하려는 습관이 있습니다. 이는 협업이 잦은 개발 직군에서 큰 강점입니다. 기획자의 의도, 디자이너의 고충, 다른 개발자의 기술적 견해를 모두 경청한 뒤 최적의 합의점을 도출해내는 능력이 탁월합니다. 덕분에 어느 팀에 가더라도 금방 융화되고, '대화가 잘 통하는 동료'라는 평가를 받곤 합니다.\n\n반면, 남의 부탁을 잘 거절하지 못하는 성격이 단점이 되기도 했습니다. 동료들의 코드 수정 요청이나 잡무를 도와주다가 정작 제 본연의 업무 시간이 부족해져 야근을 하는 경우가 종종 있었습니다. 좋은 게 좋은 것이라 생각했지만, 결과적으로는 전체 일정에 차질을 줄 수 있음을 깨달았습니다.\n\n이를 극복하기 위해 '업무의 우선순위화'와 '정중한 거절'을 연습했습니다. 부탁을 받으면 현재 제 업무 리스트와 마감 기한을 투명하게 공유하고, "지금은 A 업무가 급해서 3시 이후에 도와드려도 될까요?"와 같이 구체적인 대안을 제시하는 방식으로 소통하고 있습니다. 이렇게 하니 오히려 서로의 업무 현황을 파악하게 되어 팀워크가 더 단단해졌습니다.`,
+                    passion: `[성격의 장단점: 몰입과 여유]\n\n"저의 장점은 한 번 꽂히면 끝을 보는 '강력한 몰입력'입니다."\n\n해결되지 않는 버그가 있거나 새로운 기술을 배울 때, 시간 가는 줄 모르고 파고드는 성격입니다. 밥 먹는 것도 잊을 정도로 집중하여 반드시 문제를 해결해내고 맙니다. 이러한 특성은 난이도 높은 개발 과제를 수행할 때 큰 동력이 됩니다.\n\n하지만 지나친 몰입이 때로는 번아웃으로 이어지거나, 주변을 챙기지 못하는 단점이 되기도 했습니다. 이를 개선하기 위해 최근에는 '뽀모도로 기법'을 도입하여 50분 집중 후 10분 휴식하는 루틴을 실천하고 있습니다. 의식적으로 휴식 시간을 가짐으로써 뇌를 환기시키고, 장기적으로 더 높은 생산성을 유지하려 노력하고 있습니다. 또한 점심시간에는 동료들과 산책을 하며 일 이야기를 잠시 내려놓는 여유도 찾고 있습니다.`,
+                    responsible: `[성격의 장단점: 책임감과 위임]\n\n"저의 장점은 '맡은 일은 무덤까지 가져가는' 강한 책임감입니다."\n\n어떤 일이든 제가 맡은 이상 대충 하는 법이 없습니다. 99%의 완성도는 실패라고 생각하며, 100%가 될 때까지 검토하고 또 검토합니다. 이러한 성격 덕분에 "OO 님에게 일을 맡기면 안심이 된다"는 동료들의 신뢰를 얻을 수 있었습니다.\n\n하지만 완벽주의 성향 때문에 때로는 스스로를 너무 다그치거나, 다른 사람에게 일을 맡기지 못해 혼자 짊어지는 경향이 있습니다. 특히 팀장 역할을 맡았을 때 모든 코드를 직접 리뷰하려다 병목 현상을 초래한 적이 있습니다.\n\n이를 극복하기 위해 '신뢰와 위임'을 배우고 있습니다. 동료들의 역량을 믿고 적절히 업무를 배분하며, 결과물에 대한 피드백을 통해 함께 성장하는 방향으로 나아가고 있습니다. 혼자 잘하는 개발자가 아닌, 팀을 잘하게 만드는 개발자로 거듭나고 있습니다.`
+                },
+                motivation: {
+                    careful: `[지원 동기] 품질의 가치를 아는 기업\n\n귀사의 서비스가 가진 '무결성'과 '안정성'에 매료되어 지원했습니다. 사용자의 신뢰를 최우선으로 하는 귀사의 철학은, 꼼꼼한 코드 작성을 원칙으로 하는 저의 가치관과 일치합니다. 저의 분석적인 역량으로 귀사 서비스의 품질을 한 단계 더 높이고 싶습니다.`,
+                    communication: `[지원 동기] 함께 성장하는 문화\n\n귀사의 수평적인 개발 문화에 끌려 지원했습니다. 코드 리뷰가 활발하고 기술 공유 세미나가 열리는 것을 보며, 이곳이라면 최고의 동료들과 시너지를 낼 수 있겠다고 확신했습니다.`,
+                    passion: `[지원 동기] 혁신의 최전선에서\n\n귀사가 보여준 끊임없는 기술적 도전에 가슴이 뛰었습니다. 레거시에 안주하지 않고 MSA 전환 등 새로운 시도를 하는 모습에 깊은 감명을 받았습니다. 저의 기술적 열정을 더해 혁신에 기여하고 싶습니다.`,
+                    responsible: `[지원 동기] 사용자를 위한 진심\n\n고객의 피드백을 즉각 반영하여 서비스를 개선하는 귀사의 운영 철학을 존경합니다. 저 또한 사용자에게 가치 있는 서비스를 제공하는 것에 가장 큰 보람을 느낍니다. 끝까지 책임지는 자세로 임하겠습니다.`
+                },
+                aspiration: {
+                    careful: `[입사 후 포부] 버그 제로, 신뢰 100%\n\n입사 후 1년 내에 서비스의 코드를 완벽히 숙지하여, 버그 발생률 0%에 도전하겠습니다. 꼼꼼한 코드 리뷰와 테스트 자동화 구축에 기여하여, 동료들이 믿고 맡길 수 있는 '수문장' 개발자로 성장하겠습니다.`,
+                    communication: `[입사 후 포부] 테크 리드를 향하여\n\n팀 내 흐름을 읽고 병목을 해결하는 커뮤니케이터가 되겠습니다. 장기적으로는 기술적 의사결정을 주도하고 팀 문화를 이끄는 테크 리드가 되어 귀사의 성장에 기여하고 싶습니다.`,
+                    passion: `[입사 후 포부] 에반젤리스트\n\n꾸준한 학습으로 사내 기술 세미나를 주최하고, 귀사의 기술력을 대외적으로 알리는 에반젤리스트가 되겠습니다. 늘 새로운 기술을 탐구하여 서비스 경쟁력을 높이겠습니다.`,
+                    responsible: `[입사 후 포부] 든든한 허리\n\n맡은 프로젝트는 끝까지 완수하여 성과를 내겠습니다. 향후에는 신입 사원들의 멘토가 되어 귀사의 든든한 허리 역할을 수행하며 조직의 안정성을 더하겠습니다.`
+                }
+            },
+            marketing: {
+                strength: {
+                    careful: `[직무 강점: 데이터 읽는 마케터]
+
+"직관은 가설일 뿐, 확신은 데이터에서 나온다고 믿는 '데이터 리터러시'형 마케터입니다."
+
+많은 마케터들이 '감'에 의존할 때, 저는 엑셀을 켜고 숫자를 봅니다. 고객의 이탈률, 전환율, 체류 시간 등 파편화된 데이터 조각들을 모아 하나의 이야기로 재구성하는 것이 저의 가장 큰 무기입니다. 이러한 분석적 사고는 한정된 예산으로 최대의 효율을 내야 하는 퍼포먼스 마케팅이나, CRM 마케팅에서 빛을 발합니다.
+
+인턴 시절, 뉴스레터 오픈율이 10%대에 머무는 문제를 해결하라는 미션을 받았습니다. 저는 지난 1년 치 발송 데이터를 요일별, 시간대별, 제목 키워드별로 전수 분석했습니다. 그 결과, '정보성' 제목보다 '궁금증 유발형' 제목이, 그리고 '월요일 오전'보다 '목요일 점심' 시간대의 클릭률이 3배 높다는 패턴을 발견했습니다. 이를 바탕으로 발송 전략을 전면 수정한 결과, 오픈율을 35%까지 끌어올리는 쾌거를 이루었습니다.
+
+데이터는 거짓말을 하지 않습니다. 귀사에서도 막연한 추측이 아닌, 명확한 근거(Data)를 바탕으로 의사결정하는 마케터가 되겠습니다. 숫자의 이면에 숨겨진 고객의 진짜 니즈를 찾아내어, 귀사의 마케팅 효율(ROAS)을 극대화하는 데 기여하겠습니다.`,
+                    communication: `[직무 강점: 마음을 움직이는 공감 능력]
+
+"고객의 페르소나에 빙의하는 '공감 스토리텔러'입니다."
+
+마케팅은 결국 사람의 마음을 얻는 일이라고 생각합니다. 저는 타겟 고객이 어떤 고민을 하고 있는지, 어떤 언어를 사용하는지 깊이 있게 탐구하고 그들의 입장에서 메시지를 던지는 능력이 탁월합니다. 단순히 제품의 기능을 나열하는 것이 아니라, 이 제품이 고객의 삶을 어떻게 변화시킬 수 있는지 '가치'를 파는 마케팅을 지향합니다.
+
+대학 축제 기획단 홍보 팀장 당시, 티켓 판매가 저조하여 비상이 걸렸습니다. 저는 고민 끝에 "대학생들이 지금 가장 듣고 싶어 하는 말이 뭘까?"를 생각했습니다. '위로'와 '일탈'이라는 키워드를 도출했고, 단순히 "가수 라인업 대박"이라고 홍보하는 대신, 시험 기간에 지친 학우들을 위로하는 감성적인 카드뉴스와 숏폼 영상을 제작했습니다. "오늘 하루는 펜 놓고 소리 질러!"라는 카피는 학우들의 폭발적인 공감을 얻었고, 역대 최단 시간 티퀘 전석 매진이라는 기록을 세웠습니다.
+
+귀사의 브랜드가 고객에게 '물건 파는 곳'이 아닌 '나를 이해해 주는 친구'로 다가갈 수 있도록 하겠습니다. 고객의 마음을 읽고 움직이는 감성 마케팅으로 귀사의 찐팬(Fan)을 만들어내겠습니다.`,
+                    passion: `[직무 강점: 트렌드 캐쳐]
+
+"자고 일어나면 바뀌는 트렌드, 누구보다 먼저 낚아채는 '트렌드 사냥꾼'입니다."
+
+새로운 밈이 나오면 써먹어봐야 직성이 풀리고, 핫플레이스는 직접 가봐야 하는 호기심 대장입니다. 마케터에게 트렌드는 흘러가는 바람이 아니라, 브랜드를 띄울 수 있는 강력한 파도라고 생각합니다. 저는 이 파도를 가장 먼저 읽고 올라타는 민첩함을 가졌습니다.
+
+개인 SNS 채널을 운영하며 숏폼 콘텐츠 실험을 지속해왔습니다. 최근 유행하는 챌린지의 음원과 필터를 발 빠르게 분석하여 저만의 색깔로 패러디했고, 알고리즘의 선택을 받아 조회수 100만 회를 달성한 경험이 있습니다. 이 과정에서 단순히 유행을 따라 하는 것을 넘어, 플랫폼별 콘텐츠 문법과 유저들의 반응 포인트를 체득했습니다.
+
+귀사의 마케팅에 'Young'한 에너지를 불어넣겠습니다. 변화를 두려워하지 않는 실험 정신으로, 업계에서 가장 힙하고 세련된 브랜드 이미지를 구축하는 데 앞장서겠습니다.`,
+                    responsible: `[직무 강점: 목표 달성의 집요함]
+
+"KPI 달성 그래프가 우상향할 때 가장 큰 희열을 느끼는 성취 지향형 마케터입니다."
+
+과정도 중요하지만 마케팅은 결국 '숫자'로 증명해야 한다고 믿습니다. 저는 목표가 주어지면 달성 가능한 시나리오 A, B, C를 수립하고, 매일매일 지표를 모니터링하며 집요하게 매달립니다. 안 되면 될 때까지 방법을 찾아내는 끈기가 저의 강점입니다.
+
+대학 시절 광고 공모전에 참가하여, 팀원들이 아이디어 고갈로 지쳐갈 때 끝까지 포기하지 않았습니다. 기존 수상작 500편을 분석하여 '심사위원들이 선호하는 구조'를 역설계했고, 이를 바탕으로 밤을 새워 기획안을 수정했습니다. 설문조사 표본이 부족할 때는 길거리로 나가 직접 스티커 설문을 받는 열정을 보였습니다. 그 결과 100:1의 경쟁률을 뚫고 대상을 수상할 수 있었습니다.
+
+귀사의 매출 목표, 제가 짊어지겠습니다. 예산이 부족하면 아이디어로 채우고, 시간이 부족하면 발로 뛰겠습니다. 반드시 목표를 달성해내는 든든한 '매출 사냥꾼'이 되겠습니다.`
+                },
+                pros_cons: {
+                    careful: `[성격의 장단점: 꼼꼼함과 속도의 균형]
+
+"오타 하나도 용납하지 않는 '매의 눈', 하지만 큰 그림도 놓치지 않습니다."
+
+브랜드의 공식 채널에 올라가는 콘텐츠는 회사의 얼굴이라고 생각합니다. 띄어쓰기 하나, 이미지 픽셀 하나까지 꼼꼼하게 검수하는 습관 덕분에 '신뢰할 수 있는 마케터'라는 평을 듣습니다.
+
+지나치게 확인하느라 작업 속도가 늦어지는 것이 단점이나, 이를 보완하기 위해 '나만의 검수 가이드라인'을 만들어 체크 시간을 단축하고 있습니다.`,
+                    communication: `[성격의 장단점: 공감과 설득]
+
+"누구와도 금방 친구가 되는 '핵인싸' 친화력."
+
+사람 만나는 것을 좋아하고 대화를 즐깁니다. 이는 협업이 많은 마케팅 직무에서 유관 부서의 협조를 이끌어내는 데 큰 힘이 됩니다. 
+
+거절을 잘 못해 일이 몰리는 경향이 있지만, 업무 우선순위를 명확히 하여 핵심 업무에 집중하는 법을 익히고 있습니다.`,
+                    passion: `[성격의 장단점: 에너자이저]
+
+"지치지 않는 열정, 하지만 번아웃은 경계합니다."
+
+새로운 프로젝트를 시작하면 아드레날린이 솟구칩니다. 아이디어가 떠오르면 바로 실행해야 직성이 풀립니다.
+
+가끔 앞만 보고 달리다 디테일을 놓칠 때가 있어, 팀원들의 피드백을 적극 수용하며 완성도를 높이고 있습니다.`,
+                    responsible: `[성격의 장단점: 책임감]
+
+"맡은 일은 끝까지 해내는 뚝심."
+
+한 번 시작한 일은 결과가 나올 때까지 놓지 않습니다. 이러한 끈기가 어려운 프로젝트를 성공으로 이끄는 원동력입니다.
+
+과도한 책임감으로 스트레스를 받을 때도 있지만, 운동과 취미 생활로 멘탈을 관리하며 롱런하는 법을 배우고 있습니다.`
+                },
+                motivation: {
+                    careful: `[지원 동기] 데이터 경영에 대한 확신\n\n숫자로 증명하는 귀사의 퍼포먼스 마케팅 철학에 공감했습니다. 감이 아닌 데이터로 승부하는 저의 강점을 가장 잘 발휘할 수 있는 곳이라 생각합니다.`,
+                    communication: `[지원 동기] 브랜드가 전하는 진심\n\n단순 판매가 아닌 고객의 삶을 바꾼다는 귀사의 브랜드 미션에 깊이 감동했습니다. 고객과 진정으로 소통하는 마케팅을 하고 싶어 지원했습니다.`,
+                    passion: `[지원 동기] 트렌드 리더\n\n항상 업계의 판을 흔드는 귀사의 마케팅 행보를 동경해왔습니다. 정해진 틀을 깨는 크리에이티브한 시도를 마음껏 펼칠 수 있는 곳이라 확신합니다.`,
+                    responsible: `[지원 동기] 고객과의 약속\n\n한 번의 구매가 아닌 평생의 관계를 지향하는 귀사의 CRM 전략이 인상 깊었습니다. 고객 신뢰를 최우선 가치로 여기는 저의 신념과 일치합니다.`
+                },
+                aspiration: {
+                    careful: `[입사 후 포부] 그로스 해커로의 성장\n\n입사 후 자사 데이터를 분석하여 효율 높은 채널을 발굴하겠습니다. 끊임없는 A/B 테스트를 통해 ROAS를 매년 20%씩 개선하는 그로스 해커가 되겠습니다.`,
+                    communication: `[입사 후 포부] 브랜드 팬덤 구축\n\n고객의 목소리를 콘텐츠에 담아 강력한 팬덤을 구축하겠습니다. "이 브랜드 참 일 잘한다"는 소리를 듣게 만드는 소통왕 마케터가 되겠습니다.`,
+                    passion: `[입사 후 포부] 킬러 콘텐츠 제작\n\n업계를 뒤흔들 킬러 콘텐츠를 기획하여 브랜드 인지도를 압도적으로 높이겠습니다. 트렌드를 선도하는 마케팅 장인으로 성장하겠습니다.`,
+                    responsible: `[입사 후 포부] 브랜드 지킴이\n\n작은 프로모션 하나도 브랜드 톤앤매너를 지키며 꼼꼼히 수행하겠습니다. 귀사의 브랜드 자산을 소중히 지키고 키워나가는 든든한 마케터가 되겠습니다.`
+                }
+            },
+            sales: {
+                strength: {
+                    careful: `[직무 강점: 철저한 사전 분석]
+
+"지피지기면 백전백승, 고객을 완벽히 분석하고 들어가는 '준비된 영업맨'입니다."
+
+성공적인 영업은 미팅 테이블에 앉기 전에 이미 80%가 결정된다고 믿습니다. 저는 고객사를 방문하기 전, 그 회사의 최근 3년 치 재무제표, 경쟁사 현황, 담당자의 성향, 최근 뉴스 기사까지 샅샅이 분석하여 맞춤형 제안서를 준비합니다.
+
+과거 인턴 활동 중, 난공불락이라 불리던 기업의 담당자를 설득해야 했습니다. 저는 해당 기업이 최근 '친환경 경영'을 선포했다는 점을 파악하고, 저희 제품의 '비용 절감' 효과 대신 '탄소 배출 저감' 효과를 강조한 제안서를 새로 작성했습니다. 담당자는 "우리 회사의 고민을 정확히 꿰뚫어 보았다"며 감탄했고, 첫 미팅에서 긍정적인 답변을 얻어낼 수 있었습니다.
+
+맨땅에 헤딩하는 열정도 중요하지만, 귀사의 영업에는 '전략'이 필요합니다. 저의 치밀한 분석력을 바탕으로 고객의 가려운 곳을 정확히 긁어주는 컨설턴트형 영업 인재가 되겠습니다.`,
+                    communication: `[직무 강점: 라포 형성의 달인]
+
+"처음 본 사람과도 10년 지기처럼, 심리 장벽을 허무는 '만렙 친화력'을 가졌습니다."
+
+영업은 물건을 파는 것이 아니라 '나'라는 사람의 신뢰를 파는 것이라 생각합니다. 저는 상대방의 말투, 표정, 관심사를 빠르게 캐치하여 대화의 눈높이를 맞추는 미러링(Mirroring) 화법에 능합니다. 닫혀있던 고객의 마음을 열고, 비즈니스 관계를 넘어 인간적인 유대감을 쌓는 것이 제 영업의 비결입니다.
+
+아르바이트 시절, 불만이 가득하여 환불을 요구하러 온 60대 고객님을 응대했습니다. 무조건 규정을 설명하기보다 먼저 어르신의 불편함에 진심으로 사과드리고, 건강 이야기로 자연스럽게 화제를 돌려 대화를 나눴습니다. 20분 뒤 그 고객님은 환불은커녕 "총각이 싹싹해서 좋다"며 오히려 다른 제품을 추가로 구매해 가셨습니다.
+
+귀사의 고객들에게 '가장 만나고 싶은 영업 사원'이 되겠습니다. 한 번 맺은 인연을 소중히 여겨, 단순 구매자를 충성 고객으로 전환시키는 관계의 마법을 보여드리겠습니다.`,
+                    passion: `[직무 강점: 거절을 두려워 않는 깡]
+
+"열 번 찍어 안 넘어가는 나무 없다? 저는 백 번이라도 찍을 준비가 된 '불도저'입니다."
+
+영업 현장에서 거절은 일상입니다. 하지만 저는 거절을 '실패'가 아닌 '설득의 시작'이라고 받아들입니다. 문전박대에도 굴하지 않고 다시 웃으며 문을 두드리는 회복탄력성, 그것이 목표를 달성해내는 제 원동력입니다.
+
+대학생 시절 동아리 후원금을 모으기 위해 학교 앞 상점 100곳을 돌았습니다. 90곳에서 잡상인 취급을 당했지만 포기하지 않았습니다. 거절당한 이유를 분석해 멘트를 수정하고, 사장님이 한가한 시간대를 공략해 재방문했습니다. 그 진심이 통해 결국 15곳에서 후원을 받아냈고, 역대 최대 후원금을 달성할 수 있었습니다.
+
+귀사의 영업 목표 달성을 위해 제 신발 밑창이 닳도록 뛰겠습니다. 어떤 난관에도 굴하지 않고 시장을 개척해나가는 야전 사령관이 되겠습니다.`,
+                    responsible: `[직무 강점: 신의를 지키는 영업]
+
+"고객과의 약속은 천재지변이 없는 한 지킵니다. 신뢰를 목숨처럼 여기는 영업가입니다."
+
+화려한 언변으로 한 번 팔 수는 있지만, 재구매를 만드는 것은 결국 '성실함'과 '약속 이행'입니다. 저는 고객의 문의에 10분 내로 응답하고, 약속 시간 10분 전에 도착하는 기본을 철저히 지킵니다. 이러한 사소한 디테일이 모여 신뢰라는 큰 자산을 만든다고 믿습니다.
+
+봉사 동아리 회장 임기 1년 동안, 매주 토요일 오전 9시 봉사 활동에 단 한 번도 지각하거나 빠진 적이 없습니다. 저의 솔선수범하는 모습에 부원들도 따랐고, 동아리는 최우수 봉사 단체 표창을 받았습니다.
+
+귀사에서도 'OO 씨가 담당이면 믿을 수 있지'라는 말을 듣겠습니다. 우직한 책임감으로 고객과 회사 사이의 든든한 다리가 되겠습니다.`
+                },
+                // Pros/Cons, Motivation, Aspiration can reuse Marketing/Dev patterns slightly varied or full new text.
+                // For completeness, I will put generic full blocks.
+                pros_cons: {
+                    careful: `[성격의 장단점] 메모광의 힘\n\n항상 수첩을 들고 다니며 고객의 사소한 말 한마디도 기록합니다. 꼼꼼한 고객 관리는 저의 자산입니다. 때로는 너무 신중하지만, 철저한 준비로 실수를 줄입니다.`,
+                    communication: `[성격의 장단점] 분위기 메이커\n\n어디서든 분위기를 주도하는 밝은 에너지가 장점입니다. 말이 많다는 평도 있지만, 경청의 중요성을 알고 조절하고 있습니다.`,
+                    passion: `[성격의 장단점] 칠전팔기\n\n실패해도 금방 툭 털고 일어나는 긍정적인 마인드가 장점입니다. 덤벙대지 않으려 차분함을 기르고 있습니다.`,
+                    responsible: `[성격의 장단점] 황소 같은 우직함\n\n요령 피우지 않고 정직하게 일합니다. 융통성 없다는 소리를 듣기도 하지만, 신뢰가 최우선이라 믿습니다.`
+                },
+                motivation: {
+                    careful: `[지원 동기] 제품의 우수성\n\n분석해보니 귀사의 제품 경쟁력이 업계 최고였습니다. 확신이 드는 제품을 팔고 싶어 지원했습니다.`,
+                    communication: `[지원 동기] 사람 중심 가치\n\n사람을 남기는 장사를 하겠다는 귀사의 영업 철학이 제 가치관과 맞았습니다.`,
+                    passion: `[지원 동기] 압도적 1등\n\n시장 점유율 1위를 향해 질주하는 귀사의 에너지에 합류하고 싶습니다.`,
+                    responsible: `[지원 동기] 고객과의 의리\n\n한 번 팔면 끝까지 책임지는 귀사의 AS 시스템을 보며, 영업사원으로서 자부심을 가질 수 있겠다 생각했습니다.`
+                },
+                aspiration: {
+                    careful: `[입사 후 포부] 컨설턴트형 영업\n\n데이터 기반의 제안 영업으로 고객의 사업 성공을 돕는 파트너가 되겠습니다.`,
+                    communication: `[입사 후 포부] 인맥 부자\n\n업계 최고의 인적 네트워크를 구축하여 귀사의 영업망을 확장하겠습니다.`,
+                    passion: `[입사 후 포부] 매출왕\n\n입사 3년 내 사내 판매왕에 도전하겠습니다. 숫자로 증명하겠습니다.`,
+                    responsible: `[입사 후 포부] 장기 고객 확보\n\n단골 고객 유치율 1위를 달성하여 안정적인 매출 기반을 만들겠습니다.`
+                }
+            },
+            design: {
+                strength: {
+                    careful: `[직무 강점: 1px의 차이를 만드는 디테일]
+
+"디자인의 완성도는 디테일에서 온다고 믿는 '프로 픽셀러'입니다."
+
+사용자는 0.1초 만에 디자인의 퀄리티를 판단합니다. 그 찰나의 순간에 신뢰를 주기 위해서는 폰트의 자간, 미묘한 그라데이션, 정렬의 오차 없는 완벽함이 필요합니다. 저는 남들이 지나치는 1px의 오차도 허용하지 않는 예리한 눈을 가졌습니다.
+
+공모전 준비 당시, 팀원들이 "이 정도면 됐다"고 할 때 저는 밤을 새워 전체 UI의 그리드 시스템을 재정비하고 아이콘의 라인 두께를 통일했습니다. 그 결과 심사위원장으로부터 "신입답지 않은 완성도와 정돈됨이 돋보인다"는 호평을 받으며 대상을 수상했습니다.
+
+귀사의 디자인 품격을 지키겠습니다. 장인이 한 땀 한 땀 옷을 짓듯, 화면 하나하나에 정성을 쏟아 사용자에게 최고의 시각적 경험을 선사하겠습니다.`,
+                    communication: `[직무 강점: 시각적 커뮤니케이션]
+
+"말보다 강한 이미지의 힘을 아는 '비주얼 통역사'입니다."
+
+기획자가 글로 쓴 기획안을, 개발자가 코드로 구현할 수 있는 화면으로 완벽하게 번역해내는 것이 디자이너의 역할입니다. 저는 기획 의도를 정확히 파악하여 시각화하고, 개발 가능성을 고려한 디자인을 제안하는 소통 능력이 뛰어납니다.
+
+프로젝트 진행 시, 항상 프로토타입 툴(Figma)을 활용하여 구체적인 인터랙션을 팀원들에게 공유합니다. "여기는 슝 하고 나와요" 같은 추상적인 말이 아닌, 실제 움직이는 화면을 보여주며 소통하니 오해가 줄고 작업 속도가 2배 빨라졌습니다.
+
+귀사의 아이디어를 가장 매력적인 현실로 만들어내겠습니다. 팀원들의 머릿속 생각을 눈앞에 펼쳐 보이는 마법사 같은 디자이너가 되겠습니다.`,
+                    passion: `[직무 강점: 트렌드 탐험]
+
+"세상의 모든 시각물에서 영감을 얻는 '디자인 덕후'입니다."
+
+디자이너에게 고여있는 것은 퇴보라고 생각합니다. 저는 주말마다 전시회를 가고, 핀터레스트를 밥 먹듯이 보며 시각적 라이브러리를 쌓습니다. 이러한 인풋(Input)이 있기에 언제나 신선한 아웃풋(Output)을 낼 수 있습니다.
+
+단순히 예쁜 그림을 그리는 것을 넘어, 최근 유행하는 UX 방법론이나 디자인 시스템 구축에도 관심이 많습니다. 새로운 툴을 배우는 것을 두려워하지 않고 실무에 바로 적용해보는 실행력을 가졌습니다.
+
+귀사의 디자인에 늘 새로운 숨결을 불어넣겠습니다. 트렌디하면서도 귀사만의 정체성을 잃지 않는 세련된 디자인을 선보이겠습니다.`,
+                    responsible: `[직무 강점: 마감 준수]
+
+"영감은 기다리는 것이 아니라 쥐어짜는 것이다. 마감을 생명처럼 여기는 디자이너입니다."
+
+예술가는 영감이 떠오를 때 작업하지만, 디자이너는 마감 시간에 맞춰 최선의 결과물을 내야 한다고 생각합니다. 저는 철저한 일정 관리로 어떤 상황에서도 약속된 퀄리티를 보장합니다.
+
+외주 작업을 진행하며 무리한 수정 요구와 촉박한 일정 속에서도, 밤을 새울지언정 펑크를 낸 적은 단 한 번도 없습니다. 이러한 성실함 덕분에 클라이언트들의 재의뢰율이 90%에 달했습니다.
+
+귀사의 프로젝트 일정에 제가 걸림돌이 되는 일은 없을 것입니다. 안정적으로 고퀄리티 디자인을 뽑아내는 '디자인 공장장'이 되겠습니다.`
+                },
+                pros_cons: {
+                    careful: `[성격의 장단점] 완벽주의\n\n완벽하지 않으면 보여주기 싫어하는 성격 탓에 작업 시간이 길어지기도 합니다. 타임 박싱(Time Boxing)을 통해 효율을 높이고 있습니다.`,
+                    communication: `[성격의 장단점] 열린 귀\n\n피드백을 두려워하지 않고 수정하는 유연함이 장점입니다. 자기 주관을 더 뚜렷이 하려고 노력 중입니다.`,
+                    passion: `[성격의 장단점] 호기심 천국\n\n하고 싶은 스타일이 너무 많아 선택 장애가 올 때가 있습니다. 기획 의도에 맞는 최적의 안을 고르는 훈련을 하고 있습니다.`,
+                    responsible: `[성격의 장단점] 끈기\n\n답이 나올 때까지 모니터 앞에서 떠나지 않습니다. 체력 관리를 위해 운동을 병행하고 있습니다.`
+                },
+                motivation: {
+                    careful: `[지원 동기] 사용자 경험 중심\n\nUI의 화려함보다 UX의 편리함을 추구하는 귀사의 디자인 철학이 존경스러워 지원했습니다.`,
+                    communication: `[지원 동기] 디자인의 가치\n\n디자인을 단순 포장이 아닌 비즈니스의 핵심으로 여기는 귀사에서 일하고 싶었습니다.`,
+                    passion: `[지원 동기] 도전적인 브랜딩\n\n매번 파격적인 비주얼로 업계를 놀라게 하는 귀사의 행보에 동참하고 싶습니다.`,
+                    responsible: `[지원 동기] 지속 가능한 디자인\n\n유행을 좇기보다 본질에 집중하는 귀사의 디자인 지속가능성에 공감했습니다.`
+                },
+                aspiration: {
+                    careful: `[입사 후 포부] 디자인 시스템 구축\n\n일관성 있는 디자인 시스템을 구축하여 작업 효율과 브랜드 통일성을 높이겠습니다.`,
+                    communication: `[입사 후 포부] 협업하고 싶은 디자이너\n\n개발자가 구현하기 편하고, 마케터가 홍보하기 좋은 디자인을 하겠습니다.`,
+                    passion: `[입사 후 포부] 크리에이티브 디렉터\n\n끊임없는 시각적 실험을 통해 귀사만의 독보적인 디자인 아이덴티티를 정립하겠습니다.`,
+                    responsible: `[입사 후 포부] 퀄리티의 기준\n\n"OOO이 디자인하면 다르다"는 말이 귀사의 품질 표준이 되도록 하겠습니다.`
+                }
+            }
+        };
+
+        // Fallback or generic filler logic removed as all main paths are filled. 
+        // Adding a safety check just in case.
+        function getAnswerText(job, question, keyword) {
+            try {
+                if (answers[job] && answers[job][question] && answers[job][question][keyword]) {
+                    return answers[job][question][keyword];
+                }
+                return "선택하신 조합에 대한 답변을 준비 중입니다.";
+            } catch (e) {
+                return "데이터 조회 오류";
+            }
+        }
+
+        // Logic
+        const inputs = document.querySelectorAll('input[type=radio]');
+        const resultBox = document.getElementById('result-box');
+
+        function updateResult() {
+            const job = document.querySelector('input[name="job"]:checked').value;
+            const question = document.querySelector('input[name="question"]:checked').value;
+            const keyword = document.querySelector('input[name="keyword"]:checked').value;
+
+            // Simple animation reset
+            resultBox.style.opacity = '0.5';
+
+            setTimeout(() => {
+                let text = getAnswerText(job, question, keyword);
+
+                // Safe formatting order:
+                // 1. Escape HTML (not needed since we define text in JS, but good practice if user input)
+                // 2. Replace Quotes first (be careful not to break HTML tags if added later)
+                // Actually, we insert spans with classes to avoid inline style quote hell.
+
+                // Replace double quotes with highlighting span
+                text = text.replace(/"(.*?)"/g, '<span class="highlight-quote">"$1"</span>');
+
+                // Replace square brackets with highlighting span
+                // Regex [^\]]* matches any char except closing bracket, works across lines if needed, 
+                // but usually titles are single line.
+                text = text.replace(/\[(.*?)\]/g, '<span class="highlight-bracket">$1</span>');
+
+                // Replace newlines with <br> for HTML rendering
+                text = text.replace(/\n/g, '<br>');
+
+                resultBox.innerHTML = text;
+                resultBox.style.opacity = '1';
+            }, 100);
+        }
+
+        // Add event listeners
+        inputs.forEach(input => {
+            input.addEventListener('change', updateResult);
+        });
+
+        // Initialize
+        updateResult();
+
+        // Copy Function
+        function copyToClipboard() {
+            const textToCopy = resultBox.innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btn = document.querySelector('.btn-primary');
+                const originalContent = btn.innerHTML;
+
+                btn.innerHTML = "<span>✅ 복사 완료!</span>";
+
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                }, 2000);
+            }).catch(err => {
+                alert('복사 실패');
+            });
+        }
+
+    </script>
+</body>
+
+</html>
