@@ -1,0 +1,44 @@
+# -----------------------
+# 1. 사이트 기본 정보 (수정 필수)
+# -----------------------
+title: "Yangbam's Lounge"      # 사이트 제목 (브라우저 탭에 표시됨)
+email: yangbam90@gmail.com   # 연락처 이메일 (선택 사항)
+description: >-                # 사이트 설명 (구글 검색 결과에 표시됨)
+  양밤의 개인 홈페이지입니다. 유용한 정보와 트렌드를 큐레이션합니다.
+  
+author:
+  name: "Yangbam"              # 운영자 닉네임
+  email: yangbam90@gmail.com
+
+# -----------------------
+# 2. URL 설정 (매우 중요)
+# -----------------------
+# 사용자 사이트(username.github.io)는 baseurl을 반드시 비워둬야 합니다.
+baseurl: "" 
+url: "https://yangbam.github.io" 
+
+# -----------------------
+# 3. 빌드 설정
+# -----------------------
+markdown: kramdown
+theme: minima                  # 기본 테마 (커스텀 CSS를 쓰려면 이 줄을 지우세요)
+
+# -----------------------
+# 4. 플러그인 (SEO 및 사이트맵 자동 생성)
+# -----------------------
+plugins:
+  - jekyll-seo-tag             # 검색 엔진 최적화 태그 자동 생성
+  - jekyll-sitemap             # sitemap.xml 자동 생성 (구글 검색 등록용)
+  - jekyll-feed                # RSS 피드 생성
+
+# -----------------------
+# 5. 제외할 파일 (빌드 속도 향상)
+# -----------------------
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - .sass-cache
+  - .jekyll-cache
